@@ -1,4 +1,5 @@
 import '../css/Main.css'
+import { NavLink } from 'react-router-dom'
 
 function Main() {
     return (
@@ -10,7 +11,9 @@ function Main() {
                 {/* 오버레이 콘텐츠 */}
                 <div className="main-content">
                     <h1>"일상에 자연스럽게 스며드는 향기, 당신의 순간을 향기로 완성하세요."</h1>
+                    <NavLink to="/chat">
                     <button className="main-start-button">START ▶</button>
+                    </NavLink>
                 </div>
             </div>
         </>
