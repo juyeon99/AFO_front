@@ -1,29 +1,44 @@
-import '../../css/Chat.css'
+import '../../css/Chat.css';
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink } from "react-router-dom"
+import { NavLink } from "react-router-dom";
 
 function Chat() {
 
-    // 메시지 상태 관리
     const [messages, setMessages] = useState([
         { sender: 'bot', text: '안녕하세요. 센티크입니다. 당신에게 어울리는 향을 찾아드리겠습니다.' }
     ]);
     const [input, setInput] = useState('');
     const [searchInput, setSearchInput] = useState('');
     const [color, setColor] = useState('#D9D9D9');
-    const [highlightedMessageIndex, setHighlightedMessageIndex] = useState(null);
+    const [highlightedMessageIndexes, setHighlightedMessageIndexes] = useState([]);
+    const [currentHighlightedIndex, setCurrentHighlightedIndex] = useState(null);
+    const [isSearchMode, setIsSearchMode] = useState(false);
     const messageEndRef = useRef(null);
 
-    const colors = ['#FF5757', '#FF7F43', '#FFBD43', '#FFE043', '#62D66A', '#98D1FF', '#56D2FF', '#FFD9A6', '#A1522C', '#86390F', '#C061FF', '#FF7FC1', '#F8E4FF', '#FFFFFF', '#000000'];
+    const colors = [
+        '#000000', '#56D2FF', '#62D66A', '#7ED3BB', '#86390F', 
+        '#98D1FF', '#A1522C', '#C061FF', '#F8E4FF', '#FF5757', 
+        '#FF7F43', '#FF7FC1', '#FFBD43', '#FFE043', '#FFE8D3', 
+        '#FFFFFF'
+    ];
+    
 
-    // 메시지 추가 함수
+
+    // Helper function to check if the color is dark
+    const isDarkColor = (color) => {
+        const hex = color.replace("#", "");
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness < 128;
+    };
+
     const handleSendMessage = () => {
         if (input.trim() === '') return;
 
-        // 새로운 사용자 메시지 추가
         setMessages([...messages, { sender: 'user', text: input }]);
 
-        // 봇의 응답 메시지 추가 (예시)
         setTimeout(() => {
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             setColor(randomColor);
@@ -33,22 +48,18 @@ function Chat() {
             ]);
         }, 1000);
 
-        // 입력 필드 초기화
         setInput('');
     };
 
-    // 입력 필드 변경 핸들러
     const handleInputChange = (e) => setInput(e.target.value);
 
-    // 엔터키로 메시지 전송 기능 추가
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
             handleSendMessage();
-            handleSearch()
+            handleSearch();
         }
     };
 
-    // 이미지 업로드 핸들러 함수 포함한 코드
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -57,46 +68,98 @@ function Chat() {
         }
     };
 
-    const handleSearchChange = (e) => setSearchInput(e.target.value);
+    const handleSearchChange = (e) => {
+        setSearchInput(e.target.value);
 
-    // 스크롤을 최신 메시지로 자동 이동
+        if (e.target.value === '') {
+            clearSearch();
+        }
+    };
+
     useEffect(() => {
         if (messageEndRef.current) {
             messageEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages]);
 
-    // 검색 기능: 단어 하이라이팅 및 이동
+    const highlightSearch = (text, query) => {
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    };
+
     const handleSearch = () => {
-        if (!searchInput.trim()) {
-            console.log("검색어가 비어있음");
-            return; // 검색어가 비어 있으면 중단
-        }
-    
-        const regex = new RegExp(searchInput, 'i'); // 대소문자 구분 없이 검색어 포함 확인
-        const index = messages.findIndex(msg => msg.text && regex.test(msg.text));
-    
-        console.log("검색어:", searchInput);
-        console.log("검색어와 매칭된 메시지 인덱스:", index);
-    
-        if (index !== -1) {
-            setHighlightedMessageIndex(index);
-    
-            // 상태가 업데이트된 후에 스크롤 이동을 실행하기 위해 setTimeout을 사용
-            setTimeout(() => {
-                const messageElement = document.getElementById(`message-${index}`);
-                if (messageElement) {
-                    console.log("스크롤 이동 실행");
-                    messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                    console.log("메시지 요소를 찾을 수 없음");
-                }
-            }, 100); // 메시지가 렌더링될 시간을 기다림
+        if (!searchInput.trim()) return;
+
+        const regex = new RegExp(searchInput, 'i');
+        const indexes = messages
+            .map((msg, idx) => (msg.text && regex.test(msg.text) ? idx : null))
+            .filter(idx => idx !== null);
+
+        if (indexes.length > 0) {
+            setHighlightedMessageIndexes(indexes);
+            const latestIndex = indexes.length - 1;
+            setCurrentHighlightedIndex(latestIndex);
+            scrollToMessage(indexes[latestIndex]);
         } else {
-            console.log("검색어와 일치하는 메시지를 찾지 못함");
+            setHighlightedMessageIndexes([]);
+            setCurrentHighlightedIndex(null);
         }
     };
-    
+
+    const clearSearch = () => {
+        setSearchInput('');
+        setHighlightedMessageIndexes([]);
+        setCurrentHighlightedIndex(null);
+        setIsSearchMode(false);
+        setTimeout(() => {
+            if (messageEndRef.current) {
+                messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+            }
+        }, 100);
+    };
+
+    const scrollToMessage = (index) => {
+        const messageElement = document.getElementById(`message-${index}`);
+        if (messageElement) {
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    const goToPreviousHighlight = () => {
+        if (highlightedMessageIndexes.length > 0 && currentHighlightedIndex > 0) {
+            const prevIndex = currentHighlightedIndex - 1;
+            setCurrentHighlightedIndex(prevIndex);
+            scrollToMessage(highlightedMessageIndexes[prevIndex]);
+        }
+    };
+
+    const goToNextHighlight = () => {
+        if (highlightedMessageIndexes.length > 0 && currentHighlightedIndex < highlightedMessageIndexes.length - 1) {
+            const nextIndex = currentHighlightedIndex + 1;
+            setCurrentHighlightedIndex(nextIndex);
+            scrollToMessage(highlightedMessageIndexes[nextIndex]);
+        }
+    };
+
+    useEffect(() => {
+        const handleArrowKeyPress = (e) => {
+            if (e.key === 'ArrowUp') {
+                goToPreviousHighlight();
+            } else if (e.key === 'ArrowDown') {
+                goToNextHighlight();
+            }
+        };
+
+        document.addEventListener('keydown', handleArrowKeyPress);
+        return () => {
+            document.removeEventListener('keydown', handleArrowKeyPress);
+        };
+    }, [currentHighlightedIndex, highlightedMessageIndexes]);
+
+    const toggleSearchMode = () => {
+        setIsSearchMode((prevMode) => !prevMode);
+    };
+
     return (
         <div className="chat-container-wrapper">
             <div className="chat-container">
@@ -117,44 +180,66 @@ function Chat() {
                         className="chat-search-input"
                         value={searchInput}
                         onChange={handleSearchChange}
-                        onKeyPress={handleKeyPress}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     />
                     <button className="chat-search-button" onClick={handleSearch}>
                         <img src="/images/search.png" alt="Search" />
                     </button>
+                    {searchInput && (
+                        <>
+                            <button className="chat-arrow-button" onClick={goToPreviousHighlight} disabled={currentHighlightedIndex === 0}>▲</button>
+                            <button className="chat-arrow-button" onClick={goToNextHighlight} disabled={currentHighlightedIndex === highlightedMessageIndexes.length - 1}>▼</button>
+                            <button className="chat-clear-search-button" onClick={clearSearch}>X</button>
+                            <button className="chat-open-search-mode" onClick={toggleSearchMode}>통합검색</button>
+                        </>
+                    )}
                 </div>
 
                 <div className="chat-message-box" style={{ '--scroll-color': color }}>
                     <div className="chat-messages-container">
-                        {messages.map((msg, index) => (
-                            <div
-                                key={index}
-                                id={`message-${index}`}
-                                className={`chat-message ${msg.sender === 'bot' ? 'bot-message' : 'user-message'} ${index === highlightedMessageIndex ? 'highlighted' : ''}`}
-                            >
-                                {msg.sender === 'bot' && (
-                                    <>
-                                        <img src="/images/logo-bot.png" alt="Bot Avatar" className="chat-avatar" />
-                                        <div>
-                                            <p className="chat-message-text">{msg.text}</p>
-                                            <div className="chat-color-bar" style={{ backgroundColor: color }}></div>
-                                        </div>
-                                    </>
-                                )}
-                                {msg.sender === 'user' && (
-                                    <>
-                                        <p className="chat-message-text">{msg.text}</p>
-                                        <div className="chat-color-circle" style={{ backgroundColor: color }}></div>
-                                    </>
-                                )}
-                                {msg.image && <img src={msg.image} alt="User Upload" className="chat-uploaded-image" />}
-                            </div>
-                        ))}
+                        {isSearchMode
+                            ? highlightedMessageIndexes.map((index) => (
+                                <div key={index} className="chat-search-result">
+                                    <p className="chat-search-result-text" dangerouslySetInnerHTML={{ __html: highlightSearch(messages[index].text, searchInput) }}></p>
+                                </div>
+                            ))
+                            : messages.map((msg, index) => (
+                                <div
+                                    key={index}
+                                    id={`message-${index}`}
+                                    className={`chat-message ${msg.sender === 'bot' ? 'chat-bot-message' : 'chat-user-message'} ${highlightedMessageIndexes.includes(index) && index === currentHighlightedIndex ? 'highlighted' : ''}`}
+                                >
+                                    {msg.sender === 'bot' && (
+                                        <>
+                                            <img src="/images/logo-bot.png" alt="Bot Avatar" className="chat-avatar" />
+                                            <div className="chat-message-text-wrapper">
+                                                <p
+                                                    className="chat-message-text"
+                                                    dangerouslySetInnerHTML={{ __html: highlightSearch(msg.text, searchInput) }}
+                                                ></p>
+                                                <div className={`chat-color-bar ${color === '#FFFFFF' ? 'highlighted-border' : ''}`} style={{ backgroundColor: color }}></div>
+                                            </div>
+                                        </>
+                                    )}
+                                    {msg.sender === 'user' && (
+                                        <>
+                                            <div className="chat-message-text-wrapper chat-user-message-wrapper">
+                                                <p
+                                                    className="chat-message-text"
+                                                    dangerouslySetInnerHTML={{ __html: highlightSearch(msg.text, searchInput) }}
+                                                ></p>
+                                                <div className={`chat-color-circle ${color === '#FFFFFF' ? 'highlighted-border' : ''}`} style={{ backgroundColor: color }}></div>
+                                            </div>
+                                        </>
+                                    )}
+                                    {msg.image && <img src={msg.image} alt="User Upload" className="chat-uploaded-image" />}
+                                </div>
+                            ))}
                         <div ref={messageEndRef}></div>
                     </div>
                 </div>
 
-                <div className="chat-input-area" style={{ backgroundColor: color }}>
+                <div className={`chat-input-area ${isDarkColor(color) ? 'chat-dark-theme' : 'chat-light-theme'} ${color === '#FFFFFF' ? 'highlighted-border' : ''}`} style={{ backgroundColor: color }}>
                     <label htmlFor="file-upload" className="chat-file-upload">
                         <img src="/images/image.png" alt="Upload" className="upload-icon" />
                         <input
@@ -169,7 +254,8 @@ function Chat() {
                         id='text'
                         type="text"
                         placeholder="메시지를 입력하세요"
-                        className="chat-input" style={{ backgroundColor: color }}
+                        className={`chat-input ${isDarkColor(color) ? 'chat-dark-theme' : 'chat-light-theme'}`}
+                        style={{ backgroundColor: color }}
                         value={input}
                         onChange={handleInputChange}
                         onKeyPress={handleKeyPress}
@@ -181,4 +267,4 @@ function Chat() {
     )
 }
 
-export default Chat
+export default Chat;
