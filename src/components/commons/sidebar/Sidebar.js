@@ -2,16 +2,28 @@ import React, { useState } from 'react';
 import '../../../css/components/Sidebar.css'
 import { Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import mainPropic from '../../../images/Main-Propic.png';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const location = useLocation(); // 현재 URL 경로
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
+    const [userNickname, setUserNickname] = useState('사용자'); // 사용자 닉네임
+    const location = useLocation();
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
 
-    // 현재 경로가 '/'일 경우 색을 반전
+    const handleLogin = () => {
+        // 로그인 처리 로직
+        setIsLoggedIn(true);
+    };
+
+    const handleLogout = () => {
+        // 로그아웃 처리 로직
+        setIsLoggedIn(false);
+    };
+
     const isActive = location.pathname === '/';
 
     return (
@@ -19,7 +31,7 @@ const Sidebar = () => {
             <div className="sidebar-container">
                 <button
                     onClick={toggleSidebar}
-                    className={`sidebar-menu-button ${isOpen ? 'open' : ''} ${isActive ? 'active' : ''}`} // 현재 페이지일 때 'active' 클래스 추가
+                    className={`sidebar-menu-button ${isOpen ? 'open' : ''} ${isActive ? 'active' : ''}`}
                 >
                     <Menu size={24} />
                 </button>
@@ -32,8 +44,56 @@ const Sidebar = () => {
                     <a href="/perfumewiki" className="sidebar-link">향수 알아가기</a>
                     <a href="/chat" className="sidebar-link">향수 추천</a>
                     <a href="/histories" className="sidebar-link">향기 히스토리</a>
+                    
                     <div className="sidebar-bottom-links">
-                        <a href="/users/signup" className="sidebar-link">• 회원가입</a>
+                        {!isLoggedIn ? (
+                            // 비로그인 상태
+                            <>
+                                <button 
+                                    className="sidebar-auth-button"
+                                    onClick={() => window.location.href='/users/signup'}
+                                >
+                                    • 회원가입
+                                </button>
+                                <div className="sidebar-profile-section">
+                                    <img 
+                                        src={mainPropic} 
+                                        alt="기본 프로필" 
+                                        className="sidebar-profile-img"
+                                    />
+                                    <button 
+                                        className="sidebar-auth-button login"
+                                        onClick={handleLogin}
+                                    >
+                                        로그인
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            // 로그인 상태
+                            <>
+                                <button 
+                                    className="sidebar-auth-button"
+                                    onClick={() => window.location.href='/users/withdrawal'}
+                                >
+                                    • 회원탈퇴
+                                </button>
+                                <button 
+                                    className="sidebar-auth-button"
+                                    onClick={handleLogout}
+                                >
+                                    • 로그아웃
+                                </button>
+                                <div className="sidebar-profile-section">
+                                    <img 
+                                        src={mainPropic} 
+                                        alt="프로필" 
+                                        className="sidebar-profile-img"
+                                    />
+                                    <span className="sidebar-username">{userNickname}님</span>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </nav>
             </div>
