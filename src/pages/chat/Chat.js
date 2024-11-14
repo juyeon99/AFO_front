@@ -13,18 +13,17 @@ function Chat() {
     const [highlightedMessageIndexes, setHighlightedMessageIndexes] = useState([]);
     const [currentHighlightedIndex, setCurrentHighlightedIndex] = useState(null);
     const [isSearchMode, setIsSearchMode] = useState(false);
+    const [selectedImages, setSelectedImages] = useState([]);
     const messageEndRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     const colors = [
-        '#000000', '#56D2FF', '#62D66A', '#7ED3BB', '#86390F', 
-        '#98D1FF', '#A1522C', '#C061FF', '#F8E4FF', '#FF5757', 
-        '#FF7F43', '#FF7FC1', '#FFBD43', '#FFE043', '#FFE8D3', 
+        '#000000', '#56D2FF', '#62D66A', '#7ED3BB', '#86390F',
+        '#98D1FF', '#A1522C', '#C061FF', '#F8E4FF', '#FF5757',
+        '#FF7F43', '#FF7FC1', '#FFBD43', '#FFE043', '#FFE8D3',
         '#FFFFFF'
     ];
-    
 
-
-    // Helper function to check if the color is dark
     const isDarkColor = (color) => {
         const hex = color.replace("#", "");
         const r = parseInt(hex.substring(0, 2), 16);
@@ -35,9 +34,18 @@ function Chat() {
     };
 
     const handleSendMessage = () => {
-        if (input.trim() === '') return;
+        if (!input.trim() && selectedImages.length === 0) return;
 
-        setMessages([...messages, { sender: 'user', text: input }]);
+        const newMessage = {
+            sender: 'user',
+            text: input.trim() || '',
+            images: selectedImages.map(img => img.url)
+        };
+
+        setMessages([...messages, newMessage]);
+
+        setInput('');
+        setSelectedImages([]);
 
         setTimeout(() => {
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
@@ -46,10 +54,32 @@ function Chat() {
                 ...prevMessages,
                 { sender: 'bot', text: '추천을 준비 중입니다...' }
             ]);
-        }, 1000);
-
-        setInput('');
+        }, 500);
     };
+
+    const handlePaste = (event) => {
+        const items = event.clipboardData.items;
+        const images = [];
+
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.startsWith("image")) {
+                const file = items[i].getAsFile();
+                const url = URL.createObjectURL(file);
+                images.push({ url, file });
+            }
+        }
+
+        if (images.length > 0) {
+            setSelectedImages(prevImages => [...prevImages, ...images]);
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener("paste", handlePaste);
+        return () => {
+            window.removeEventListener("paste", handlePaste);
+        };
+    }, []);
 
     const handleInputChange = (e) => setInput(e.target.value);
 
@@ -61,11 +91,18 @@ function Chat() {
     };
 
     const handleImageUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const imageUrl = URL.createObjectURL(file);
-            setMessages([...messages, { sender: 'user', image: imageUrl }]);
-        }
+        const files = Array.from(e.target.files);
+        const newImages = files.map(file => ({
+            url: URL.createObjectURL(file),
+            file: file
+        }));
+
+        setSelectedImages(prevImages => [...prevImages, ...newImages]);
+        e.target.value = '';
+    };
+
+    const handleRemoveImage = (index) => {
+        setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index));
     };
 
     const handleSearchChange = (e) => {
@@ -83,6 +120,8 @@ function Chat() {
     }, [messages]);
 
     const highlightSearch = (text, query) => {
+        if (!text) return '';
+
         const regex = new RegExp(`(${query})`, 'gi');
         return text.replace(regex, '<span class="highlight">$1</span>');
     };
@@ -173,7 +212,7 @@ function Chat() {
                     </p>
                 </div>
 
-                <div className="chat-search-bar">
+                <div className={`chat-search-bar ${searchInput ? 'search-active' : 'search-inactive'}`}>
                     <input
                         type="text"
                         placeholder="검색할 단어를 입력해주세요"
@@ -222,46 +261,66 @@ function Chat() {
                                         </>
                                     )}
                                     {msg.sender === 'user' && (
-                                        <>
-                                            <div className="chat-message-text-wrapper chat-user-message-wrapper">
+                                        <div className="chat-message-text-wrapper chat-user-message-wrapper">
+                                            {msg.text && (
                                                 <p
                                                     className="chat-message-text"
                                                     dangerouslySetInnerHTML={{ __html: highlightSearch(msg.text, searchInput) }}
                                                 ></p>
-                                                <div className={`chat-color-circle ${color === '#FFFFFF' ? 'highlighted-border' : ''}`} style={{ backgroundColor: color }}></div>
-                                            </div>
-                                        </>
+                                            )}
+                                            {msg.images && msg.images.map((image, idx) => (
+                                                <img key={idx} src={image} alt="Uploaded" className="chat-uploaded-image" />
+                                            ))}
+                                            <div className={`chat-color-circle ${color === '#FFFFFF' ? 'highlighted-border' : ''}`} style={{ backgroundColor: color }}></div>
+                                        </div>
                                     )}
-                                    {msg.image && <img src={msg.image} alt="User Upload" className="chat-uploaded-image" />}
                                 </div>
                             ))}
                         <div ref={messageEndRef}></div>
                     </div>
                 </div>
+                <div className="chat-input-area-wrapper">
+                    {/* 이미지 미리보기 카드 */}
+                    {selectedImages.length > 0 && (
+                        <div className="chat-image-preview-container">
+                            {selectedImages.map((image, index) => (
+                                <div key={index} className="chat-image-preview-card">
+                                    <img src={image.url} alt="Selected" className="chat-image-preview" />
+                                    <button className="chat-remove-image-button" onClick={() => handleRemoveImage(index)}>×</button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
-                <div className={`chat-input-area ${isDarkColor(color) ? 'chat-dark-theme' : 'chat-light-theme'} ${color === '#FFFFFF' ? 'highlighted-border' : ''}`} style={{ backgroundColor: color }}>
-                    <label htmlFor="file-upload" className="chat-file-upload">
-                        <img src="/images/image.png" alt="Upload" className="upload-icon" />
+                    {/* 채팅 입력창 */}
+                    <div className={`chat-input-area ${isDarkColor(color) ? 'chat-dark-theme' : 'chat-light-theme'} ${color === '#FFFFFF' ? 'highlighted-border' : ''}`} style={{ backgroundColor: color }}>
+                        <label htmlFor="file-upload" className="chat-file-upload">
+                            <img src="/images/image.png" alt="Upload" className="upload-icon" />
+                            <input
+                                id="file-upload"
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={handleImageUpload}
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                            />
+                        </label>
+
                         <input
-                            id="file-upload"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            style={{ display: 'none' }}
+                            id='text'
+                            type="text"
+                            placeholder="메시지를 입력하세요"
+                            className={`chat-input ${isDarkColor(color) ? 'chat-dark-theme' : 'chat-light-theme'}`}
+                            style={{ backgroundColor: color }}
+                            value={input}
+                            onChange={handleInputChange}
+                            onKeyPress={handleKeyPress}
                         />
-                    </label>
-                    <input
-                        id='text'
-                        type="text"
-                        placeholder="메시지를 입력하세요"
-                        className={`chat-input ${isDarkColor(color) ? 'chat-dark-theme' : 'chat-light-theme'}`}
-                        style={{ backgroundColor: color }}
-                        value={input}
-                        onChange={handleInputChange}
-                        onKeyPress={handleKeyPress}
-                    />
-                    <button className="chat-send-button" onClick={handleSendMessage}>➤</button>
+                        <button className="chat-send-button" onClick={handleSendMessage}>➤</button>
+                    </div>
                 </div>
+
             </div>
         </div>
     )
