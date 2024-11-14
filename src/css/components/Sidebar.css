@@ -91,7 +91,7 @@
     color: #333;
     text-align: left;
     padding: 0.5rem;
-    margin-left: 10px;
+    margin-left: 0px;
 }
 
 /* 수정된 프로필 섹션 스타일 */
@@ -117,7 +117,7 @@
 }
 
 .sidebar-bottom-links {
-    margin-top: 300px;
+    margin-top: 550px;
     padding-top: 1rem;
     display: flex;
     flex-direction: column;

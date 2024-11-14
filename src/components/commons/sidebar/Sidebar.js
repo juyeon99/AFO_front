@@ -48,27 +48,19 @@ const Sidebar = () => {
                     <div className="sidebar-bottom-links">
                         {!isLoggedIn ? (
                             // 비로그인 상태
-                            <>
+                            <div className="sidebar-profile-section">
+                                <img 
+                                    src={mainPropic} 
+                                    alt="기본 프로필" 
+                                    className="sidebar-profile-img"
+                                />
                                 <button 
-                                    className="sidebar-auth-button"
-                                    onClick={() => window.location.href='/users/signup'}
+                                    className="sidebar-auth-button login"
+                                    onClick={handleLogin}
                                 >
-                                    • 회원가입
+                                    로그인/회원가입
                                 </button>
-                                <div className="sidebar-profile-section">
-                                    <img 
-                                        src={mainPropic} 
-                                        alt="기본 프로필" 
-                                        className="sidebar-profile-img"
-                                    />
-                                    <button 
-                                        className="sidebar-auth-button login"
-                                        onClick={handleLogin}
-                                    >
-                                        로그인
-                                    </button>
-                                </div>
-                            </>
+                            </div>
                         ) : (
                             // 로그인 상태
                             <>
