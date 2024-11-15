@@ -1,13 +1,13 @@
 /* Main.css */
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
 
-
-html,
+/* 전체 배경 색상 설정 */
 body {
+    background-color: #EFEDED;
     margin: 0;
-    padding: 0;
-    overflow: hidden;
-    height: 100%;
+    overflow-x: hidden;
+    font-family: 'Nanum Myeongjo';
 }
 
 /* 비디오 배경 컨테이너 */
@@ -18,47 +18,208 @@ body {
     overflow: hidden;
 }
 
+.main-logo-image{
+    padding-top: 15px;
+    max-width: 150px;
+    max-height: 150px;
+    margin: 0 auto;
+    display: block;
+    translate: -10px -40px;
+}
+
 /* 화면을 가득 채우는 비디오 */
 .main-background-video {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
     z-index: -1;
+    transition: opacity 0.5s ease;
+}
+
+/* 스크롤에 따라 덮이는 색상 오버레이 */
+.main-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    transition: background-color 0.5s ease;
 }
 
 /* 오버레이 콘텐츠 */
 .main-content {
     position: absolute;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    left: 48%;
+    transform: translate(-60%, -50%);
     color: white;
     text-align: center;
-}
-
-.main-content h1 {
-    font-size: 24px;
-    margin-bottom: 20px;
+    z-index: 1;
+    margin: 50px;
+    transition: opacity 0.5s ease;
     font-family: 'Nanum Myeongjo';
 }
 
+/* 분리된 h1 콘텐츠 */
+.main-title {
+    position: absolute;
+    top: 40%; /* 원하는 위치에 맞게 조정 */
+    left: 40.3%;
+    transform: translate(-33%, -50%);
+    color: white;
+    text-align: center;
+    font-family: 'Nanum Myeongjo';
+    z-index: 1;
+}
+
+/* START 버튼 스타일 */
 .main-start-button {
     padding: 10px 20px;
-    font-size: 18px;
-    border: 2px solid white;
+    font-size: 25px;
+    border: 3px solid white;
     color: white;
     background: transparent;
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: background-color 0.3s;
     font-family: 'Nanum Myeongjo';
-    margin-top: 20px;
 }
 
 .main-start-button:hover {
     background: rgba(255, 255, 255, 0.2);
+}
+
+/* 소개 페이지 섹션 */
+.intro-section {
+    padding: 30px 20px;
+    text-align: center;
+    font-family: 'Nanum Myeongjo';
+    z-index: 2;
+    position: relative;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    margin-top: 20vh;
+}
+
+.intro-section h2 {
+    margin-top: -40px;
+    margin-bottom: 120px;
+}
+
+.intro-content-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 70px; /* 아이템 간의 간격 추가 */
+}
+
+.intro-item1, .intro-item3 {
+    margin-top: 60px;
+    width: 18%; /* 양쪽 아이템은 더 좁게 설정 */
+    height: 40%;
+    padding: 20px;
+    padding-bottom: 40px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.intro-item2 {
+    width: 25%;
+    padding: 20px;
+    padding-bottom: 80px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* 이미지 스타일 */
+.intro-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.intro-item h4, .intro-item2 h4 {
+    font-weight: bold;
+    font-family: 'Nanum Myeongjo';
+}
+
+.intro-item1 p, .intro-item2 p, .intro-item3 p {
+    margin-top: 10px;
+    font-family: 'Nanum Gothic';
+}
+
+/* 추가 소개 섹션 */
+.additional-section {
+    text-align: center;
+    font-family: 'Nanum Myeongjo';
+    margin-top: 100px;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.additional-section h3{
+    margin: 50px;
+}
+
+.additional-h2 {
+    margin-bottom: 100px; 
+}
+
+.additional-section h2 {
+    margin-top: 50px;
+    font-family: 'Nanum Myeongjo';
+}
+
+.additional-section p {
+    margin: 10px 0;
+    font-family: 'Nanum Myeongjo';
+}
+
+.additional-images {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    margin: 20px;
+}
+
+.additional-image {
+    width: 30%;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 80px;
+}
+
+.highlight {
+    position: relative;
+    background-color:rgb(255, 255, 143); /* 기본 형광펜 배경색 */
+    padding: 0 2px; /* 텍스트 주변 간격 */
+    line-height: 1.8; /* 원하는 값으로 행간 설정 */
+}
+
+.highlight::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-color: rgb(255, 255, 143);
+    z-index: -1;
+    transform: translateY(-50%);
+}
+
+.footer-image{
+    width: 45%; /* 너비를 45%로 설정 */
+    height: auto; /* 높이를 자동으로 조정하여 비율을 유지 */
+    border-radius: 8px;
 }
