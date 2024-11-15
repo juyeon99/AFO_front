@@ -172,8 +172,6 @@ function Main() {
                     <h2 className="additional-h2">오직 <span className="highlight">방향에서만 만날 수 있는 나만의 향기</span>, 지금 바로 찾아보세요.</h2>
                 </div>
                 <img src="/images/footer.png" alt="footer-image" className="footer-image" />
-                <a href="/login" style={{ cursor: 'pointer' }}>로그인</a>
-                <a href="/history" style={{ cursor: 'pointer' }}>히스토리</a>
             </div> 
         </>
     );

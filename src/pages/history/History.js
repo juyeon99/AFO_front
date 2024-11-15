@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../css/History.css';
 
 function History() {
@@ -124,9 +125,14 @@ function History() {
     // 점 개수 계산
     const dotCount = Math.ceil(cards.length / cardsPerPage);
 
+    const navigate = useNavigate();
+
     return (
         <div className="history-main-container">
-            <img src="/images/logo.png" alt="Logo" className="history-logo" />
+        <img src="/images/logo.png" alt="Logo" className="history-logo"
+        onClick={() => navigate('/')}
+        style={{ cursor: 'pointer' }}
+        />
             <div className="history-header">
                 {historyData.map((item, index) => (
                     <button
