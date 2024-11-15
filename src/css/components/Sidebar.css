@@ -35,7 +35,7 @@
     top: 0;
     left: 0;
     height: 100%;
-    width: 250px;
+    width: 260px;
     background-color: #EFEDED;
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
@@ -98,16 +98,20 @@
 .sidebar-profile-section {
     display: flex;
     align-items: center;
-    gap: 1rem;
     padding: 0.5rem 0;
-    margin-top: 0.5rem;
+    position: absolute; /* 절대 위치 */
+    bottom: 40px;
+    left: 80px; /* 수평 가운데 정렬 */
+    transform: translateX(-30%); /* 수평 가운데 정렬을 위한 이동 */
 }
 
+
 .sidebar-profile-img {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
+    padding-right: 10px;
 }
 
 .sidebar-username {
@@ -117,8 +121,7 @@
 }
 
 .sidebar-bottom-links {
-    margin-top: 400px;
-    padding-top: 1rem;
+    margin-top: 370px;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

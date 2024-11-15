@@ -1,8 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../css/pages/footer/FAQ.css';
 
 const FAQ = () => {
+    
+    const navigate = useNavigate();
+
     return (
+        <>
+            <img src="/images/logo.png" alt="1번 이미지" className="main-logo-image"
+            onClick={() => navigate('/')}
+            style={{ cursor: 'pointer' }}
+            />
         <div className="faq-container">
             <div className="faq-content">
                 <div className="faq-title">-자주 묻는 질문-</div>
@@ -56,6 +65,7 @@ const FAQ = () => {
                 <br/>
             </div>
         </div>
+        </>
     );
 };
 

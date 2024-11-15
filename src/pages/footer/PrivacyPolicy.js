@@ -1,8 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../css/pages/footer/PrivacyPolicy.css';
 
 const PrivacyPolicy = () => {
+    
+    const navigate = useNavigate();
+
     return (
+        <>
+            <img src="/images/logo.png" alt="1번 이미지" className="main-logo-image"
+            onClick={() => navigate('/')}
+            style={{ cursor: 'pointer' }}
+            />
         <div className="privacy-container">
             <div className="privacy-content">
                 <div className="privacy-title">-개인정보 처리방침-</div>
@@ -64,6 +73,7 @@ const PrivacyPolicy = () => {
                 <br/>
             </div>
         </div>
+        </>
     );
 };
 
