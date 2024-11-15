@@ -3,10 +3,11 @@ import Main from "./pages/Main";
 import React from 'react';
 import Layout from './layouts/Layout';
 import './App.css'
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import CookiePolicy from './pages/CookiePolicy';
-import TermsOfUse from './pages/TermsofUse';
-import FAQ from './pages/FAQ';
+import PrivacyPolicy from './pages/footer/PrivacyPolicy';
+import CookiePolicy from './pages/footer/CookiePolicy';
+import TermsOfUse from './pages/footer/TermsofUse';
+import FAQ from './pages/footer/FAQ';
+
 
 function App() {
   return (

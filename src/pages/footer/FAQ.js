@@ -1,5 +1,5 @@
 import React from 'react';
-import '../css/pages/FAQ.css';
+import '../../css/pages/footer/FAQ.css';
 
 const FAQ = () => {
     return (

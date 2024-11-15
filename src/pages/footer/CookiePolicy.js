@@ -1,5 +1,5 @@
 import React from 'react';
-import '../css/pages/CookiePolicy.css';
+import '../../css/pages/footer/CookiePolicy.css';
 
 const CookiePolicy = () => {
     return (
