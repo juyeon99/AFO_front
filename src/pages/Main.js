@@ -1,5 +1,6 @@
 import '../css/Main.css';
 import React, { useEffect, useState, useRef } from 'react';
+import Login from './Login'
 
 function Main() {
     const [scrollY, setScrollY] = useState(0);
