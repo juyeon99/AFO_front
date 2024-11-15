@@ -1,6 +1,7 @@
 import '../css/Main.css';
 import React, { useEffect, useState, useRef } from 'react';
 import Login from './Login'
+import { NavLink } from 'react-router-dom'
 
 function Main() {
     const [scrollY, setScrollY] = useState(0);
@@ -114,7 +115,9 @@ function Main() {
                 ></div>
                 <h1 className="main-title">"일상에 자연스럽게 스며드는 향기, 당신의 순간을 향기로 완성하세요."</h1>
                 <div className="main-content" style={{ opacity: videoOpacity }}>
-                    <button className="main-start-button">START ▶</button>
+                    <NavLink to="/chat">
+                        <button className="main-start-button">START ▶</button>
+                    </NavLink>
                 </div>
             </div>
 
@@ -165,14 +168,14 @@ function Main() {
                     <img src="/images/infoSub2.png" alt="추가 이미지 2" className="additional-image" />
                 </div>
                 <div className="fade-in-section" ref={fadeInSectionRef} style={fadeInSectionStyle}>
-                    <h2 className="additional-h2">당신이 입력한 이미지와 텍스트를 통해 <span className="highlight">맞춤 향을 추천</span>할 뿐만 아니라,<br/>
-                    <span className="highlight">향과 어울리는 색</span>을 통해 <span className="highlight">향을 시각적</span>으로 느끼는 감각적 경험을 선사합니다.</h2>
+                    <h2 className="additional-h2">당신이 입력한 이미지와 텍스트를 통해 <span className="highlight">맞춤 향을 추천</span>할 뿐만 아니라,<br />
+                        <span className="highlight">향과 어울리는 색</span>을 통해 <span className="highlight">향을 시각적</span>으로 느끼는 감각적 경험을 선사합니다.</h2>
                     <h1>•</h1>
                     <h1>•</h1>
                     <h2 className="additional-h2">오직 <span className="highlight">방향에서만 만날 수 있는 나만의 향기</span>, 지금 바로 찾아보세요.</h2>
                 </div>
                 <img src="/images/footer.png" alt="footer-image" className="footer-image" />
-            </div> 
+            </div>
         </>
     );
 }

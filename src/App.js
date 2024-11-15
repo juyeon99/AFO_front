@@ -11,7 +11,7 @@ import PrivacyPolicy from './pages/footer/PrivacyPolicy';
 import CookiePolicy from './pages/footer/CookiePolicy';
 import TermsOfUse from './pages/footer/TermsofUse';
 import FAQ from './pages/footer/FAQ';
-
+import Chat from "./pages/chat/Chat";
 
 function App() {
   return (
@@ -36,6 +36,10 @@ function App() {
           <Route path="/login" element={<Login/>}/>
           <Route path="/history" element={<History/>}/>
           <Route path="/login-info" element={<LoginInfo/>}/>
+          <Route path="/" element={<Main/>}/>
+          <Route index element={<Main/>}/>
+          <Route path="/chat" element={<Chat/>}/>
+
         </Routes>
       </BrowserRouter>
     </>
