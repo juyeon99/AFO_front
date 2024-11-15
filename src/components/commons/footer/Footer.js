@@ -27,19 +27,6 @@ const Footer = () => {
         { title: '[ 깃허브 ]', path: '#' }
     ];
 
-    // 법적 링크 데이터
-    const legalLinks = [
-        { title: '개인정보 처리방침', path: '/privacy' },
-        { title: '이용 약관', path: '/terms' },
-        { title: '쿠키 정책', path: '/cookies' }
-    ];
-
-    // 링크 클릭 핸들러
-    const handleLinkClick = (e, path) => {
-        e.preventDefault();
-        console.log(`Navigating to: ${path}`);
-    };
-
     return (
         <>
             {!isMainPage && (
@@ -51,7 +38,7 @@ const Footer = () => {
                     />
                 </div>
             )}
-            <footer className="footer">
+            <Footer className="footer">
                 <div className="footer-container">
                     <div className="footer-logo-section">
                         <img 
@@ -66,10 +53,7 @@ const Footer = () => {
                         <nav className="footer-nav">
                             {navLinks.map((link, index) => (
                                 <React.Fragment key={index}>
-                                    <a
-                                        href={link.path}
-                                        onClick={(e) => handleLinkClick(e, link.path)}
-                                    >
+                                    <a href={link.path}>
                                         {link.title}
                                     </a>
                                     {index < navLinks.length - 1 && <span className="separator">|</span>}
@@ -82,7 +66,6 @@ const Footer = () => {
                                 <a
                                     key={index}
                                     href={link.path}
-                                    onClick={(e) => handleLinkClick(e, link.path)}
                                 >
                                     {link.title}
                                 </a>
@@ -96,17 +79,17 @@ const Footer = () => {
 
                         <div className="footer-bottom-block">
                             <div className="footer-legal">
-                                {legalLinks.map((link, index) => (
-                                    <React.Fragment key={index}>
-                                        <a
-                                            href={link.path}
-                                            onClick={(e) => handleLinkClick(e, link.path)}
-                                        >
-                                            {link.title}
-                                        </a>
-                                        {index < legalLinks.length - 1 && <span className="separator">|</span>}
-                                    </React.Fragment>
-                                ))}
+                                <a href="/privacyPolicy" className="privacyPolicy">
+                                    <b>개인정보 처리방침</b>
+                                </a>
+                                <span className="separator">|</span>
+                                <a href="/termsOfUse" className="termsOfUse">
+                                    <b>이용약관</b>
+                                </a>
+                                <span className="separator">|</span>
+                                <a href="/cookies" className="cookiePolicy">
+                                    <b>쿠키 정책</b>
+                                </a>
                             </div>
 
                             <div className="footer-copyright">
@@ -115,7 +98,7 @@ const Footer = () => {
                         </div>
                     </div>
                 </div>
-            </footer>
+            </Footer>
         </>
     );
 };
