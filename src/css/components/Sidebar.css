@@ -1,0 +1,135 @@
+.sidebar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    position: absolute;
+    background-color: transparent;
+    z-index: 10;
+}
+
+.sidebar-menu-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    padding: 0.5rem;
+    margin-left: 10px;
+    z-index: 1001;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    transition: color 0.3s ease;
+}
+
+.sidebar-menu-button.active {
+    color: white;
+}
+
+.sidebar-menu-button.open {
+    transform: translateX(250px);
+}
+
+.sidebar-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 250px;
+    background-color: #EFEDED;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 999;
+}
+
+.sidebar-sidebar-open {
+    transform: translateX(0);
+}
+
+.sidebar-nav {
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    font-family: 'Nanum Myeongjo', serif;
+    text-align: center;
+    margin-top: 100px;
+}
+
+.sidebar-link {
+    color: #333;
+    text-decoration: none;
+    padding: 0.5rem;
+    transition: color 0.2s;
+}
+
+.sidebar-link:hover {
+    color: #000;
+}
+
+/* 수정된 인증 버튼 스타일 */
+.sidebar-auth-button {
+    background: none;
+    border: none;
+    color: #333;
+    padding: 0.5rem;
+    cursor: pointer;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 1rem;
+    transition: color 0.2s;
+    text-align: left;
+    width: 100%;
+    margin-left: 50px;
+}
+
+.sidebar-auth-button:hover {
+    color: #000;
+}
+
+.sidebar-auth-button.login {
+    background-color: transparent;
+    color: #333;
+    text-align: left;
+    padding: 0.5rem;
+    margin-left: 0px;
+}
+
+/* 수정된 프로필 섹션 스타일 */
+.sidebar-profile-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+}
+
+.sidebar-profile-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.sidebar-username {
+    color: #333;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.sidebar-bottom-links {
+    margin-top: 400px;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+}
