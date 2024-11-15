@@ -1,0 +1,118 @@
+.perfumedatabase-container {
+    padding: 100px;
+    background-color: #EFEDED;
+    position: relative;
+}
+
+.perfumedatabase-search {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    position: absolute;
+    right: 100px;
+    top: 100px;
+}
+
+.perfumedatabase-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    margin-top: 60px;
+}
+
+.perfumedatabase-filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background-color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.perfumedatabase-filter-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.perfumedatabase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    grid-template-columns: repeat(6, 1fr);
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+.perfumedatabase-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.perfumedatabase-card:hover {
+    transform: translateY(-5px);
+}
+
+.perfumedatabase-image {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.perfumedatabase-brand-en {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.perfumedatabase-brand-kr {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.perfumedatabase-divider {
+    width: 80%;
+    height: 1px;
+    background-color: #eee;
+    margin: 10px auto;
+}
+
+.perfumedatabase-product-name {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.perfumedatabase-concentration {
+    font-size: 12px;
+    color: #888;
+}
+
+.perfumedatabase-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.perfumedatabase-page-btn {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+}
+
+.perfumedatabase-page-btn.active {
+    background: #000;
+    color: white;
+}

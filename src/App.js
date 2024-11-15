@@ -7,6 +7,7 @@ import PrivacyPolicy from './pages/footer/PrivacyPolicy';
 import CookiePolicy from './pages/footer/CookiePolicy';
 import TermsOfUse from './pages/footer/TermsofUse';
 import FAQ from './pages/footer/FAQ';
+import PerfumeDatabase from './pages/perfumedatabase/PerfumeDatabase';
 
 
 function App() {
@@ -31,6 +32,10 @@ function App() {
         </Route>
         <Route path="/FAQ" element={<Layout />}>
           <Route index element={<FAQ/>} />
+          {/* 다른 페이지도 Layout 내에서 정의 */}
+        </Route>
+        <Route path="/PerfumeDatabase" element={<Layout />}>
+          <Route index element={<PerfumeDatabase/>} />
           {/* 다른 페이지도 Layout 내에서 정의 */}
         </Route>
       </Routes>
