@@ -8,16 +8,6 @@ const Footer = () => {
     const location = useLocation();
     const isMainPage = location.pathname === '/';
 
-    // 네비게이션 링크 데이터
-    const navLinks = [
-        { title: '소개', path: '/intro' },
-        { title: '향료 알아가기', path: '/fragrance' },
-        { title: '향수 알아가기', path: '/perfume' },
-        { title: '맞춤 향수 추천', path: '/recommend' },
-        { title: '향기 히스토리', path: '/history' },
-        { title: '자주 묻는 질문 (FAQ)', path: '/faq' }
-    ];
-
     // 소셜 미디어 링크 데이터
     const socialLinks = [
         { title: '[ 인스타그램 ]', path: '#' },
@@ -38,7 +28,7 @@ const Footer = () => {
                     />
                 </div>
             )}
-            <Footer className="footer">
+            <footer className="footer">
                 <div className="footer-container">
                     <div className="footer-logo-section">
                         <img 
@@ -50,23 +40,25 @@ const Footer = () => {
 
                     <div className="footer-textbox">
                         <div className="footer-slogan">당신만의 특별한 향기</div>
-                        <nav className="footer-nav">
-                            {navLinks.map((link, index) => (
-                                <React.Fragment key={index}>
-                                    <a href={link.path}>
-                                        {link.title}
-                                    </a>
-                                    {index < navLinks.length - 1 && <span className="separator">|</span>}
-                                </React.Fragment>
-                            ))}
+                        <nav className="footer-navlinks">
+                            <div className="footer-nav">
+                                <a href="/intro">소개</a>
+                                <span className="separator">|</span>
+                                <a href="/fragrance">향료 알아가기</a>
+                                <span className="separator">|</span>
+                                <a href="/perfume">향수 알아가기</a>
+                                <span className="separator">|</span>
+                                <a href="/recommend">맞춤 향수 추천</a>
+                                <span className="separator">|</span>
+                                <a href="/history">향기 히스토리</a>
+                                <span className="separator">|</span>
+                                <a href="/FAQ">자주 묻는 질문 (FAQ)</a>
+                            </div>
                         </nav>
 
                         <div className="footer-social">
                             {socialLinks.map((link, index) => (
-                                <a
-                                    key={index}
-                                    href={link.path}
-                                >
+                                <a key={index} href={link.path}>
                                     {link.title}
                                 </a>
                             ))}
@@ -79,15 +71,15 @@ const Footer = () => {
 
                         <div className="footer-bottom-block">
                             <div className="footer-legal">
-                                <a href="/privacyPolicy" className="privacyPolicy">
+                                <a href="/PrivacyPolicy" className="PrivacyPolicy">
                                     <b>개인정보 처리방침</b>
                                 </a>
                                 <span className="separator">|</span>
-                                <a href="/termsOfUse" className="termsOfUse">
+                                <a href="/TermsofUse" className="TermsofUse">
                                     <b>이용약관</b>
                                 </a>
                                 <span className="separator">|</span>
-                                <a href="/cookies" className="cookiePolicy">
+                                <a href="/CookiePolicy" className="CookiePolicy">
                                     <b>쿠키 정책</b>
                                 </a>
                             </div>
@@ -98,7 +90,7 @@ const Footer = () => {
                         </div>
                     </div>
                 </div>
-            </Footer>
+            </footer>
         </>
     );
 };
