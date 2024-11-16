@@ -1,5 +1,6 @@
 import '../../css/pages/perfumedatabase/PerfumeDatabase.css';
 import React, { useState } from 'react';
+import { Search } from 'lucide-react';
 
 const PerfumeDatabase = () => {
     // 임시 데이터
@@ -112,14 +113,20 @@ const PerfumeDatabase = () => {
 
     const [perfumes] = useState(tempPerfumes);
     const [currentPage, setCurrentPage] = useState(1);
-    const [filter, setFilter] = useState('all');
+    const [activeFilter, setActiveFilter] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
 
-    const itemsPerPage = 12; // 6x2 그리드
-    const filterTypes = ['Perfume', 'Eau de Parfum', 'Eau de Toilette', 'Eau de Cologne'];
+    const itemsPerPage = 12;
 
-    const handleFilterClick = (filterType) => {
-        setFilter(filterType);
+    const filterButtons = [
+        { id: 'EDP', label: 'Eau de Parfum' },
+        { id: 'EDT', label: 'Eau de Toilette' },
+        { id: 'EDC', label: 'Eau de Cologne' },
+        { id: 'PARFUM', label: 'Parfum' }
+    ];
+
+    const handleFilterClick = (filterId) => {
+        setActiveFilter(activeFilter === filterId ? '' : filterId);
         setCurrentPage(1);
     };
 
@@ -132,10 +139,12 @@ const PerfumeDatabase = () => {
         setCurrentPage(page);
     };
 
-    const filteredPerfumes = perfumes.filter(perfume => 
-        perfume.brandEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        perfume.brandKr.includes(searchTerm)
-    );
+    const filteredPerfumes = perfumes.filter(perfume => {
+        const matchesSearch = perfume.brandEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            perfume.brandKr.includes(searchTerm);
+        const matchesFilter = !activeFilter || perfume.name.includes(activeFilter);
+        return matchesSearch && matchesFilter;
+    });
 
     const renderPaginationButtons = () => {
         const totalPages = Math.ceil(filteredPerfumes.length / itemsPerPage);
@@ -170,22 +179,31 @@ const PerfumeDatabase = () => {
 
     return (
         <div className="perfumedatabase-container">
-            <input
-                type="text"
-                className="perfumedatabase-search"
-                placeholder="브랜드명"
-                value={searchTerm}
-                onChange={handleSearch}
-            />
+            <div className="perfumedatabase-search-container">
+                <input
+                    type="text"
+                    className="perfumedatabase-search"
+                    placeholder="브랜드명"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                />
+                <Search
+                    className="perfumedatabase-search-icon"
+                    size={20}
+                    color="#333"
+                />
+            </div>
+
+            <div className="perfumedatabase-divider-line" />
 
             <div className="perfumedatabase-filters">
-                {filterTypes.map((type) => (
+                {filterButtons.map(button => (
                     <button
-                        key={type}
-                        className="perfumedatabase-filter-btn"
-                        onClick={() => handleFilterClick(type)}
+                        key={button.id}
+                        className={`perfumedatabase-filter-btn ${activeFilter === button.id ? 'active' : ''}`}
+                        onClick={() => handleFilterClick(button.id)}
                     >
-                        {type}
+                        {button.label}
                     </button>
                 ))}
             </div>
