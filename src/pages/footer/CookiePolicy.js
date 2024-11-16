@@ -1,8 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../css/pages/footer/CookiePolicy.css';
 
 const CookiePolicy = () => {
+    
+    const navigate = useNavigate();
+
     return (
+        <>
+            <img src="/images/logo.png" alt="1번 이미지" className="main-logo-image"
+            onClick={() => navigate('/')}
+            style={{ cursor: 'pointer' }}
+            />
         <div className="cookiepolicy-container">
             <div className="cookiepolicy-content">
                 <div className="cookiepolicy-title">-쿠키 정책-</div>
@@ -49,6 +58,7 @@ const CookiePolicy = () => {
                 <br/>
             </div>
         </div>
+        </>
     );
 };
 
