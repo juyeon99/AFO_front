@@ -25,45 +25,24 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Main />} />
-            <Route path='/PrivacyPolicy' element={<PrivacyPolicy/>}/>
-            <Route path='/CookiePolicy' element={<CookiePolicy/>}/>
-            <Route path='/TermsofUse' element={<TermsOfUse/>}/>
-            <Route path='/FAQ' element={<FAQ/>}/>
-            <Route path='/spiceslist' element={<SpicesList/>}/>
-            <Route path='/perfumelist' element={<PerfumeList/>}/>
+            <Route path='/PrivacyPolicy' element={<PrivacyPolicy />} />
+            <Route path='/CookiePolicy' element={<CookiePolicy />} />
+            <Route path='/TermsofUse' element={<TermsOfUse />} />
+            <Route path='/FAQ' element={<FAQ />} />
+            <Route path='/spiceslist' element={<SpicesList />} />
+            <Route path='/perfumelist' element={<PerfumeList />} />
           </Route>
 
-        <Route path="/Admin" element={<AdminLayout />}>
-          <Route index element={<AdminMain />} />
-        </Route>
-        <Route path="/" element={<Layout />}>
+          <Route path="/" element={<AdminLayout />}>
+            <Route path='/Admin' element={<AdminMain />} />
+          </Route>
+
+          <Route path="/" element={<Main />} />
           <Route index element={<Main />} />
-        </Route>
-        <Route path="/PrivacyPolicy" element={<Layout />}>
-          <Route index element={<PrivacyPolicy/>} />
-        </Route>
-        <Route path="/CookiePolicy" element={<Layout />}>
-          <Route index element={<CookiePolicy/>} />
-        </Route>
-        <Route path="/TermsofUse" element={<Layout />}>
-          <Route index element={<TermsOfUse/>} />
-        </Route>
-        <Route path="/FAQ" element={<Layout />}>
-          <Route index element={<FAQ/>} />
-        </Route>
-        <Route path="/PerfumeList" element={<Layout />}>
-          <Route index element={<PerfumeList/>} />
-          {/* 다른 페이지도 Layout 내에서 정의 */}
-        </Route>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/history" element={<History/>}/>
-          <Route path="/login-info" element={<LoginInfo/>}/>
-          <Route path="/" element={<Main/>}/>
-          <Route index element={<Main/>}/>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/login-info" element={<LoginInfo/>}/>
-          <Route path="/chat" element={<Chat/>}/>
-          <Route path="/history" element={<History/>}/>
+          <Route path="/login" element={<Login />} />
+          <Route path="/login-info" element={<LoginInfo />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/history" element={<History />} />
 
         </Routes>
       </BrowserRouter>

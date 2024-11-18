@@ -1,8 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import '../../../css/components/Footer.css';
-import banghyangLogo from '../../../images/banghyangLogo.png';
-import footerLogo from '../../../images/footerLogo.png';
 
 const Footer = () => {
     const location = useLocation();
@@ -22,7 +20,7 @@ const Footer = () => {
             {!isMainPage && (
                 <div className="footer-logo-outer">
                     <img 
-                        src={footerLogo}
+                        src="/images/footerLogo.png"
                         alt="상단 푸터 로고"
                         className="footer-top-logo"
                     />
@@ -32,7 +30,7 @@ const Footer = () => {
                 <div className="footer-container">
                     <div className="footer-logo-section">
                         <img 
-                            src={banghyangLogo}
+                            src="/images/footerLogo.png"
                             alt="방향 로고"
                             className="footer-logo"
                         />

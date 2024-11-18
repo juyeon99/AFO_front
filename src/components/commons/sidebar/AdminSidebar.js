@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import '../../../css/components/AdminSidebar.css'
 import { Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import mainPropic from '../../../images/Main-Propic.png';
 
 const AdminSidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
-    const [userNickname, setUserNickname] = useState('사용자'); // 사용자 닉네임
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userNickname, setUserNickname] = useState('사용자');
     const location = useLocation();
 
     const toggleSidebar = () => {
@@ -15,12 +14,10 @@ const AdminSidebar = () => {
     };
 
     const handleLogin = () => {
-        // 로그인 처리 로직
         setIsLoggedIn(true);
     };
 
     const handleLogout = () => {
-        // 로그아웃 처리 로직
         setIsLoggedIn(false);
     };
 
@@ -48,10 +45,9 @@ const AdminSidebar = () => {
                     
                     <div className="admin-sidebar-bottom-links">
                         {!isLoggedIn ? (
-                            // 비로그인 상태
                             <div className="admin-sidebar-profile-section">
                                 <img 
-                                    src={mainPropic} 
+                                    src="/images/Main-Propic.png"
                                     alt="기본 프로필"    
                                     className="admin-sidebar-profile-img"
                                 />
@@ -63,7 +59,6 @@ const AdminSidebar = () => {
                                 </button>
                             </div>
                         ) : (
-                            // 로그인 상태
                             <>
                                 <button 
                                     className="admin-sidebar-auth-button"
@@ -79,7 +74,7 @@ const AdminSidebar = () => {
                                 </button>
                                 <div className="admin-sidebar-profile-section">
                                     <img 
-                                        src={mainPropic} 
+                                        src="/images/Main-Propic.png"
                                         alt="프로필" 
                                         className="admin-sidebar-profile-img"
                                     />

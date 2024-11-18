@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import '../../../css/components/Sidebar.css'
 import { Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import mainPropic from '../../../images/Main-Propic.png';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -50,7 +49,7 @@ const Sidebar = () => {
                             // 비로그인 상태
                             <div className="sidebar-profile-section">
                                 <img 
-                                    src={mainPropic} 
+                                    src="/images/Main-Propic.png"
                                     alt="기본 프로필" 
                                     className="sidebar-profile-img"
                                 />
@@ -78,7 +77,7 @@ const Sidebar = () => {
                                 </button>
                                 <div className="sidebar-profile-section">
                                     <img 
-                                        src={mainPropic} 
+                                        src="/images/Main-Propic.png"
                                         alt="프로필" 
                                         className="sidebar-profile-img"
                                     />
