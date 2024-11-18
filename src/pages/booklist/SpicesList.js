@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import '../../css/SpicesList.css';
+import { Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function SpicesList() {
     const filters = [
@@ -102,7 +104,14 @@ function SpicesList() {
         return brightness > 128 ? '#000000' : '#FFFFFF';
     };
 
+    const navigate = useNavigate();
+
     return (
+        <>
+            <img src="/images/logo.png" alt="1번 이미지" className="main-logo-image"
+            onClick={() => navigate('/')}
+            style={{ cursor: 'pointer' }}
+            />
         <div className="spices-container">
             <div className="spices-header">
                 <div className="spices-title">향료</div>
@@ -110,9 +119,14 @@ function SpicesList() {
                     <input
                         type="text"
                         className="spices-search-input"
-                        placeholder="향료명 검색"
+                        placeholder="향료명"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <Search
+                        className="spices-list-search-icon"
+                        size={20}
+                        color="#333"
                     />
                 </form>
             </div>
@@ -218,6 +232,7 @@ function SpicesList() {
             </div>
 
         </div>
+        </>
     );
 }
 

@@ -41,7 +41,7 @@ const Sidebar = () => {
                 <nav className="sidebar-nav">
                     <a href="/Introduction" className="sidebar-link">소개</a>
                     <a href="/spiceslist" className="sidebar-link">향료 알아가기</a>
-                    <a href="/perfumewiki" className="sidebar-link">향수 알아가기</a>
+                    <a href="/perfumelist" className="sidebar-link">향수 알아가기</a>
                     <a href="/chat" className="sidebar-link">향수 추천</a>
                     <a href="/history" className="sidebar-link">향기 히스토리</a>
                     

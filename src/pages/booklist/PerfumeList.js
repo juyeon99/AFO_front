@@ -1,6 +1,7 @@
-import '../../css/pages/booklist/PerfumeList.css';
+import '../../css/PerfumeList.css';
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const PerfumeList = () => {
     // 임시 데이터
@@ -146,93 +147,111 @@ const PerfumeList = () => {
         return matchesSearch && matchesFilter;
     });
 
-    const renderPaginationButtons = () => {
-        const totalPages = Math.ceil(filteredPerfumes.length / itemsPerPage);
-        const buttons = [];
+    const totalPages = Math.ceil(filteredPerfumes.length / itemsPerPage);
 
-        for (let i = 1; i <= Math.min(5, totalPages); i++) {
-            buttons.push(
-                <button
-                    key={i}
-                    className={`perfume-list-page-btn ${currentPage === i ? 'active' : ''}`}
-                    onClick={() => handlePageChange(i)}
-                >
-                    {i}
-                </button>
-            );
-        }
-
-        if (totalPages > 5) {
-            buttons.push(
-                <button
-                    key="next"
-                    className="perfume-list-page-btn"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                >
-                    &gt;
-                </button>
-            );
-        }
-
-        return buttons;
-    };
+    const navigate = useNavigate();
 
     return (
-        <div className="perfume-list-container">
-            <div className="perfume-list-search-container">
-                <input
-                    type="text"
-                    className="perfume-list-search"
-                    placeholder="브랜드명"
-                    value={searchTerm}
-                    onChange={handleSearch}
-                />
-                <Search
-                    className="perfume-list-search-icon"
-                    size={20}
-                    color="#333"
-                />
-            </div>
+        <>
+            <img src="/images/logo.png" alt="1번 이미지" className="main-logo-image"
+                onClick={() => navigate('/')}
+                style={{ cursor: 'pointer' }}
+            />
+            <div className="perfume-list-container">
+                <div className="perfume-header">
+                    <div className="perfume-title">향수</div>
+                    <form className="perfume-list-search-container">
+                        <input
+                            type="text"
+                            className="perfume-list-search"
+                            placeholder="브랜드명"
+                            value={searchTerm}
+                            onChange={handleSearch}
+                        />
+                        <Search
+                            className="perfume-list-search-icon"
+                            size={20}
+                            color="#333"
+                        />
+                    </form>
+                </div>
 
-            <div className="perfume-list-divider-line" />
+                <div className="perfume-list-divider-line" />
 
-            <div className="perfume-list-filters">
-                {filterButtons.map(button => (
-                    <button
-                        key={button.id}
-                        className={`perfume-list-filter-btn ${activeFilter === button.id ? 'active' : ''}`}
-                        onClick={() => handleFilterClick(button.id)}
-                    >
-                        {button.label}
-                    </button>
-                ))}
-            </div>
-
-            <div className="perfume-list-grid">
-                {filteredPerfumes
-                    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-                    .map((perfume) => (
-                        <div key={perfume.id} className="perfume-list-card">
-                            <img
-                                src={perfume.imageUrl}
-                                alt={perfume.name}
-                                className="perfume-list-image"
-                            />
-                            <div className="perfume-list-brand-en">{perfume.brandEn}</div>
-                            <div className="perfume-list-brand-kr">{perfume.brandKr}</div>
-                            <div className="perfume-list-divider" />
-                            <div className="perfume-list-product-name">{perfume.name}</div>
-                            <div className="perfume-list-concentration">
-                                {perfume.concentration}
-                            </div>
-                        </div>
+                <div className="perfume-list-filters">
+                    {filterButtons.map(button => (
+                        <button
+                            key={button.id}
+                            className={`perfume-list-filter-btn ${activeFilter === button.id ? 'active' : ''}`}
+                            onClick={() => handleFilterClick(button.id)}
+                        >
+                            {button.label}
+                        </button>
                     ))}
-            </div>
+                </div>
 
-            <div className="perfume-list-pagination">
-                {renderPaginationButtons()}
+                <div className="perfume-items-container">
+                    {filteredPerfumes
+                        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                        .map((perfume) => (
+                            <div key={perfume.id} className="perfume-item-card">
+                                <img
+                                    src={perfume.imageUrl}
+                                    alt={perfume.name}
+                                    className="perfume-item-image"
+                                />
+                                <div className="perfume-item-name">{perfume.name}</div>
+                                <div className="perfume-divider-small"></div>
+                                <div className="perfume-category">{perfume.brandEn}</div>
+                            </div>
+                        ))}
+                </div>
+
+                <div className="perfume-pagination">
+                    <button
+                        className={`perfume-pagination-button ${currentPage === 1 ? 'disabled' : ''}`}
+                        onClick={() => handlePageChange(1)}
+                        disabled={currentPage === 1}
+                    >
+                        {'<<'}
+                    </button>
+
+                    <button
+                        className={`perfume-pagination-button ${currentPage === 1 ? 'disabled' : ''}`}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    >
+                        {'<'}
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, index) => (
+                        <button
+                            key={index + 1}
+                            className={`perfume-pagination-button ${currentPage === index + 1 ? 'active' : ''}`}
+                            onClick={() => handlePageChange(index + 1)}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+
+                    <button
+                        className={`perfume-pagination-button ${currentPage === totalPages ? 'disabled' : ''}`}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    >
+                        {'>'}
+                    </button>
+
+                    <button
+                        className={`perfume-pagination-button ${currentPage === totalPages ? 'disabled' : ''}`}
+                        onClick={() => handlePageChange(totalPages)}
+                        disabled={currentPage === totalPages}
+                    >
+                        {'>>'}
+                    </button>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
