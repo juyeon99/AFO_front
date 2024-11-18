@@ -44,9 +44,9 @@ const Footer = () => {
                             <div className="footer-nav">
                                 <a href="/intro">소개</a>
                                 <span className="separator">|</span>
-                                <a href="/fragrance">향료 알아가기</a>
+                                <a href="/spiceslist">향료 알아가기</a>
                                 <span className="separator">|</span>
-                                <a href="/PerfumeList">향수 알아가기</a>
+                                <a href="/perfumeList">향수 알아가기</a>
                                 <span className="separator">|</span>
                                 <a href="/recommend">맞춤 향수 추천</a>
                                 <span className="separator">|</span>

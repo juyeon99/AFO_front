@@ -1,0 +1,200 @@
+.spices-container {
+    position: relative;
+    width: 1200px; /* 고정된 폭 */
+    margin: 0 auto; /* 화면 중앙 정렬 */
+    background: #EFEDED;
+    padding: 20px;
+    box-sizing: border-box;
+    margin-top: 30px;
+}
+
+.spices-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #000000;
+    padding-bottom: 10px;
+    transform: translateY(-60px);
+}
+
+.spices-title {
+    font-family: 'NanumMyeongjo', serif;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.spices-logo {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto;
+    background-size: contain;
+}
+
+.spices-filters {
+    display: grid;
+    grid-template-columns: repeat(9, auto); 
+    gap: 10px;
+    width: 60%;
+    transform: translateY(-40px);
+}
+
+.spices-filter-item {
+    width: 40px;
+    height: 10px;
+    padding: 10px 20px;
+    border: 1px solid #000000;
+    border-radius: 35px;
+    font-family: 'NanumMyeongjo', serif;
+    font-size: 14px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.spices-filter-item.active {
+    color: #FFFFFF;
+}
+
+.spices-search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #EFEDED;
+}
+
+.spices-search-input {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #000000;
+    border-radius: 25px;
+    width: 240px; /* 검색 바 너비 */
+    height: 15px;
+    background-color: #EFEDED;
+}
+
+.spices-search-input:focus {
+    outline: none;
+    border-color: #FF7F43;
+    box-shadow: 0 0 5px rgba(255, 127, 67, 0.5);
+}
+
+.spices-list-search-icon {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translate(-60px, -15px);
+    cursor: pointer;
+}
+
+.spices-items-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 한 줄에 6개 */
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.spices-item-card {
+    width: 200px;
+    height: 300px;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.spices-item-card img {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 10px;
+}
+
+.spices-name {
+    font-family: 'NanumMyeongjo', serif;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.spices-divider-small {
+    width: 80%;
+    height: 1px;
+    background-color: #000000;
+    margin: 0 auto 10px auto; /* 구분선 아래 간격 */
+}
+
+.spices-category {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    text-align: center;
+    color: #000000;
+    margin-top: 10px;
+}
+
+.spices-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.spices-pagination-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #EFEDED;
+    color: #000000;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.spices-pagination-button.active {
+    background-color: #EFEDED;
+    color: black;
+    font-weight: bold;
+}
+
+.spices-pagination-button:hover:not(.disabled) {
+    background-color: #CDC6CE;
+    color: #FFFFFF;
+}
+
+.spices-pagination-button.disabled {
+    color: #A0A0A0;
+    cursor: not-allowed;
+}
+
+
+.spices-item-card .spices-name,
+.spices-item-card .spices-category {
+    transition: opacity 0.3s ease;
+}
+
+.spices-item-card.hover img,
+.spices-item-card.hover .spices-name,
+.spices-item-card.hover .spices-category {
+    opacity: 0;
+}
+
+.spices-description {
+    font-size: 16px;
+    text-align: center;
+    padding: 10px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.spices-item-card.hover .spices-description {
+    display: block;
+    opacity: 1;
+}
