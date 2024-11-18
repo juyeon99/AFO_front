@@ -12,6 +12,7 @@ import CookiePolicy from './pages/footer/CookiePolicy';
 import TermsOfUse from './pages/footer/TermsofUse';
 import FAQ from './pages/footer/FAQ';
 import Chat from "./pages/chat/Chat";
+import SpicesList from './pages/booklist/SpicesList';
 
 function App() {
   return (
@@ -20,25 +21,19 @@ function App() {
         <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Main />} />
-        </Route>
-        <Route path="/PrivacyPolicy" element={<Layout />}>
-          <Route index element={<PrivacyPolicy/>} />
-        </Route>
-        <Route path="/CookiePolicy" element={<Layout />}>
-          <Route index element={<CookiePolicy/>} />
-        </Route>
-        <Route path="/TermsofUse" element={<Layout />}>
-          <Route index element={<TermsOfUse/>} />
-        </Route>
-        <Route path="/FAQ" element={<Layout />}>
-          <Route index element={<FAQ/>} />
+          <Route path='/PrivacyPolicy' element={<PrivacyPolicy/>}/>
+          <Route path='/CookiePolicy' element={<CookiePolicy/>}/>
+          <Route path='/TermsofUse' element={<TermsOfUse/>}/>
+          <Route path='/FAQ' element={<FAQ/>}/>
+          <Route path='/spiceslist' element={<SpicesList/>}/>
+
         </Route>
           <Route path="/login" element={<Login/>}/>
-          <Route path="/history" element={<History/>}/>
           <Route path="/login-info" element={<LoginInfo/>}/>
           <Route path="/" element={<Main/>}/>
           <Route index element={<Main/>}/>
           <Route path="/chat" element={<Chat/>}/>
+          <Route path="/history" element={<History/>}/>
 
         </Routes>
       </BrowserRouter>
