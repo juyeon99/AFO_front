@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import '../../../css/components/Footer.css';
 import banghyangLogo from '../../../images/banghyangLogo.png';
 import footerLogo from '../../../images/footerLogo.png';
+import { FaInstagram, FaFacebook, FaTwitter, FaYoutube, FaGithub } from "react-icons/fa";
 
 const Footer = () => {
     const location = useLocation();
@@ -10,12 +11,19 @@ const Footer = () => {
 
     // 소셜 미디어 링크 데이터
     const socialLinks = [
-        { title: '[ 인스타그램 ]', path: '#' },
-        { title: '[ 페이스북 ]', path: '#' },
-        { title: '[ 트위터 ]', path: '#' },
-        { title: '[ 유튜브 ]', path: '#' },
-        { title: '[ 깃허브 ]', path: '#' }
+        { title: '인스타그램', icon: <FaInstagram />, path: '#' },
+        { title: '페이스북', icon: <FaFacebook />, path: '#' },
+        { title: '트위터', icon: <FaTwitter />, path: '#' },
+        { title: '유튜브', icon: <FaYoutube />, path: '#' },
+        { title: '깃허브', icon: <FaGithub />, path: 'https://github.com/Project-AllForOne' }
     ];
+
+    // 클릭 핸들러
+    const handleClick = (path) => {
+        if (path === '#') {
+            alert('링크가 비활성화되어 있습니다.');
+        }
+    };
 
     return (
         <>
@@ -58,8 +66,19 @@ const Footer = () => {
 
                         <div className="footer-social">
                             {socialLinks.map((link, index) => (
-                                <a key={index} href={link.path}>
-                                    {link.title}
+                                <a
+                                    key={index}
+                                    href={link.path !== '#' ? link.path : undefined} // 깃허브만 링크 활성화
+                                    onClick={(e) => {
+                                        if (link.path === '#') {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    target={link.path !== '#' ? '_blank' : undefined}
+                                    rel="noopener noreferrer"
+                                    style={{ fontSize: '24px', color: '#000', textDecoration: 'none' }}
+                                >
+                                    {link.icon}
                                 </a>
                             ))}
                         </div>
