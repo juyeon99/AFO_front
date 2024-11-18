@@ -51,9 +51,9 @@ const Footer = () => {
                                 }
                                 }}>소개</a>
                                 <span className="separator">|</span>
-                                <a href="/fragrance">향료 알아가기</a>
+                                <a href="/spiceslist">향료 알아가기</a>
                                 <span className="separator">|</span>
-                                <a href="/perfume">향수 알아가기</a>
+                                <a href="/perfumeList">향수 알아가기</a>
                                 <span className="separator">|</span>
                                 <a href="/recommend">맞춤 향수 추천</a>
                                 <span className="separator">|</span>

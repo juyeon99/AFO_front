@@ -1,0 +1,173 @@
+.perfume-list-container {
+    position: relative;
+    width: 1200px; /* 고정된 폭 */
+    margin: 0 auto; /* 화면 중앙 정렬 */
+    background: #EFEDED;
+    padding: 20px;
+    box-sizing: border-box;
+    margin-top: 30px;
+}
+
+.perfume-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    transform: translateY(-60px);
+}
+
+.perfume-title {
+    font-family: 'NanumMyeongjo', serif;
+    font-size: 24px;
+    font-weight: bold;
+    translate: 5px 50px;
+}
+
+.perfume-list-search-container {
+    position: absolute;
+    max-width: 200px;
+    width: 100%;
+    translate: 840px 50px;
+}
+
+.perfume-list-search {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border: 1px solid #333;
+    background-color: #EFEDED;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.perfume-list-search-icon {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translate(0px, -20px);
+    cursor: pointer;
+}
+
+.perfume-list-divider-line {
+    width: 95%;
+    height: 1px;
+    background-color: #333;
+    margin-top: 60px;
+    transform: translateY(-70px);
+}
+
+.perfume-list-filters {
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 40px;
+    margin-top: 20px;
+    translate: -40px -50px;
+}
+
+.perfume-list-filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #333;
+    border-radius: 20px;
+    background-color: #EFEDED;
+    ;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 150px;
+    text-align: center;
+    margin-right: 50px;
+}
+
+.perfume-list-filter-btn.active {
+    background-color: #000;
+    color: white;
+    border-color: #000;
+}
+
+.perfume-list-filter-btn:hover {
+    background-color: #000;
+    color: white;
+}
+
+.perfume-items-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 한 줄에 6개 */
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.perfume-item-card {
+    width: 200px;
+    height: 300px;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.perfume-item-card img {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 10px;
+}
+
+.perfume-item-name {
+    font-family: 'NanumMyeongjo', serif;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.perfume-divider-small {
+    width: 80%;
+    height: 1px;
+    background-color: #000000;
+    margin: 0 auto 10px auto;
+}
+
+.perfume-category {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    text-align: center;
+    color: #000000;
+    margin-top: 10px;
+}
+
+.perfume-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.perfume-pagination-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #EFEDED;
+    color: #000000;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.perfume-pagination-button.active {
+    background-color: #EFEDED;
+    color: black;
+    font-weight: bold;
+}
+
+.perfume-pagination-button:hover:not(.disabled) {
+    background-color: #CDC6CE;
+    color: #FFFFFF;
+}
+
+.perfume-pagination-button.disabled {
+    color: #A0A0A0;
+    cursor: not-allowed;
+}
