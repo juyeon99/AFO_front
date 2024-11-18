@@ -122,6 +122,7 @@ function Main() {
             </div>
 
             <div
+                id="intro-section"
                 className="intro-section"
                 ref={introSectionRef}
                 style={introSectionStyle}
