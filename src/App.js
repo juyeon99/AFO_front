@@ -13,6 +13,8 @@ import TermsOfUse from './pages/footer/TermsofUse';
 import FAQ from './pages/footer/FAQ';
 import Chat from "./pages/chat/Chat";
 import PerfumeList from './pages/booklist/PerfumeList';
+import AdminLayout from './layouts/AdminLayout';
+import AdminMain from './pages/AdminMain';
 
 
 function App() {
@@ -20,6 +22,9 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
+        <Route path="/Admin" element={<AdminLayout />}>
+          <Route index element={<AdminMain />} />
+        </Route>
         <Route path="/" element={<Layout />}>
           <Route index element={<Main />} />
         </Route>
