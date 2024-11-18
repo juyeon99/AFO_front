@@ -1,0 +1,160 @@
+.perfume-list-container {
+    padding: 100px;
+    background-color: #EFEDED;
+    position: relative;
+}
+
+.perfume-list-search-container {
+    position: absolute;
+    right: 100px;
+    top: 100px;
+    max-width: 200px;
+    width: 100%;
+    margin-right: 100px;
+}
+
+.perfume-list-search {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border: 1px solid #333;
+    background-color: #EFEDED;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.perfume-list-search-icon {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translate(0px, -20px);
+    cursor: pointer;
+}
+
+.perfume-list-divider-line {
+    width: 95%;
+    height: 1px;
+    background-color: #333;
+    margin: 20px auto 0;
+    margin-top: 60px;
+}
+
+.perfume-list-filters {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+    padding: 0 40px;
+    margin-top: 20px;
+    margin-bottom: 60px;
+}
+
+.perfume-list-filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #333;
+    border-radius: 20px;
+    background-color: #EFEDED;
+    ;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 150px;
+    text-align: center;
+    margin-right: 50px;
+}
+
+.perfume-list-filter-btn.active {
+    background-color: #000;
+    color: white;
+    border-color: #000;
+}
+
+.perfume-list-filter-btn:hover {
+    background-color: #000;
+    color: white;
+}
+
+.perfume-list-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+.perfume-list-card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    width: 160px;
+    margin: 0 auto;
+    margin-bottom: 30px;
+}
+
+.perfume-list-card:hover {
+    transform: translateY(-5px);
+}
+
+.perfume-list-image {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.perfume-list-brand-en {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.perfume-list-brand-kr {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.perfume-list-divider {
+    width: 80%;
+    height: 1px;
+    background-color: #eee;
+    margin: 10px auto;
+}
+
+.perfume-list-product-name {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.perfume-list-concentration {
+    font-size: 12px;
+    color: #888;
+}
+
+.perfume-list-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.perfume-list-page-btn {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+}
+
+.perfume-list-page-btn.active {
+    background: #000;
+    color: white;
+}
+
+.perfume-list-page-btn:hover {
+    background: #000;
+    color: white;
+}

@@ -12,6 +12,8 @@ import CookiePolicy from './pages/footer/CookiePolicy';
 import TermsOfUse from './pages/footer/TermsofUse';
 import FAQ from './pages/footer/FAQ';
 import Chat from "./pages/chat/Chat";
+import PerfumeList from './pages/booklist/PerfumeList';
+
 
 function App() {
   return (
@@ -32,6 +34,10 @@ function App() {
         </Route>
         <Route path="/FAQ" element={<Layout />}>
           <Route index element={<FAQ/>} />
+        </Route>
+        <Route path="/PerfumeList" element={<Layout />}>
+          <Route index element={<PerfumeList/>} />
+          {/* 다른 페이지도 Layout 내에서 정의 */}
         </Route>
           <Route path="/login" element={<Login/>}/>
           <Route path="/history" element={<History/>}/>
