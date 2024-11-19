@@ -118,6 +118,9 @@ function Main() {
                     <NavLink to="/chat">
                         <button className="main-start-button">START ▶</button>
                     </NavLink>
+                    <NavLink to="/admin/perfumes">
+                        <button className="main-start-button">관리자 ▶</button>
+                    </NavLink>
                 </div>
             </div>
 

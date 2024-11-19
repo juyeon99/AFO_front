@@ -14,6 +14,7 @@ import FAQ from './pages/footer/FAQ';
 import Chat from "./pages/chat/Chat";
 import PerfumeList from './pages/booklist/PerfumeList';
 import SpicesList from './pages/booklist/SpicesList';
+import AdminPerfumeList from './pages/admin/AdminPerfumeList';
 
 function App() {
   return (
@@ -36,7 +37,8 @@ function App() {
           <Route path="/login-info" element={<LoginInfo/>}/>
           <Route path="/chat" element={<Chat/>}/>
           <Route path="/history" element={<History/>}/>
-
+          
+          <Route path="/admin/perfumes" element={<AdminPerfumeList/>}/>
         </Routes>
       </BrowserRouter>
     </>

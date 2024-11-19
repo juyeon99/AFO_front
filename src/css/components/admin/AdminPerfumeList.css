@@ -1,0 +1,313 @@
+.admin-perfume-list-container {
+    position: relative;
+    width: 1200px; /* 고정된 폭 */
+    margin: 0 auto; /* 화면 중앙 정렬 */
+    background: #EFEDED;
+    padding: 20px;
+    box-sizing: border-box;
+    margin-top: 30px;
+}
+
+.admin-perfume-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    transform: translateY(-60px);
+}
+
+.admin-perfume-title {
+    font-family: 'NanumMyeongjo', serif;
+    font-size: 24px;
+    font-weight: bold;
+    translate: 5px 50px;
+}
+
+.admin-perfume-list-search-container {
+    position: absolute;
+    max-width: 200px;
+    width: 100%;
+    translate: 840px 50px;
+}
+
+.admin-perfume-list-search {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border: 1px solid #333;
+    background-color: #EFEDED;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.admin-perfume-list-search-icon {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translate(0px, -20px);
+    cursor: pointer;
+}
+
+.admin-perfume-list-divider-line {
+    width: 95%;
+    height: 1px;
+    background-color: #333;
+    margin-top: 60px;
+    transform: translateY(-70px);
+}
+
+.admin-perfume-list-filters {
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 40px;
+    margin-top: 20px;
+    translate: -40px -50px;
+}
+
+.admin-perfume-list-filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #333;
+    border-radius: 20px;
+    background-color: #EFEDED;
+    ;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 150px;
+    text-align: center;
+    margin-right: 50px;
+}
+
+.admin-perfume-list-filter-btn.active {
+    background-color: #000;
+    color: white;
+    border-color: #000;
+}
+
+.admin-perfume-list-filter-btn:hover {
+    background-color: #000;
+    color: white;
+}
+
+.admin-perfume-items-container {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 한 줄에 6개 */
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.admin-perfume-item-card {
+    width: 200px;
+    height: 300px;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-perfume-item-card img {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 10px;
+}
+
+.admin-perfume-item-name {
+    font-family: 'NanumMyeongjo', serif;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.admin-perfume-divider-small {
+    width: 80%;
+    height: 1px;
+    background-color: #000000;
+    margin: 0 auto 10px auto;
+}
+
+.admin-perfume-category {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    text-align: center;
+    color: #000000;
+    margin-top: 10px;
+}
+
+.admin-perfume-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.admin-perfume-pagination-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #EFEDED;
+    color: #000000;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-perfume-pagination-button.active {
+    background-color: #EFEDED;
+    color: black;
+    font-weight: bold;
+}
+
+.admin-perfume-pagination-button:hover:not(.disabled) {
+    background-color: #CDC6CE;
+    color: #FFFFFF;
+}
+
+.admin-perfume-pagination-button.disabled {
+    color: #A0A0A0;
+    cursor: not-allowed;
+}
+
+.perfume-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+}
+
+.perfume-form-label {
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.perfume-form-input,
+.perfume-form-select,
+.perfume-form-textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.perfume-form-textarea {
+    resize: none;
+    height: 80px;
+}
+
+.perfume-form-file {
+    font-size: 14px;
+    padding: 5px;
+}
+
+.perfume-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.perfume-form-button {
+    padding: 10px 15px;
+    border: none;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.perfume-form-button.save {
+    background-color: #5cb85c;
+    color: white;
+}
+
+.perfume-form-button.save:hover {
+    background-color: #4cae4c;
+}
+
+.perfume-form-button.cancel {
+    background-color: #d9534f;
+    color: white;
+}
+
+.perfume-form-button.cancel:hover {
+    background-color: #c9302c;
+}
+
+.modal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* 카드 안 연필 아이콘 */
+.edit-button {
+    position: absolute;
+    font-size: 20px;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #EFEDED;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.edit-button:hover {
+    background-color: #CCC;
+}
+
+.card-checkbox {
+    cursor: pointer;
+}
+
+/* +, 체크, 휴지통 버튼 */
+.add-button,
+.checkbox-button,
+.delete-button {
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #333;
+    border-radius: 10%;
+    cursor: pointer;
+    background-color: #EFEDED;
+    transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.add-button:hover,
+.checkbox-button:hover,
+.delete-button:hover {
+    background-color: #CCC;
+    transform: scale(1.1);
+}
