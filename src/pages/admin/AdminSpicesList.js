@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import '../../css/admin/AdminSpicesList.css';
-import { Search } from 'lucide-react';
+import { Search,Trash2, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Edit } from 'lucide-react';
 
 function AdminSpicesList() {
     const filters = [
@@ -87,12 +86,12 @@ function AdminSpicesList() {
     // 추가 및 삭제 처리
     const handleAddSubmit = () => {
         setIsAdding(false); // 추가 모달 닫기
-        setSuccessMessage('항수가 성공적으로 등록되었습니다!'); // 성공 메시지 설정
+        setSuccessMessage('항료가 성공적으로 등록되었습니다!'); // 성공 메시지 설정
     };
 
     const handleDeleteConfirm = () => {
         setIsDeleting(false); // 삭제 모달 닫기
-        setSuccessMessage(`${selectedItem} 항수 카드가 삭제되었습니다!`); // 성공 메시지 설정
+        setSuccessMessage(`${selectedItem} 항료 카드가 삭제되었습니다!`); // 성공 메시지 설정
     };
 
     const handleEditClick = (item) => {
@@ -391,7 +390,7 @@ function AdminSpicesList() {
                     <div className="admin-spices-controls">
                         <button onClick={handleAddClick} className="admin-spices-add-button">+</button>
                         <button className="admin-spices-select-button" onClick={toggleSelectMode}>
-                            {isSelecting ? 'v' : 'v'}
+                            {isSelecting ? '✓' : '✓'}
                         </button>
                         <button onClick={handleDeleteClick} className="admin-spices-delete-button">
                             <Trash2 size={20} />
