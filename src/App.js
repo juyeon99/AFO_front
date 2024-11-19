@@ -15,6 +15,10 @@ import Chat from "./pages/chat/Chat";
 import PerfumeList from './pages/booklist/PerfumeList';
 import SpicesList from './pages/booklist/SpicesList';
 
+import LoginTest from "./pages/test/LoginTest";
+import KakaoRedirectPage from './pages/test/KakaoRedirectPage';
+import MemberTest from './pages/test/MemberTest';
+
 function App() {
   return (
     <>
@@ -37,6 +41,9 @@ function App() {
           <Route path="/chat" element={<Chat />} />
           <Route path="/history" element={<History />} />
 
+          <Route path='/logintest' element={<LoginTest />} />
+          <Route path='/oauth/redirected/kakao' element={<KakaoRedirectPage />} />
+          <Route path='/success' element={<MemberTest />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -1,4 +1,4 @@
-function LoginPage() {
+function LoginTest() {
 
     const handleButtonClick = () => {
         window.location.href = "http://localhost:8080/oauth/kakao"
@@ -12,4 +12,4 @@ function LoginPage() {
     )
 }
 
-export default LoginPage
+export default LoginTest
