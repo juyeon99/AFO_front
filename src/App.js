@@ -14,6 +14,7 @@ import FAQ from './pages/footer/FAQ';
 import Chat from "./pages/chat/Chat";
 import PerfumeList from './pages/booklist/PerfumeList';
 import SpicesList from './pages/booklist/SpicesList';
+import AdminSpicesList from './pages/admin/AdminSpicesList';
 
 function App() {
   return (
@@ -30,12 +31,13 @@ function App() {
             <Route path='/perfumelist' element={<PerfumeList />} />
           </Route>
 
-          <Route path="/" element={<Main />} />
-          <Route index element={<Main />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/login-info" element={<LoginInfo />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/history" element={<History />} />
+          <Route path="/" element={<Main/>}/>
+          <Route index element={<Main/>}/>
+          <Route path="/login" element={<Login/>}/>
+          <Route path="/login-info" element={<LoginInfo/>}/>
+          <Route path="/chat" element={<Chat/>}/>
+          <Route path="/history" element={<History/>}/>
+          <Route path="/admin/spices" element={<AdminSpicesList/>}/>
 
         </Routes>
       </BrowserRouter>
