@@ -22,20 +22,20 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Main />} />
-            <Route path='/PrivacyPolicy' element={<PrivacyPolicy/>}/>
-            <Route path='/CookiePolicy' element={<CookiePolicy/>}/>
-            <Route path='/TermsofUse' element={<TermsOfUse/>}/>
-            <Route path='/FAQ' element={<FAQ/>}/>
-            <Route path='/spiceslist' element={<SpicesList/>}/>
-            <Route path='/perfumelist' element={<PerfumeList/>}/>
+            <Route path='/PrivacyPolicy' element={<PrivacyPolicy />} />
+            <Route path='/CookiePolicy' element={<CookiePolicy />} />
+            <Route path='/TermsofUse' element={<TermsOfUse />} />
+            <Route path='/FAQ' element={<FAQ />} />
+            <Route path='/spiceslist' element={<SpicesList />} />
+            <Route path='/perfumelist' element={<PerfumeList />} />
           </Route>
 
-          <Route path="/" element={<Main/>}/>
-          <Route index element={<Main/>}/>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/login-info" element={<LoginInfo/>}/>
-          <Route path="/chat" element={<Chat/>}/>
-          <Route path="/history" element={<History/>}/>
+          <Route path="/" element={<Main />} />
+          <Route index element={<Main />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/login-info" element={<LoginInfo />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/history" element={<History />} />
 
         </Routes>
       </BrowserRouter>
