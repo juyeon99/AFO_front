@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../../css/admin/AdminSpicesList.css';
 import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Trash2, Edit } from 'lucide-react';
 
 function AdminSpicesList() {
     const filters = [
@@ -50,7 +51,69 @@ function AdminSpicesList() {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [hoveredItemId, setHoveredItemId] = useState(null);
+    const [isSelecting, setIsSelecting] = useState(false);
+    const [selectedItems, setSelectedItems] = useState(new Set());
+    const [isAdding, setIsAdding] = useState(false); // 추가 모달 상태
+    const [isDeleting, setIsDeleting] = useState(false); // 삭제 모달 상태
+    const [successMessage, setSuccessMessage] = useState(''); // 성공 메시지 모달 상태
+    const [selectedItem, setSelectedItem] = useState(null); // 삭제할 항목
+    const [imagePreview, setImagePreview] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingItem, setEditingItem] = useState(null);
     const itemsPerPage = 12;
+
+    const toggleSelectMode = () => {
+        setIsSelecting(!isSelecting); // v 버튼 클릭 시 상태 변경
+    };
+
+    const handleCheckboxChange = (id) => {
+        const newSelectedItems = new Set(selectedItems);
+        if (newSelectedItems.has(id)) {
+            newSelectedItems.delete(id); // 선택 해제
+        } else {
+            newSelectedItems.add(id); // 선택 추가
+        }
+        setSelectedItems(newSelectedItems);
+    };
+
+    const handleAddClick = () => setIsAdding(true);
+    const handleAddClose = () => setIsAdding(false);
+    const handleDeleteClick = (item) => {
+        setSelectedItem(item);
+        setIsDeleting(true);
+    };
+    const handleDeleteClose = () => setIsDeleting(false);
+
+    // 추가 및 삭제 처리
+    const handleAddSubmit = () => {
+        setIsAdding(false); // 추가 모달 닫기
+        setSuccessMessage('항수가 성공적으로 등록되었습니다!'); // 성공 메시지 설정
+    };
+
+    const handleDeleteConfirm = () => {
+        setIsDeleting(false); // 삭제 모달 닫기
+        setSuccessMessage(`${selectedItem} 항수 카드가 삭제되었습니다!`); // 성공 메시지 설정
+    };
+
+    const handleEditClick = (item) => {
+        setEditingItem(item); // 클릭한 아이템 데이터를 상태로 저장
+        setIsEditing(true); // 수정 모달 열기
+    };
+
+    const handleEditClose = () => {
+        setIsEditing(false); // 수정 모달 닫기
+        setEditingItem(null); // 수정 데이터 초기화
+    };
+
+    const handleEditSubmit = () => {
+        // 데이터 수정 로직 추가 (현재는 콘솔 출력)
+        console.log("수정된 데이터:", editingItem);
+
+        setIsEditing(false); // 수정 모달 닫기
+        setEditingItem(null); // 수정 데이터 초기화
+    };
+
+    const handleSuccessClose = () => setSuccessMessage('');
 
     const filteredItems =
         activeFilters.has('ALL') || activeFilters.size === 0
@@ -106,132 +169,348 @@ function AdminSpicesList() {
 
     const navigate = useNavigate();
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result); // 업로드된 이미지 미리보기 URL
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleReset = () => {
+        setImagePreview(null); // 파일 선택 영역 초기화
+    };
+
     return (
         <>
             <img src="/images/logo.png" alt="1번 이미지" className="main-logo-image"
-            onClick={() => navigate('/')}
-            style={{ cursor: 'pointer' }}
+                onClick={() => navigate('/')}
+                style={{ cursor: 'pointer' }}
             />
-        <div className="admin-spices-container">
-            <div className="admin-spices-header">
-                <div className="admin-spices-title">향료</div>
-                <form className="admin-spices-search-bar">
-                    <input
-                        type="text"
-                        className="admin-spices-search-input"
-                        placeholder="향료명"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <Search
-                        className="admin-spices-list-search-icon"
-                        size={20}
-                        color="#333"
-                    />
-                </form>
-            </div>
-            <div className="admin-spices-filters">
-                {filters.map((filter, index) => (
-                    <div
-                        key={index}
-                        className={`admin-spices-filter-item ${activeFilters.has(filter.name) ? 'active' : ''}`}
-                        style={{
-                            backgroundColor: activeFilters.has(filter.name) || activeFilters.has('ALL') ? filter.color : '#EFEDED',
-                            color: activeFilters.has(filter.name) || activeFilters.has('ALL') ? getTextColor(filter.color) : '#000000',
-                            borderColor: 'black',
-                        }}
-                        onClick={() => handleFilterClick(filter.name)}
-                    >
-                        {filter.name}
-                    </div>
-                ))}
-            </div>
-            <div className="admin-spices-items-container">
-                {displayedItems.map((item) => {
-                    const filterColor = filters.find((f) => f.name === item.filter)?.color || '#FFFFFF';
+            <div className="admin-spices-container">
+                <div className="admin-spices-header">
+                    <div className="admin-spices-title">향료</div>
+                    <form className="admin-spices-search-bar">
+                        <input
+                            type="text"
+                            className="admin-spices-search-input"
+                            placeholder="향료명"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <Search
+                            className="admin-spices-list-search-icon"
+                            size={20}
+                            color="#333"
+                        />
+                    </form>
+                </div>
 
-                    return (
-                        <div
-                            key={item.id}
-                            className={`admin-spices-item-card ${hoveredItemId === item.id ? 'hover' : ''}`}
-                            onMouseEnter={() => setHoveredItemId(item.id)}
-                            onMouseLeave={() => setHoveredItemId(null)}
-                            style={{
-                                backgroundColor: hoveredItemId === item.id ? filterColor : '#FFFFFF',
-                            }}
-                        >
-                            {hoveredItemId === item.id ? (
-                                <div
-                                    className="admin-spices-description"
-                                    style={{
-                                        color: getTextColor(filterColor), // 밝기에 따라 텍스트 색상 결정
-                                    }}
-                                >
-                                    {item.description}
+                {/* 추가 모달 */}
+                {isAdding && (
+                    <div className="admin-spices-modal-backdrop">
+                        <div className="admin-spices-modal-container">
+                            <h2 className="admin-spices-modal-title">향료 카드 추가하기</h2>
+                            <div className="admin-spices-modal-content">
+                                <div className="admin-spices-modal-row">
+                                    <label>향료명</label>
+                                    <input className='admin-spices-modal-row-name' type="text" placeholder="ex) Blood Orange" />
                                 </div>
-                            ) : (
-                                <>
-                                    <img src={item.image} alt={item.name} />
-                                    <div className="admin-spices-name">{item.name}</div>
-                                    <div className="admin-spices-divider-small"></div>
-                                    <div className="admin-spices-category">{item.category}</div>
-                                </>
-                            )}
+                                <div className="admin-spices-modal-row">
+                                    <label>계열</label>
+                                    <input className='admin-spices-modal-row-spices' type="text" placeholder="ex) spicy" />
+                                </div>
+                                <div className="admin-spices-modal-row-description">
+                                    <label>향료 설명</label>
+                                    <textarea placeholder="ex) 달콤한 오렌지의..." />
+                                </div>
+                                <div className="admin-spices-modal-row">
+                                    <label className='admin-spices-modal-row-image-label'>이미지</label>
+                                    <div
+                                        className="admin-spices-image-upload"
+                                        onClick={() => document.getElementById("file-input").click()}
+                                    >
+                                        {imagePreview ? (
+                                            <img
+                                                src={imagePreview}
+                                                alt="미리보기"
+                                                className="admin-spices-image-preview"
+                                            />
+                                        ) : (
+                                            <div className="admin-spices-placeholder">+</div>
+                                        )}
+                                        <input
+                                            id="file-input"
+                                            type="file"
+                                            className="admin-spices-file-input"
+                                            onChange={handleImageChange}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="admin-spices-modal-actions">
+                                <button onClick={() => { handleAddSubmit(); handleReset(); }} className="admin-spices-save-button">
+                                    저장
+                                </button>
+                                <button onClick={() => { handleAddClose(); handleReset(); }} className="admin-spices-cancel-button">
+                                    취소
+                                </button>
+                            </div>
                         </div>
-                    );
-                })}
-            </div>
+                    </div>
+                )}
 
-            <div className="admin-spices-pagination">
-                {/* 처음으로 이동 버튼 */}
-                <button
-                    className={`admin-spices-pagination-button ${currentPage === 1 ? 'disabled' : ''}`}
-                    onClick={() => handlePageChange(1)}
-                    disabled={currentPage === 1}
-                >
-                    {'<<'}
-                </button>
+                {isEditing && (
+                    <div className="admin-spices-modal-backdrop">
+                        <div className="admin-spices-modal-container">
+                            <h2 className="admin-spices-modal-title">향료 카드 수정하기</h2>
+                            <div className="admin-spices-modal-content">
+                                <div className="admin-spices-modal-row">
+                                    <label>향료명</label>
+                                    <input
+                                        type="text"
+                                        className='admin-spices-modal-row-name'
+                                        value={editingItem?.name || ''}
+                                        onChange={(e) =>
+                                            setEditingItem((prev) => ({ ...prev, name: e.target.value }))
+                                        }
+                                        placeholder="ex) Blood Orange"
+                                    />
+                                </div>
+                                <div className="admin-spices-modal-row">
+                                    <label>계열</label>
+                                    <input
+                                        type="text"
+                                        className='admin-spices-modal-row-spices'
+                                        value={editingItem?.category || ''}
+                                        onChange={(e) =>
+                                            setEditingItem((prev) => ({ ...prev, category: e.target.value }))
+                                        }
+                                        placeholder="ex) Citrus 계열"
+                                    />
+                                </div>
+                                <div className="admin-spices-modal-row-description">
+                                    <label>향료 설명</label>
+                                    <textarea
+                                        value={editingItem?.description || ''}
+                                        onChange={(e) =>
+                                            setEditingItem((prev) => ({ ...prev, description: e.target.value }))
+                                        }
+                                        placeholder="ex) 상큼하고 톡 쏘는 블러드 오렌지의 향"
+                                    />
+                                </div>
+                                <div className="admin-spices-modal-row">
+                                    <label className="admin-spices-modal-row-image-label">이미지</label>
+                                    <div
+                                        className="admin-spices-image-upload"
+                                        onClick={() => document.getElementById('file-input-edit').click()}
+                                    >
+                                        {imagePreview || editingItem?.image ? (
+                                            <img
+                                                src={imagePreview || editingItem?.image}
+                                                alt="미리보기"
+                                                className="admin-spices-image-preview"
+                                            />
+                                        ) : (
+                                            <div className="admin-spices-placeholder">+</div>
+                                        )}
+                                        <input
+                                            id="file-input-edit"
+                                            type="file"
+                                            className="admin-spices-file-input"
+                                            onChange={(e) => {
+                                                const file = e.target.files[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => {
+                                                        setEditingItem((prev) => ({ ...prev, image: reader.result }));
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="admin-spices-modal-actions">
+                                <button onClick={handleEditSubmit} className="admin-spices-save-button">
+                                    저장
+                                </button>
+                                <button onClick={handleEditClose} className="admin-spices-cancel-button">
+                                    취소
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
-                {/* 이전 페이지로 이동 버튼 */}
-                <button
-                    className={`admin-spices-pagination-button ${currentPage === 1 ? 'disabled' : ''}`}
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                >
-                    {'<'}
-                </button>
+                {/* 삭제 모달 */}
+                {isDeleting && (
+                    <div className="admin-spices-modal-backdrop">
+                        <div className="admin-spices-modal-container-delete">
+                            <h2 className="admin-spices-modal-title-delete">- 향수카드 삭제 -</h2>
+                            <p>향수카드를 삭제하시겠습니까?</p>
+                            <div className="admin-spices-modal-actions-delete">
+                                <button onClick={handleDeleteConfirm} className="admin-spices-confirm-button">확인</button>
+                                <button onClick={handleDeleteClose} className="admin-spices-cancel-button-delete">취소</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
-                {/* 페이지 번호 */}
-                {Array.from({ length: totalPages }, (_, index) => (
+                {/* 성공 메시지 모달 */}
+                {successMessage && (
+                    <div className="admin-spices-modal-backdrop">
+                        <div className="admin-spices-modal-container-success">
+                            <p className="admin-spices-success-message-success">{successMessage}</p>
+                            <div className="admin-spices-modal-actions-success">
+                                <button onClick={handleSuccessClose} className="admin-spices-cancel-button-success">확인</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                <div className="admin-spices-filters">
+                    {filters.map((filter, index) => (
+                        <div
+                            key={index}
+                            className={`admin-spices-filter-item ${activeFilters.has(filter.name) ? 'active' : ''}`}
+                            style={{
+                                backgroundColor: activeFilters.has(filter.name) || activeFilters.has('ALL') ? filter.color : '#EFEDED',
+                                color: activeFilters.has(filter.name) || activeFilters.has('ALL') ? getTextColor(filter.color) : '#000000',
+                                borderColor: 'black',
+                            }}
+                            onClick={() => handleFilterClick(filter.name)}
+                        >
+                            {filter.name}
+                        </div>
+                    ))}
+
+                    <div className="admin-spices-controls">
+                        <button onClick={handleAddClick} className="admin-spices-add-button">+</button>
+                        <button className="admin-spices-select-button" onClick={toggleSelectMode}>
+                            {isSelecting ? 'v' : 'v'}
+                        </button>
+                        <button onClick={handleDeleteClick} className="admin-spices-delete-button">
+                            <Trash2 size={20} />
+                        </button>
+                    </div>
+
+                </div>
+                <div className="admin-spices-items-container">
+                    {displayedItems.map((item) => {
+                        const filterColor = filters.find((f) => f.name === item.filter)?.color || '#FFFFFF';
+
+                        return (
+                            <div
+                                key={item.id}
+                                className={`admin-spices-item-card ${hoveredItemId === item.id ? 'hover' : ''}`}
+                                onMouseEnter={() => setHoveredItemId(item.id)}
+                                onMouseLeave={() => setHoveredItemId(null)}
+                                onClick={() => handleCheckboxChange(item.id)}
+                                style={{
+                                    backgroundColor: hoveredItemId === item.id ? filterColor : '#FFFFFF',
+                                }}
+                            >
+                                {/* 체크박스 표시 */}
+                                {isSelecting && (
+                                    <>
+                                        {/* 체크박스 */}
+                                        <input
+                                            type="checkbox"
+                                            id={`checkbox-${item.id}`} // 고유 ID 부여
+                                            className="admin-spices-item-select-checkbox"
+                                            checked={selectedItems.has(item.id)}
+                                            onClick={(e) => e.stopPropagation()}
+                                            onChange={() => handleCheckboxChange(item.id)}
+                                        />
+                                        {/* 커스텀 레이블 */}
+                                        <label htmlFor={`checkbox-${item.id}`}></label>
+                                    </>
+                                )}
+
+                                {/* Edit 아이콘 버튼 */}
+                                <button
+                                    className="admin-spices-edit-button"
+                                    onClick={() => handleEditClick(item)} // 수정 버튼 클릭 시 실행
+                                >
+                                    <Edit size={16} color="#333" /> {/* Edit 아이콘 사용 */}
+                                </button>
+
+                                {hoveredItemId === item.id ? (
+                                    <div
+                                        className="admin-spices-description"
+                                        style={{
+                                            color: getTextColor(filterColor), // 밝기에 따라 텍스트 색상 결정
+                                        }}
+                                    >
+                                        {item.description}
+                                    </div>
+                                ) : (
+                                    <>
+                                        <img src={item.image} alt={item.name} />
+                                        <div className="admin-spices-name">{item.name}</div>
+                                        <div className="admin-spices-divider-small"></div>
+                                        <div className="admin-spices-category">{item.category}</div>
+                                    </>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+
+                <div className="admin-spices-pagination">
+                    {/* 처음으로 이동 버튼 */}
                     <button
-                        key={index + 1}
-                        className={`admin-spices-pagination-button ${currentPage === index + 1 ? 'active' : ''}`}
-                        onClick={() => handlePageChange(index + 1)}
+                        className={`admin-spices-pagination-button ${currentPage === 1 ? 'disabled' : ''}`}
+                        onClick={() => handlePageChange(1)}
+                        disabled={currentPage === 1}
                     >
-                        {index + 1}
+                        {'<<'}
                     </button>
-                ))}
 
-                {/* 다음 페이지로 이동 버튼 */}
-                <button
-                    className={`admin-spices-pagination-button ${currentPage === totalPages ? 'disabled' : ''}`}
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                >
-                    {'>'}
-                </button>
+                    {/* 이전 페이지로 이동 버튼 */}
+                    <button
+                        className={`admin-spices-pagination-button ${currentPage === 1 ? 'disabled' : ''}`}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    >
+                        {'<'}
+                    </button>
 
-                {/* 마지막으로 이동 버튼 */}
-                <button
-                    className={`admin-spices-pagination-button ${currentPage === totalPages ? 'disabled' : ''}`}
-                    onClick={() => handlePageChange(totalPages)}
-                    disabled={currentPage === totalPages}
-                >
-                    {'>>'}
-                </button>
+                    {/* 페이지 번호 */}
+                    {Array.from({ length: totalPages }, (_, index) => (
+                        <button
+                            key={index + 1}
+                            className={`admin-spices-pagination-button ${currentPage === index + 1 ? 'active' : ''}`}
+                            onClick={() => handlePageChange(index + 1)}
+                        >
+                            {index + 1}
+                        </button>
+                    ))}
+
+                    {/* 다음 페이지로 이동 버튼 */}
+                    <button
+                        className={`admin-spices-pagination-button ${currentPage === totalPages ? 'disabled' : ''}`}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    >
+                        {'>'}
+                    </button>
+
+                    {/* 마지막으로 이동 버튼 */}
+                    <button
+                        className={`admin-spices-pagination-button ${currentPage === totalPages ? 'disabled' : ''}`}
+                        onClick={() => handlePageChange(totalPages)}
+                        disabled={currentPage === totalPages}
+                    >
+                        {'>>'}
+                    </button>
+                </div>
+
             </div>
-
-        </div>
         </>
     );
 }
