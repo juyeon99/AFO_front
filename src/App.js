@@ -14,6 +14,7 @@ import FAQ from './pages/footer/FAQ';
 import Chat from "./pages/chat/Chat";
 import PerfumeList from './pages/booklist/PerfumeList';
 import SpicesList from './pages/booklist/SpicesList';
+import AdminSpicesList from './pages/admin/AdminSpicesList';
 import AdminPerfumeList from './pages/admin/AdminPerfumeList';
 
 function App() {
@@ -23,12 +24,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Main />} />
-            <Route path='/PrivacyPolicy' element={<PrivacyPolicy/>}/>
-            <Route path='/CookiePolicy' element={<CookiePolicy/>}/>
-            <Route path='/TermsofUse' element={<TermsOfUse/>}/>
-            <Route path='/FAQ' element={<FAQ/>}/>
-            <Route path='/spiceslist' element={<SpicesList/>}/>
-            <Route path='/perfumelist' element={<PerfumeList/>}/>
+            <Route path='/PrivacyPolicy' element={<PrivacyPolicy />} />
+            <Route path='/CookiePolicy' element={<CookiePolicy />} />
+            <Route path='/TermsofUse' element={<TermsOfUse />} />
+            <Route path='/FAQ' element={<FAQ />} />
+            <Route path='/spiceslist' element={<SpicesList />} />
+            <Route path='/perfumelist' element={<PerfumeList />} />
           </Route>
 
           <Route path="/" element={<Main/>}/>
@@ -37,7 +38,7 @@ function App() {
           <Route path="/login-info" element={<LoginInfo/>}/>
           <Route path="/chat" element={<Chat/>}/>
           <Route path="/history" element={<History/>}/>
-          
+          <Route path="/admin/spices" element={<AdminSpicesList/>}/>
           <Route path="/admin/perfumes" element={<AdminPerfumeList/>}/>
         </Routes>
       </BrowserRouter>
