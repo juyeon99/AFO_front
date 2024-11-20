@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import '../../css/admin/AdminSpicesList.css';
-import { Search } from 'lucide-react';
+import { Search,Trash2, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Edit } from 'lucide-react';
 
 function AdminSpicesList() {
     const filters = [
@@ -405,7 +404,7 @@ function AdminSpicesList() {
                     <div className="admin-spices-controls">
                         <button onClick={handleAddClick} className="admin-spices-add-button">+</button>
                         <button className="admin-spices-select-button" onClick={toggleSelectMode}>
-                            {isSelecting ? 'v' : 'v'}
+                            {isSelecting ? '✓' : '✓'}
                         </button>
                         <button onClick={handleDeleteClick} className="admin-spices-delete-button">
                             <Trash2 size={20} />

@@ -38,7 +38,15 @@ const Sidebar = () => {
 
             <div className={`sidebar-sidebar ${isOpen ? 'sidebar-sidebar-open' : ''}`}>
                 <nav className="sidebar-nav">
-                    <a href="/Introduction" className="sidebar-link">소개</a>
+                <a href="#" className="sidebar-link"
+                        onClick={(e) => {
+                        e.preventDefault(); // 기본 링크 동작 방지
+                        const target = document.getElementById('intro-section'); // 해당 섹션의 id를 가져옴
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth', block: 'start' }); // 부드럽게 스크롤
+                        }
+                        setIsOpen(false); // 사이드바 닫기
+                    }}>소개</a>
                     <a href="/spiceslist" className="sidebar-link">향료 알아가기</a>
                     <a href="/perfumelist" className="sidebar-link">향수 알아가기</a>
                     <a href="/chat" className="sidebar-link">향수 추천</a>

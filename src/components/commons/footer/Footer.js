@@ -48,7 +48,14 @@ const Footer = () => {
                         <div className="footer-slogan">당신만의 특별한 향기</div>
                         <nav className="footer-navlinks">
                             <div className="footer-nav">
-                                <a href="/intro">소개</a>
+                                <a href="#"
+                                onClick={(e) => {
+                                e.preventDefault(); // 기본 링크 동작 방지
+                                const target = document.getElementById('intro-section'); // 해당 섹션의 id를 가져옴
+                                if (target) {
+                                    target.scrollIntoView({ behavior: 'smooth', block: 'start' }); // 부드럽게 스크롤
+                                }
+                                }}>소개</a>
                                 <span className="separator">|</span>
                                 <a href="/spiceslist">향료 알아가기</a>
                                 <span className="separator">|</span>
