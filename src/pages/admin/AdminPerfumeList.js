@@ -139,7 +139,10 @@ const AdminPerfumeList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [successMessage, setSuccessMessage] = useState('');
     const [editingItem, setEditingItem] = useState(null);
+    const [isAdding, setIsAdding] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
     const itemsPerPage = 12;
+    const [isDeleting, setIsDeleting] = useState(false); // 삭제 모달 상태
 
     const handleCheckboxToggle = () => setShowCheckboxes(!showCheckboxes);
 
@@ -149,26 +152,58 @@ const AdminPerfumeList = () => {
         );
     };
 
-    const handleAddButtonClick = () => setShowAddModal(true);
-    const handleDeleteButtonClick = () => setShowDeleteModal(true);
+    const handleAddButtonClick = () => {
+        setShowAddModal(true);
+        setIsAdding(true); // 추가 모드 활성화
+        setIsEditing(false); // 수정 모드 비활성화
+    };
 
-    // 추가 및 삭제 처리
-    const handleAddSubmit = () => {
-        setShowAddModal(false); // 추가 모달 닫기
-        setSuccessMessage('항수가 성공적으로 등록되었습니다!'); // 성공 메시지 설정
+    const handleDeleteButtonClick = () => {
+        if (checkedCards.length === 0) {
+            alert("삭제할 카드를 선택하세요.");
+            return;
+        }
+
+        const perfumeToDelete = perfumes.find((perfume) => perfume.id === checkedCards[0]); // 첫 번째 선택된 카드
+        setSelectedPerfume(perfumeToDelete); // 삭제할 카드 설정
+        setIsDeleting(true); // 삭제 모달 활성화
     };
 
     const handleDeleteConfirm = () => {
-        setShowDeleteModal(false); // 삭제 모달 닫기
-        setSuccessMessage(`${selectedPerfume} 항료 카드가 삭제되었습니다!`); // 성공 메시지 설정
+        if (!selectedPerfume) {
+            // selectedPerfume이 null일 경우 에러 방지
+            console.error("선택된 향수 카드가 없습니다.");
+            return;
+        }
+
+        // 삭제 로직 실행
+        setIsDeleting(false); // 삭제 모달 닫기
+        setSuccessMessage(`${selectedPerfume.name} 향수 카드가 삭제되었습니다!`); // 성공 메시지 표시
     };
 
-    const handleEditSubmit = () => {
-        // 데이터 수정 로직 추가 (현재는 콘솔 출력)
-        console.log("수정된 데이터:", editingItem);
+    const handleDeleteClose = () => {
+        setIsDeleting(false); // 삭제 모달 닫기
+        setShowDeleteModal(false); // 추가 안전을 위해 모달 닫기
+    };
 
-        setShowEditModal(false); // 수정 모달 닫기
-        setEditingItem(null); // 수정 데이터 초기화
+    const handleSubmit = () => {
+        if (isAdding) {
+            // 추가 로직
+            setSuccessMessage('향수가 성공적으로 등록되었습니다!'); // 추가 성공 메시지
+            setShowAddModal(false); // 추가 모달 닫기
+            setIsAdding(false); // 추가 상태 초기화
+        }
+
+        if (isEditing) {
+            // 수정 로직
+            console.log("수정된 데이터:", editingItem); // 수정 데이터 확인
+            setSuccessMessage('향수가 성공적으로 수정되었습니다!'); // 수정 성공 메시지
+            setShowEditModal(false); // 수정 모달 닫기
+            setIsEditing(false); // 수정 상태 초기화
+        }
+
+        // 상태 초기화 (공통)
+        setEditingItem(null);
     };
 
     const closeModal = () => {
@@ -197,6 +232,8 @@ const AdminPerfumeList = () => {
     const handleEditButtonClick = (perfume) => {
         setSelectedPerfume(perfume);
         setShowEditModal(true);
+        setIsEditing(true); // 수정 모드 활성화
+        setIsAdding(false); // 추가 모드 비활성화
     };
 
     const handleSuccessClose = () => setSuccessMessage('');
@@ -257,9 +294,13 @@ const AdminPerfumeList = () => {
                             {button.label}
                         </button>
                     ))}
-                    <button className="add-button" onClick={handleAddButtonClick}>+</button>
-                    <button className="checkbox-button" onClick={handleCheckboxToggle}>✓</button>
-                    <button className="delete-button" onClick={handleDeleteButtonClick}>🗑</button>
+                    <div className="admin-perfume-list-filters2">
+                        <button className="add-button" onClick={handleAddButtonClick}>+</button>
+                        <button className="checkbox-button" onClick={handleCheckboxToggle}>✓</button>
+                        <button onClick={handleDeleteButtonClick} className="delete-button">
+                            <Trash2 size={20} />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="admin-perfume-items-container">
@@ -270,14 +311,16 @@ const AdminPerfumeList = () => {
                                 {showCheckboxes && (
                                     <input
                                         type="checkbox"
-                                        className="card-checkbox"
+                                        className="card-select-circle"
+                                        name="perfume-select"
+                                        checked={checkedCards.includes(perfume.id)}
                                         onChange={() => handleCardCheckboxChange(perfume.id)}
                                     />
                                 )}
 
                                 {/* Edit 아이콘 버튼 */}
                                 <button
-                                    className="admin-spices-edit-button"
+                                    className="admin-perfume-edit-button"
                                     onClick={() => handleEditButtonClick(perfume)} // 수정 버튼 클릭 시 실행
                                 >
                                     <Edit size={16} color="#333" /> {/* Edit 아이콘 사용 */}
@@ -289,6 +332,9 @@ const AdminPerfumeList = () => {
                                 />
                                 <div className="admin-perfume-item-name">{perfume.name}</div>
                                 <div className="admin-perfume-category">{perfume.brandEn}</div>
+                                <div className="admin-perfume-description">
+                                    {perfume.concentration}
+                                </div>
                             </div>
                         ))}
                 </div>
@@ -407,7 +453,7 @@ const AdminPerfumeList = () => {
                             <div className="admin-perfume-modal-actions">
                                 <button
                                     onClick={() => {
-                                        handleAddSubmit(); handleReset();
+                                        handleSubmit(); handleReset();
                                     }}
                                     className="admin-perfume-save-button"
                                 >
@@ -524,7 +570,12 @@ const AdminPerfumeList = () => {
                                 </div>
                             </div>
                             <div className="admin-perfume-modal-actions">
-                                <button onClick={handleEditSubmit} className="admin-perfume-save-button">
+                                <button
+                                    onClick={() => {
+                                        handleSubmit(); handleReset();
+                                    }}
+                                    className="admin-perfume-save-button"
+                                >
                                     저장
                                 </button>
                                 <button onClick={closeModal} className="admin-perfume-cancel-button">
@@ -535,6 +586,19 @@ const AdminPerfumeList = () => {
                     </div>
                 )}
 
+                {/* 삭제 모달 */}
+                {isDeleting && (
+                    <div className="admin-spices-modal-backdrop">
+                        <div className="admin-spices-modal-container-delete">
+                            <h2 className="admin-spices-modal-title-delete">- 향수카드 삭제 -</h2>
+                            <p>향수카드를 삭제하시겠습니까?</p>
+                            <div className="admin-spices-modal-actions-delete">
+                                <button onClick={handleDeleteConfirm} className="admin-spices-confirm-button">확인</button>
+                                <button onClick={handleDeleteClose} className="admin-spices-cancel-button-delete">취소</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* 성공 메시지 모달 */}
                 {successMessage && (
