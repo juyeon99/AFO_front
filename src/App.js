@@ -14,6 +14,11 @@ import FAQ from './pages/footer/FAQ';
 import Chat from "./pages/chat/Chat";
 import PerfumeList from './pages/booklist/PerfumeList';
 import SpicesList from './pages/booklist/SpicesList';
+import AdminSpicesList from './pages/admin/AdminSpicesList';
+import AdminLayout from './layouts/AdminLayout';
+import AdminMain from './pages/admin/AdminMain';
+import AdminMembers from './pages/admin/AdminMembers';
+
 
 import LoginTest from "./pages/test/LoginTest";
 import KakaoRedirectPage from './pages/test/KakaoRedirectPage';
@@ -34,12 +39,18 @@ function App() {
             <Route path='/perfumelist' element={<PerfumeList />} />
           </Route>
 
-          <Route path="/" element={<Main />} />
-          <Route index element={<Main />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/login-info" element={<LoginInfo />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/history" element={<History />} />
+          <Route path="/" element={<AdminLayout />}>
+            <Route path='/Admin' element={<AdminMain />} />
+            <Route path='/member' element={<AdminMembers/>}/>
+          </Route>
+
+          <Route path="/" element={<Main/>}/>
+          <Route index element={<Main/>}/>
+          <Route path="/login" element={<Login/>}/>
+          <Route path="/login-info" element={<LoginInfo/>}/>
+          <Route path="/chat" element={<Chat/>}/>
+          <Route path="/history" element={<History/>}/>
+          <Route path="/admin/spices" element={<AdminSpicesList/>}/>
 
           <Route path='/logintest' element={<LoginTest />} />
           <Route path='/oauth/redirected/kakao' element={<KakaoRedirectPage />} />
