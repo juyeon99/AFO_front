@@ -47,16 +47,16 @@ function App() {
             <Route path="/admin/perfumes" element={<AdminPerfumeList />} />
           </Route>
 
-          <Route path="/" element={<Main />} />
           <Route index element={<Main />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login/>}/>
+          <Route path="/oauth/redirected/kakao" element={<Login />} />
           <Route path="/login-info" element={<LoginInfo />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/history" element={<History />} />
 
-          <Route path='/logintest' element={<LoginTest />} />
+          {/* <Route path='/logintest' element={<LoginTest />} />
           <Route path='/oauth/redirected/kakao' element={<KakaoRedirectPage />} />
-          <Route path='/membertest' element={<MemberTest />} />
+          <Route path='/membertest' element={<MemberTest />} /> */}
         </Routes>
       </BrowserRouter>
     </>
