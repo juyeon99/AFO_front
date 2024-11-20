@@ -114,7 +114,7 @@ const PerfumeList = () => {
 
     const [perfumes] = useState(tempPerfumes);
     const [currentPage, setCurrentPage] = useState(1);
-    const [activeFilter, setActiveFilter] = useState('');
+    const [activeFilters, setActiveFilters] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
 
     const itemsPerPage = 12;
@@ -127,7 +127,13 @@ const PerfumeList = () => {
     ];
 
     const handleFilterClick = (filterId) => {
-        setActiveFilter(activeFilter === filterId ? '' : filterId);
+        setActiveFilters(prev => {
+            if (prev.includes(filterId)) {
+                return prev.filter(id => id !== filterId);
+            } else {
+                return [...prev, filterId];
+            }
+        });
         setCurrentPage(1);
     };
 
@@ -143,7 +149,8 @@ const PerfumeList = () => {
     const filteredPerfumes = perfumes.filter(perfume => {
         const matchesSearch = perfume.brandEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
             perfume.brandKr.includes(searchTerm);
-        const matchesFilter = !activeFilter || perfume.name.includes(activeFilter);
+        const matchesFilter = activeFilters.length === 0 ||
+            activeFilters.some(filter => perfume.name.includes(filter));
         return matchesSearch && matchesFilter;
     });
 
@@ -182,7 +189,7 @@ const PerfumeList = () => {
                     {filterButtons.map(button => (
                         <button
                             key={button.id}
-                            className={`perfume-list-filter-btn ${activeFilter === button.id ? 'active' : ''}`}
+                            className={`perfume-list-filter-btn ${activeFilters.includes(button.id) ? 'active' : ''}`}
                             onClick={() => handleFilterClick(button.id)}
                         >
                             {button.label}
