@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import '../../../css/components/Sidebar.css'
+import '../../../css/components/AdminSidebar.css'
 import { Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
-const Sidebar = () => {
+const AdminSidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
-    const [userNickname, setUserNickname] = useState('사용자'); // 사용자 닉네임
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userNickname, setUserNickname] = useState('사용자');
     const location = useLocation();
 
     const toggleSidebar = () => {
@@ -14,74 +14,71 @@ const Sidebar = () => {
     };
 
     const handleLogin = () => {
-        // 로그인 처리 로직
         setIsLoggedIn(true);
     };
 
     const handleLogout = () => {
-        // 로그아웃 처리 로직
         setIsLoggedIn(false);
     };
 
-    const isActive = location.pathname === '/';
+    const isActive = location.pathname === '/Admin';
 
     return (
         <>
-            <div className="sidebar-container">
+            <div className="admin-sidebar-container">
                 <button
                     onClick={toggleSidebar}
-                    className={`sidebar-menu-button ${isOpen ? 'open' : ''} ${isActive ? 'active' : ''}`}
+                    className={`admin-sidebar-menu-button ${isOpen ? 'open' : ''} ${isActive ? 'active' : ''}`}
                 >
                     <Menu size={24} />
                 </button>
             </div>
 
-            <div className={`sidebar-sidebar ${isOpen ? 'sidebar-sidebar-open' : ''}`}>
-                <nav className="sidebar-nav">
-                    <a href="/Introduction" className="sidebar-link">소개</a>
-                    <a href="/spiceslist" className="sidebar-link">향료 알아가기</a>
-                    <a href="/perfumelist" className="sidebar-link">향수 알아가기</a>
-                    <a href="/chat" className="sidebar-link">향수 추천</a>
-                    <a href="/history" className="sidebar-link">향기 히스토리</a>
+            <div className={`admin-sidebar-sidebar ${isOpen ? 'admin-sidebar-sidebar-open' : ''}`}>
+                <nav className="admin-sidebar-nav">
+                    <a href="/Introduction" className="admin-sidebar-link">소개</a>
+                    <a href="/spiceswiki" className="admin-sidebar-link">향로 알아가기</a>
+                    <a href="/perfumewiki" className="admin-sidebar-link">향수 알아가기</a>
+                    <a href="/chat" className="admin-sidebar-link">향수 추천</a>
+                    <a href="/history" className="admin-sidebar-link">향기 히스토리</a>
+                    <a href="/member" className="admin-sidebar-link">회원 조회</a>
                     
-                    <div className="sidebar-bottom-links">
+                    <div className="admin-sidebar-bottom-links">
                         {!isLoggedIn ? (
-                            // 비로그인 상태
-                            <div className="sidebar-profile-section">
+                            <div className="admin-sidebar-profile-section">
                                 <img 
                                     src="/images/Main-Propic.png"
-                                    alt="기본 프로필" 
-                                    className="sidebar-profile-img"
+                                    alt="기본 프로필"    
+                                    className="admin-sidebar-profile-img"
                                 />
                                 <button 
-                                    className="sidebar-auth-button login"
+                                    className="admin-sidebar-auth-button login"
                                     onClick={handleLogin}
                                 >
                                     로그인/회원가입
                                 </button>
                             </div>
                         ) : (
-                            // 로그인 상태
                             <>
                                 <button 
-                                    className="sidebar-auth-button"
+                                    className="admin-sidebar-auth-button"
                                     onClick={() => window.location.href='/users/withdrawal'}
                                 >
                                     • 회원탈퇴
                                 </button>
                                 <button 
-                                    className="sidebar-auth-button"
+                                    className="admin-sidebar-auth-button"
                                     onClick={handleLogout}
                                 >
                                     • 로그아웃
                                 </button>
-                                <div className="sidebar-profile-section">
+                                <div className="admin-sidebar-profile-section">
                                     <img 
                                         src="/images/Main-Propic.png"
                                         alt="프로필" 
-                                        className="sidebar-profile-img"
+                                        className="admin-sidebar-profile-img"
                                     />
-                                    <span className="sidebar-username">{userNickname}님</span>
+                                    <span className="admin-sidebar-username">{userNickname}님</span>
                                 </div>
                             </>
                         )}
@@ -91,7 +88,7 @@ const Sidebar = () => {
 
             {isOpen && (
                 <div
-                    className="sidebar-overlay"
+                    className="admin-sidebar-overlay"
                     onClick={toggleSidebar}
                 />
             )}
@@ -99,4 +96,4 @@ const Sidebar = () => {
     );
 };
 
-export default Sidebar;
+export default AdminSidebar;

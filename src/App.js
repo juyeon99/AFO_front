@@ -15,6 +15,10 @@ import Chat from "./pages/chat/Chat";
 import PerfumeList from './pages/booklist/PerfumeList';
 import SpicesList from './pages/booklist/SpicesList';
 import AdminSpicesList from './pages/admin/AdminSpicesList';
+import AdminLayout from './layouts/AdminLayout';
+import AdminMain from './pages/admin/AdminMain';
+import AdminMembers from './pages/admin/AdminMembers';
+
 
 function App() {
   return (
@@ -29,6 +33,11 @@ function App() {
             <Route path='/FAQ' element={<FAQ />} />
             <Route path='/spiceslist' element={<SpicesList />} />
             <Route path='/perfumelist' element={<PerfumeList />} />
+          </Route>
+
+          <Route path="/" element={<AdminLayout />}>
+            <Route path='/Admin' element={<AdminMain />} />
+            <Route path='/member' element={<AdminMembers/>}/>
           </Route>
 
           <Route path="/" element={<Main/>}/>
