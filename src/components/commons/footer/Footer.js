@@ -1,8 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import '../../../css/components/Footer.css';
-import banghyangLogo from '../../../images/banghyangLogo.png';
-import footerLogo from '../../../images/footerLogo.png';
 import { FaInstagram, FaFacebook, FaTwitter, FaYoutube, FaGithub } from "react-icons/fa";
 
 const Footer = () => {
@@ -29,8 +27,8 @@ const Footer = () => {
         <>
             {!isMainPage && (
                 <div className="footer-logo-outer">
-                    <img 
-                        src={footerLogo}
+                    <img
+                        src="/images/footerLogo.png"
                         alt="상단 푸터 로고"
                         className="footer-top-logo"
                     />
@@ -39,8 +37,8 @@ const Footer = () => {
             <footer className="footer">
                 <div className="footer-container">
                     <div className="footer-logo-section">
-                        <img 
-                            src={banghyangLogo}
+                        <img
+                            src="/images/footerLogo.png"
                             alt="방향 로고"
                             className="footer-logo"
                         />
@@ -88,10 +86,10 @@ const Footer = () => {
                                     {link.icon}
                                 </a>
                             ))}
-                        </div>
+                        </div> 
 
                         <div className="footer-company-info">
-                            회사명: 올포원 | 서비스명: 방향(訪香) | 위치: 서울특별시 강남구 테헤란로 123 | 사업자 등록번호: 123-45-67890<br/>
+                            회사명: 올포원 | 서비스명: 방향(訪香) | 위치: 서울특별시 강남구 테헤란로 123 | 사업자 등록번호: 123-45-67890<br />
                             통신판매업 신고번호: 제 2024-서울강남-1234호 | 대표자: 홍길동 | 고객센터: 02-1234-5678 | 이메일: support@banghyang.com
                         </div>
 
