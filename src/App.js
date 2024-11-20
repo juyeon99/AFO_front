@@ -41,20 +41,20 @@ function App() {
 
           <Route path="/" element={<AdminLayout />}>
             <Route path='/Admin' element={<AdminMain />} />
-            <Route path='/member' element={<AdminMembers/>}/>
+            <Route path='/member' element={<AdminMembers />} />
           </Route>
 
-          <Route path="/" element={<Main/>}/>
-          <Route index element={<Main/>}/>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/login-info" element={<LoginInfo/>}/>
-          <Route path="/chat" element={<Chat/>}/>
-          <Route path="/history" element={<History/>}/>
-          <Route path="/admin/spices" element={<AdminSpicesList/>}/>
+          <Route path="/" element={<Main />} />
+          <Route index element={<Main />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/login-info" element={<LoginInfo />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/admin/spices" element={<AdminSpicesList />} />
 
           <Route path='/logintest' element={<LoginTest />} />
           <Route path='/oauth/redirected/kakao' element={<KakaoRedirectPage />} />
-          <Route path='/success' element={<MemberTest />} />
+          <Route path='/membertest' element={<MemberTest />} />
         </Routes>
       </BrowserRouter>
     </>

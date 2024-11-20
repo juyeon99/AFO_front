@@ -13,7 +13,7 @@ function KakaoRedirectPage() {
             const response = await axios.get(`http://localhost:8080/oauth/login/kakao?code=${code}`)
             const data = response.data // 응답 데이터
             alert("로그인 성공" + data)
-            navigate("/success")
+            navigate("/")
         } catch (error) {
             navigate("/fail")
         }
