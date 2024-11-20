@@ -1,6 +1,7 @@
 /* AdminMembers.css */
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
+
 .admin-members-container {
     position: relative;
     width: 1200px;
@@ -55,15 +56,15 @@
 }
 
 .admin-members-divider-line {
-    width: 110%;  /* 120%에서 100%로 변경 */
+    width: 110%;
     height: 1px;
     background-color: #333;
-    margin: 60px auto 0;  /* auto를 사용하여 가운데 정렬 */
+    margin: 60px auto 0;
     margin-bottom: 30px;
     transform: translateY(-70px);
     position: relative;
     left: 50%;
-    transform: translate(-50%, -70px);  /* X축 중앙 정렬을 위해 -50% 추가 */
+    transform: translate(-50%, -70px);
 }
 
 .admin-members-table {
@@ -73,8 +74,11 @@
 
 .admin-members-table table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate; /* collapse에서 separate로 변경 */
+    border-spacing: 0; /* 셀 간격을 0으로 설정 */
     background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
 }
 
 .admin-members-table th,
@@ -84,11 +88,47 @@
     border: 1px solid #333;
 }
 
-.admin-members-table th {
-    background-color: #fff;
-    font-weight: bold;
+/* 첫 번째 행(th)의 첫 번째와 마지막 셀 둥글게 */
+.admin-members-table th:first-child {
+    border-top-left-radius: 10px;
+}
+.admin-members-table th:last-child {
+    border-top-right-radius: 10px;
+}
+
+/* 마지막 행의 첫 번째와 마지막 셀 둥글게 */
+.admin-members-table tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+.admin-members-table tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
 }
 
 .admin-members-table tr:hover {
     background-color: #f9f9f9;
+}
+
+.admin-members-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.pagination-button {
+    padding: 8px 12px;
+    border: 1px solid #333;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+}
+
+.pagination-button:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination-button.active {
+    background-color: #333;
+    color: #fff;
 }
