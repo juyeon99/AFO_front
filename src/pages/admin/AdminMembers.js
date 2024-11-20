@@ -9,7 +9,7 @@ function AdminMembers() {
         {
             id: 1,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
@@ -17,7 +17,7 @@ function AdminMembers() {
         {
             id: 2,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
@@ -25,7 +25,7 @@ function AdminMembers() {
         {
             id: 3,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
@@ -33,7 +33,7 @@ function AdminMembers() {
         {
             id: 4,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
@@ -41,7 +41,7 @@ function AdminMembers() {
         {
             id: 5,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
@@ -49,7 +49,7 @@ function AdminMembers() {
         {
             id: 6,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
@@ -57,7 +57,7 @@ function AdminMembers() {
         {
             id: 7,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
@@ -65,7 +65,7 @@ function AdminMembers() {
         {
             id: 8,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
@@ -73,7 +73,7 @@ function AdminMembers() {
         {
             id: 9,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
@@ -81,7 +81,7 @@ function AdminMembers() {
         {
             id: 10,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
@@ -89,7 +89,7 @@ function AdminMembers() {
         {
             id: 11,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
@@ -97,7 +97,7 @@ function AdminMembers() {
         {
             id: 12,
             memberId: '은혜감자',
-            name: '문은혜',
+            name: '권은혜',
             gender: '여자',
             age: 26,
             email: 'king@gmail.com'
