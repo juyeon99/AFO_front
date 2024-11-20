@@ -15,7 +15,8 @@ import Chat from "./pages/chat/Chat";
 import PerfumeList from './pages/booklist/PerfumeList';
 import SpicesList from './pages/booklist/SpicesList';
 import AdminLayout from './layouts/AdminLayout';
-import AdminMain from './pages/AdminMain';
+import AdminMain from './pages/admin/AdminMain';
+import AdminMembers from './pages/admin/AdminMembers';
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
 
           <Route path="/" element={<AdminLayout />}>
             <Route path='/Admin' element={<AdminMain />} />
+            <Route path='/member' element={<AdminMembers/>}/>
           </Route>
 
           <Route path="/" element={<Main />} />

@@ -1,6 +1,6 @@
-import '../css/pages/admin/AdminMain.css';
+import '../../css/pages/admin/AdminMain.css';
 import React, { useEffect, useState, useRef } from 'react';
-import Login from './Login'
+import Login from '../Login'
 import { NavLink } from 'react-router-dom'
 
 function AdminMain() {
