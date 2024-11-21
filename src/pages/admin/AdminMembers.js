@@ -4,7 +4,6 @@ import { Search } from 'lucide-react';
 import '../../css/pages/admin/AdminMembers.css';
 
 function AdminMembers() {
-    // 임시 회원 데이터
     const tempMembers = [
         {
             id: 1,
@@ -106,14 +105,28 @@ function AdminMembers() {
 
     const [members] = useState(tempMembers);
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const membersPerPage = 10;
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
+        setCurrentPage(1); // 검색 시 첫 페이지로 이동
     };
 
     const filteredMembers = members.filter(member => 
         member.memberId.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    // 페이지네이션 계산
+    const indexOfLastMember = currentPage * membersPerPage;
+    const indexOfFirstMember = indexOfLastMember - membersPerPage;
+    const currentMembers = filteredMembers.slice(indexOfFirstMember, indexOfLastMember);
+    const totalPages = Math.ceil(filteredMembers.length / membersPerPage);
+
+    // 페이지 변경 핸들러
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
 
     return (
         <div className="admin-members-container">
@@ -149,7 +162,7 @@ function AdminMembers() {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredMembers.map((member) => (
+                        {currentMembers.map((member) => (
                             <tr key={member.id}>
                                 <td>{member.memberId}</td>
                                 <td>{member.name}</td>
@@ -160,6 +173,18 @@ function AdminMembers() {
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+            <div className="admin-members-pagination">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`pagination-button ${currentPage === pageNum ? 'active' : ''}`}
+                    >
+                        {pageNum}
+                    </button>
+                ))}
             </div>
         </div>
     );
