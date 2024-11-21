@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import '../../../css/components/Footer.css';
+import '../../css/components/Footer.css';
 import { FaInstagram, FaFacebook, FaTwitter, FaYoutube, FaGithub } from "react-icons/fa";
 
 const Footer = () => {

@@ -8,6 +8,10 @@
     z-index: 10;
 }
 
+.sidebar-menu {
+    translate: 20px -40px;
+}
+
 .sidebar-menu-button {
     background: none;
     border: none;
