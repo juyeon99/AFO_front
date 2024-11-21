@@ -21,7 +21,7 @@ import AdminMembers from './pages/admin/AdminMembers';
 import AdminPerfumeList from './pages/admin/AdminPerfumeList';
 import ErrorScreen from './Fail';
 
-
+// 원래 로그인
 import LoginTest from "./pages/test/LoginTest";
 import KakaoRedirectPage from './pages/test/KakaoRedirectPage';
 import MemberTest from './pages/test/MemberTest';
@@ -39,6 +39,7 @@ function App() {
             <Route path='/FAQ' element={<FAQ />} />
             <Route path='/spiceslist' element={<SpicesList />} />
             <Route path='/perfumelist' element={<PerfumeList />} />
+            <Route path="/history" element={<History />} />
           </Route>
 
           <Route path="/" element={<AdminLayout />}>
@@ -54,7 +55,7 @@ function App() {
           <Route path='/fail' element={<ErrorScreen/>}/>
           <Route path="/login-info" element={<LoginInfo />} />
           <Route path="/chat" element={<Chat />} />
-          <Route path="/history" element={<History />} />
+
 
           {/* <Route path='/logintest' element={<LoginTest />} />
           <Route path='/oauth/redirected/kakao' element={<KakaoRedirectPage />} />

@@ -210,6 +210,9 @@ const PerfumeList = () => {
                                 <div className="perfume-item-name">{perfume.name}</div>
                                 <div className="perfume-divider-small"></div>
                                 <div className="perfume-category">{perfume.brandEn}</div>
+                                <div className="perfume-description">
+                                    {perfume.concentration}
+                                </div>
                             </div>
                         ))}
                 </div>
