@@ -3,23 +3,35 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { handleOAuthKakao } from '../module/AuthModule';
+import ErrorScreen from '../Fail';
 
 function Login() {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
 
-    const { loading, isLoggedIn, error } = useSelector((state) => state.auth); // Redux 상태 가져오기
+    const { loading, error } = useSelector((state) => state.auth); // Redux 상태 가져오기
+
+    // LoadingScreen
+    function LoadingScreen() {
+        return (
+            <div className="login-container-loading">
+                <div className="spinner"></div>
+                <span>로그인 처리 중입니다...</span>
+            </div>
+        );
+    }
 
     // 카카오 OAuth 처리
     useEffect(() => {
         const searchParam = new URLSearchParams(location.search);
         const code = searchParam.get('code'); // 카카오 리다이렉트로 받은 code 확인
+        console.log("리다이렉트 후 인증 코드:", code);
         if (code) {
             dispatch(handleOAuthKakao(code))
                 .then(() => {
                     alert('로그인 성공!');
-                    window.location.href = "/";
+                    navigate('/');;
                 })
                 .catch(() => {
                     alert('로그인 실패!');
@@ -31,15 +43,18 @@ function Login() {
     // UI 처리
     const handleLogin = () => {
         // 카카오 로그인 URL로 리디렉트
+        console.log("카카오 로그인 버튼 클릭");
         window.location.href = "http://localhost:8080/oauth/kakao";
     };
 
+    // 로딩 화면 처리
     if (loading) {
-        return <div className="login-container">로그인 처리 중...</div>;
+        return <LoadingScreen />;
     }
 
+    // 에러 화면 처리
     if (error) {
-        return <div className="login-container">에러 발생: {error}</div>;
+        return <ErrorScreen errorMessage={error} onRetry={() => window.location.reload()} />;
     }
 
     return (

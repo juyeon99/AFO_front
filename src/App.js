@@ -19,6 +19,7 @@ import AdminLayout from './layouts/AdminLayout';
 import AdminMain from './pages/admin/AdminMain';
 import AdminMembers from './pages/admin/AdminMembers';
 import AdminPerfumeList from './pages/admin/AdminPerfumeList';
+import ErrorScreen from './Fail';
 
 
 import LoginTest from "./pages/test/LoginTest";
@@ -50,6 +51,7 @@ function App() {
           <Route index element={<Main />} />
           <Route path="/login" element={<Login/>}/>
           <Route path="/oauth/redirected/kakao" element={<Login />} />
+          <Route path='/fail' element={<ErrorScreen/>}/>
           <Route path="/login-info" element={<LoginInfo />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/history" element={<History />} />

@@ -25,10 +25,10 @@ const Sidebar = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('token'); // 로컬 스토리지에서 토큰 제거
+        localStorage.removeItem(''); // 로컬 스토리지에서 토큰 제거
         dispatch(logout()); // Redux 상태 초기화
-        setIsMenuOpen(false); // 메뉴 닫기
         setIsOpen(false); // 사이드바 닫기
-        navigate('/login'); // 로그아웃 후 메인 페이지로 이동
+        navigate('/'); // 로그아웃 후 메인 페이지로 이동
     };
 
     const isActive = location.pathname === '/';
@@ -82,15 +82,7 @@ const Sidebar = () => {
                                         alt="프로필"
                                         className="sidebar-profile-img"
                                     />
-                                    <span className="sidebar-username">{userNickname}님</span>
-
-                                    {/* 사용자 이름 클릭 시 메뉴 열기 */}
-                                    <button
-                                        className="sidebar-auth-button"
-                                        onClick={toggleMenu}
-                                    >
-                                        {isMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
-                                    </button>
+                                    <span className="sidebar-username" onClick={toggleMenu}>{userNickname}님</span>
                                 </div>
 
                                 {/* 회원탈퇴/로그아웃 메뉴 */}
