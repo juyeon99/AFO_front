@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../css/components/Sidebar.css'
 import { Menu } from 'lucide-react';
 import { useLocation, NavLink, useNavigate } from 'react-router-dom';
@@ -9,11 +9,18 @@ const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false); // 회원탈퇴/로그아웃 메뉴 열림 상태
     const { isLoggedIn, user } = useSelector((state) => state.auth);
-    // 사용자 닉네임 가져오기 (없으면 기본값 '사용자')
-    const userNickname = user?.name || '사용자';
+    const [localUser, setLocalUser] = useState(null);
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        // 로컬 스토리지에서 사용자 정보 가져오기
+        const storedUser = JSON.parse(localStorage.getItem('auth'));
+        if (storedUser) {
+            setLocalUser(storedUser); // 로컬 사용자 정보 상태 저장
+        }
+    }, [isLoggedIn]);
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
@@ -24,13 +31,36 @@ const Sidebar = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('token'); // 로컬 스토리지에서 토큰 제거
-        localStorage.removeItem(''); // 로컬 스토리지에서 토큰 제거
+        localStorage.removeItem('auth');
         dispatch(logout()); // Redux 상태 초기화
         setIsOpen(false); // 사이드바 닫기
         navigate('/'); // 로그아웃 후 메인 페이지로 이동
+        window.location.reload(); // 페이지 새로고침
     };
 
+    const handleScrollToIntro = (e) => {
+        e.preventDefault(); // 기본 링크 동작 방지
+
+        const target = document.getElementById('intro-section'); // 현재 페이지에서 섹션 찾기
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' }); // 부드럽게 스크롤
+        } else {
+            // 메인 페이지로 이동한 후 스크롤 동작 실행
+            navigate('/', { replace: false });
+            setTimeout(() => {
+                const newTarget = document.getElementById('intro-section');
+                if (newTarget) {
+                    newTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100); // 페이지 이동 후 DOM 렌더링 시간을 고려하여 딜레이 추가
+        }
+
+        setIsOpen(false); // 사이드바 닫기
+    };
+
+    const userNickname = localUser?.name || '사용자';
+    const userRole = localUser?.role || 'USER'; // 사용자 역할 가져오기
+    const isAdmin = userRole === 'ADMIN';
     const isActive = location.pathname === '/';
 
     return (
@@ -46,19 +76,18 @@ const Sidebar = () => {
 
             <div className={`sidebar-sidebar ${isOpen ? 'sidebar-sidebar-open' : ''}`}>
                 <nav className="sidebar-nav">
-                    <a href="#" className="sidebar-link"
-                        onClick={(e) => {
-                            e.preventDefault(); // 기본 링크 동작 방지
-                            const target = document.getElementById('intro-section'); // 해당 섹션의 id를 가져옴
-                            if (target) {
-                                target.scrollIntoView({ behavior: 'smooth', block: 'start' }); // 부드럽게 스크롤
-                            }
-                            setIsOpen(false); // 사이드바 닫기
-                        }}>소개</a>
+                    <a href="#" className="sidebar-link" onClick={handleScrollToIntro}>
+                        소개
+                    </a>
                     <a href="/spiceslist" className="sidebar-link">향료 알아가기</a>
                     <a href="/perfumelist" className="sidebar-link">향수 알아가기</a>
                     <a href="/chat" className="sidebar-link">향수 추천</a>
                     <a href="/history" className="sidebar-link">향기 히스토리</a>
+
+                    {/* 관리자 전용 링크 */}
+                    {isAdmin && (
+                        <a href="/member" className="admin-sidebar-link">회원 조회</a>
+                    )}
 
                     <div className="sidebar-bottom-links">
                         {!isLoggedIn ? (

@@ -1,15 +1,16 @@
 import '../css/Main.css';
 import React, { useEffect, useState, useRef } from 'react';
-import Login from './Login'
 import { NavLink } from 'react-router-dom'
 
 function Main() {
     const [scrollY, setScrollY] = useState(0);
+    const [showScrollTopButton, setShowScrollTopButton] = useState(false);
     const [loaded, setLoaded] = useState(false);
     const [introInView, setIntroInView] = useState(false);
     const [additionalInView1, setAdditionalInView1] = useState(false);
     const [additionalInView2, setAdditionalInView2] = useState(false);
     const [fadeInSectionInView, setFadeInSectionInView] = useState(false);
+    const [role, setRole] = useState(null);
 
     const videoRef = useRef(null);
     const introSectionRef = useRef(null);
@@ -20,6 +21,7 @@ function Main() {
     useEffect(() => {
         const handleScroll = () => {
             setScrollY(window.scrollY);
+            setShowScrollTopButton(window.scrollY > 300); // 스크롤이 300px 이상이면 버튼 표시
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
@@ -28,6 +30,13 @@ function Main() {
     useEffect(() => {
         if (videoRef.current) {
             videoRef.current.onloadeddata = () => setLoaded(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem('auth'));
+        if (storedUser && storedUser.role) {
+            setRole(storedUser.role); // 사용자 역할 저장
         }
     }, []);
 
@@ -69,6 +78,13 @@ function Main() {
     const videoOpacity = loaded ? Math.max(1 - scrollY / 300, 0) : 1;
     const overlayOpacity = Math.min(scrollY / 300, 1);
 
+    const handleScrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth', // 부드럽게 스크롤
+        });
+    };
+
     // 각 섹션 스타일 (Intersection Observer 상태에 따라 변경)
     const introSectionStyle = {
         opacity: introInView ? 1 : 0,
@@ -94,10 +110,20 @@ function Main() {
         transition: 'opacity 0.7s ease, transform 0.7s ease',
     };
 
+
+
     return (
         <>
             <div className="main-video-container">
                 <img src="/images/logo-w.png" alt="1번 이미지" className="main-logo-image" />
+
+                {/* 관리자 문구 */}
+                {role === 'ADMIN' && (
+                    <div className="admin-banner">
+                        관리자 페이지
+                    </div>
+                )}
+
                 <video
                     ref={videoRef}
                     className="main-background-video"
@@ -177,6 +203,13 @@ function Main() {
                 </div>
                 <img src="/images/footer.png" alt="footer-image" className="footer-image" />
             </div>
+
+            {/* 위로 올라가기 버튼 */}
+            {showScrollTopButton && (
+                <button className="scroll-to-top-button" onClick={handleScrollToTop}>
+                    ▲
+                </button>
+            )}
         </>
     );
 }

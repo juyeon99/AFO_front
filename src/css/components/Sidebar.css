@@ -9,7 +9,7 @@
 }
 
 .sidebar-menu {
-    translate: 20px -40px;
+    translate: 20px -80px;
 }
 
 .sidebar-menu-button {
@@ -61,6 +61,13 @@
 }
 
 .sidebar-link {
+    color: #333;
+    text-decoration: none;
+    padding: 0.5rem;
+    transition: color 0.2s;
+}
+
+.admin-sidebar-link {
     color: #333;
     text-decoration: none;
     padding: 0.5rem;

@@ -1,6 +1,6 @@
 import '../../css/Chat.css';
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 function Chat() {
 
@@ -320,10 +320,22 @@ function Chat() {
         setIsSearchMode((prevMode) => !prevMode);
     };
 
+    const navigate = useNavigate();
+
+    const handleGoBack = () => {
+        navigate(-1); // 이전 페이지로 이동
+    };
+
+
     return (
         <div className="chat-container-wrapper">
             <div className="chat-container">
                 <div className="chat-header">
+                    {/* 뒤로가기 버튼 */}
+                    <button className="chat-back-button" onClick={handleGoBack}>
+                        <img src="/images/back.png" alt="back" className="chat-back-image" />
+                    </button>
+
                     <NavLink to="/">
                         <img src="/images/logo.png" alt="방향" className="chat-title-image" />
                     </NavLink>

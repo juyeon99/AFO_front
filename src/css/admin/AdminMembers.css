@@ -8,6 +8,7 @@
     background: #EFEDED;
     padding: 120px;
     box-sizing: border-box;
+    transform: translateY(-40px);
 }
 
 .admin-members-header {
@@ -131,27 +132,36 @@
     border-bottom-right-radius: 10px;
 }
 
-.admin-members-pagination {
+.admin-member-pagination {
     display: flex;
     justify-content: center;
-    gap: 10px;
     margin-top: 20px;
+    gap: 10px;
 }
 
-.pagination-button {
-    padding: 8px 12px;
-    border: 1px solid #333;
-    background-color: #fff;
+.admin-member-pagination-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #EFEDED;
+    color: #000000;
     cursor: pointer;
     transition: all 0.3s ease;
-    border-radius: 5px;
 }
 
-.pagination-button:hover {
-    background-color: #f0f0f0;
+.admin-member-pagination-button.active {
+    background-color: #EFEDED;
+    color: black;
+    font-weight: bold;
 }
 
-.pagination-button.active {
-    background-color: #333;
-    color: #fff;
+.admin-member-pagination-button:hover:not(.disabled) {
+    background-color: #CDC6CE;
+    color: #FFFFFF;
+}
+
+.admin-member-pagination-button.disabled {
+    color: #A0A0A0;
+    cursor: not-allowed;
 }

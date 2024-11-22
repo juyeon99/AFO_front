@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../css/pages/footer/TermsofUse.css';
+import '../../css/footer/TermsofUse.css';
 
 const TermsOfUse = () => {
 

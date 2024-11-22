@@ -200,22 +200,6 @@
     opacity: 1;
 }
 
-.admin-spices-card-checkbox {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 20px;
-    height: 20px;
-}
-
-.admin-spices-card-icons {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    gap: 5px;
-}
-
 .admin-spices-select-icon,
 .admin-spices-delete-icon {
     background: none;
@@ -223,7 +207,6 @@
     font-size: 20px;
     cursor: pointer;
 }
-
 
 .admin-spices-controls {
     display: flex;
@@ -281,7 +264,7 @@
     border-radius: 50%;     
     cursor: pointer;         
     transition: background-color 0.3s ease;
-    translate: -70px -130px;
+    translate: -80px -140px;
 }
 
 .admin-spices-item-select-checkbox:checked + label {
@@ -490,8 +473,8 @@
 /* Edit 아이콘 버튼 */
 .admin-spices-edit-button {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 15px;
+    right: 20px;
     background: none;
     border: none;
     cursor: pointer;

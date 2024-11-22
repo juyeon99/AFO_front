@@ -30,11 +30,9 @@ function Login() {
         if (code) {
             dispatch(handleOAuthKakao(code))
                 .then(() => {
-                    alert('로그인 성공!');
                     navigate('/');;
                 })
                 .catch(() => {
-                    alert('로그인 실패!');
                     navigate('/fail'); // 실패 시 실패 페이지로 이동
                 });
         }
@@ -44,7 +42,7 @@ function Login() {
     const handleLogin = () => {
         // 카카오 로그인 URL로 리디렉트
         console.log("카카오 로그인 버튼 클릭");
-        window.location.href = "http://localhost:8080/oauth/kakao";
+        window.location.href = "http://localhost:8080/kakao/login";
     };
 
     // 로딩 화면 처리
@@ -59,7 +57,7 @@ function Login() {
 
     return (
         <div className="login-container">
-            <img src="/images/logo.png" className="login-logo" alt="Logo" />
+            <img src="/images/logo.png" className="login-logo" alt="Logo" onClick={() => navigate('/')}/>
             <p className="login-subtitle">당신의 향기, 당신의 이야기 - 일상의 특별한 향기</p>
 
             <div className="login-box">

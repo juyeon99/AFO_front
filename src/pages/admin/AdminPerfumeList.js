@@ -127,16 +127,16 @@ const AdminPerfumeList = () => {
     ];
 
     const [perfumes, setPerfumes] = useState(tempAdminPerfumes);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [activeFilter, setActiveFilter] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
     const [showCheckboxes, setShowCheckboxes] = useState(false); // 체크박스 표시 여부
     const [checkedCards, setCheckedCards] = useState([]); // 선택된 카드 목록
     const [showAddModal, setShowAddModal] = useState(false); // 추가 모달 표시
     const [showDeleteModal, setShowDeleteModal] = useState(false); // 삭제 모달 표시
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedPerfume, setSelectedPerfume] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [activeFilter, setActiveFilter] = useState("");
     const [imagePreview, setImagePreview] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
     const [successMessage, setSuccessMessage] = useState('');
     const [editingItem, setEditingItem] = useState(null);
     const [isAdding, setIsAdding] = useState(false);
@@ -294,10 +294,10 @@ const AdminPerfumeList = () => {
                             {button.label}
                         </button>
                     ))}
-                    <div className="admin-perfume-list-filters2">
-                        <button className="add-button" onClick={handleAddButtonClick}>+</button>
-                        <button className="checkbox-button" onClick={handleCheckboxToggle}>✓</button>
-                        <button onClick={handleDeleteButtonClick} className="delete-button">
+                    <div className="admin-perfume-controls">
+                        <button className="admin-perfume-add-button" onClick={handleAddButtonClick}>+</button>
+                        <button className="admin-perfume-checkbox-button" onClick={handleCheckboxToggle}>✓</button>
+                        <button onClick={handleDeleteButtonClick} className="admin-perfume-delete-button">
                             <Trash2 size={20} />
                         </button>
                     </div>
@@ -311,7 +311,7 @@ const AdminPerfumeList = () => {
                                 {showCheckboxes && (
                                     <input
                                         type="checkbox"
-                                        className="card-select-circle"
+                                        className="admin-perfume-card-select-circle"
                                         name="perfume-select"
                                         checked={checkedCards.includes(perfume.id)}
                                         onChange={() => handleCardCheckboxChange(perfume.id)}
