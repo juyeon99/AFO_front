@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../css/pages/footer/CookiePolicy.css';
+import '../../css/footer/CookiePolicy.css';
 
 const CookiePolicy = () => {
     

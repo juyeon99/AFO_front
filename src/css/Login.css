@@ -110,6 +110,7 @@
     width: 700px;
     height: 400px;
     gap: 20px;
+    translate: 0px 50px;
 }
 
 .kakao-login-button {

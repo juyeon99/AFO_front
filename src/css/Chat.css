@@ -31,6 +31,28 @@
     text-align: center;
 }
 
+.chat-back-button {
+    position: absolute;
+    top: 10px; /* 화면 상단에서의 거리 */
+    left: 10px; /* 화면 왼쪽에서의 거리 */
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
+    font-family: 'Nanum Myeongjo';
+}
+
+.chat-back-button:hover .chat-back-image {
+    filter: invert(40%) sepia(80%) saturate(300%) hue-rotate(210deg); /* 색상 변경 효과 */
+    transform: scale(1.1); /* 이미지 확대 */
+}
+
+.chat-back-image {
+    width: 60px;
+    height: 60px;
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
 .chat-title-image {
     max-width: 150px;
     max-height: 150px;

@@ -8,11 +8,11 @@ const apis = axios.create({
     },
 });
 
-// 요청 인터셉터: 인증 토큰 추가
+// 요청 인터셉터: Access Token 추가
 apis.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token"); // 토큰 가져오기
-    if (token) {
-        config.headers["Authorization"] = `Bearer ${token}`; // Authorization 헤더 추가
+    const accessToken = localStorage.getItem("accessToken"); // Access Token 가져오기
+    if (accessToken) {
+        config.headers["Authorization"] = `Bearer ${accessToken}`; 
     }
     console.log("Request Sent:", config); // 요청 로그
     return config;
@@ -24,10 +24,10 @@ apis.interceptors.response.use(
     (error) => {
         if (error.response && error.response.status === 401) {
             console.error("Unauthorized: Token expired or invalid");
-            localStorage.removeItem("token"); // 토큰 제거
-            window.location.href = "/login"; // 로그인 페이지로 이동
+            localStorage.removeItem("accessToken"); // Access Token 제거
+            window.location.href = "/login";
         }
-        return Promise.reject(error); // 다른 에러 반환
+        return Promise.reject(error);
     }
 );
 
