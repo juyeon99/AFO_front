@@ -1,121 +1,36 @@
 // AdminMembers.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import '../../css/admin/AdminMembers.css';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from "react-redux";
+import { fetchMembers, selectMembers, selectLoading } from "../../module/MemberModule";
+
 
 function AdminMembers() {
-    const tempMembers = [
-        {
-            id: 1,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        },
-        {
-            id: 2,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        },
-        {
-            id: 3,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        },
-        {
-            id: 4,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        },
-        {
-            id: 5,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        },
-        {
-            id: 6,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        },
-        {
-            id: 7,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        },
-        {
-            id: 8,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        },
-        {
-            id: 9,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        },
-        {
-            id: 10,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        },
-        {
-            id: 11,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        },
-        {
-            id: 12,
-            memberId: '은혜감자',
-            name: '권은혜',
-            gender: '여자',
-            age: 26,
-            email: 'king@gmail.com'
-        }
-    ];
 
-    const [members] = useState(tempMembers);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const members = useSelector(selectMembers);
+    const loading = useSelector(selectLoading);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const membersPerPage = 10;
 
+    useEffect(() => {
+        dispatch(fetchMembers());
+    }, [dispatch]);
+
     const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
+        e.preventDefault();
+        console.log("Search Term:", e.target.value); // 입력값 확인
+        setSearchTerm(e.target.value || "");
         setCurrentPage(1); // 검색 시 첫 페이지로 이동
     };
 
+    
     const filteredMembers = members.filter(member =>
-        member.memberId.toLowerCase().includes(searchTerm.toLowerCase())
+        member.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // 페이지네이션 계산
@@ -128,8 +43,6 @@ function AdminMembers() {
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
-
-    const navigate = useNavigate();
 
     return (
         <>
@@ -147,7 +60,7 @@ function AdminMembers() {
                         <input
                             type="text"
                             className="admin-members-search"
-                            placeholder="아이디 검색"
+                            placeholder="이름 검색"
                             value={searchTerm}
                             onChange={handleSearch}
                         />
@@ -162,28 +75,34 @@ function AdminMembers() {
                 <div className="admin-members-divider-line" />
 
                 <div className="admin-members-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>회원 아이디</th>
-                                <th>회원 이름</th>
-                                <th>성별</th>
-                                <th>나이</th>
-                                <th>이메일</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentMembers.map((member) => (
-                                <tr key={member.id}>
-                                    <td>{member.memberId}</td>
-                                    <td>{member.name}</td>
-                                    <td>{member.gender}</td>
-                                    <td>{member.age}</td>
-                                    <td>{member.email}</td>
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : (
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>이름</th>
+                                    <th>이메일</th>
+                                    <th>성별</th>
+                                    <th>출생연도</th>
+                                    <th>가입일</th>
+                                    <th>역할</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {currentMembers.map((member) => (
+                                    <tr key={member.email}>
+                                        <td>{member.name}</td>
+                                        <td>{member.email}</td>
+                                        <td>{member.gender}</td>
+                                        <td>{member.birthyear}</td>
+                                        <td>{new Date(member.createdAt).toLocaleDateString()}</td>
+                                        <td>{member.role}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
 
                 <div className="admin-member-pagination">

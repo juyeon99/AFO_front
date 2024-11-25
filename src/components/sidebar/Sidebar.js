@@ -64,7 +64,7 @@ const Sidebar = () => {
     const isActive = location.pathname === '/';
 
     return (
-        <>
+        <div className="sidebar-wrapper">
             <div className="sidebar-container">
                 <button
                     onClick={toggleSidebar}
@@ -142,7 +142,7 @@ const Sidebar = () => {
                     onClick={toggleSidebar}
                 />
             )}
-        </>
+        </div>
     );
 };
 

@@ -1,3 +1,16 @@
+.sidebar-wrapper {
+    position: fixed; /* 화면에 고정 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
 .sidebar-container {
     display: flex;
     align-items: center;
@@ -9,7 +22,7 @@
 }
 
 .sidebar-menu {
-    translate: 20px -80px;
+    translate: 40px -90px;
 }
 
 .sidebar-menu-button {
@@ -91,6 +104,11 @@
     text-align: left;
     width: 100%;
     margin-left: 50px;
+
+    white-space: nowrap; /* 텍스트가 줄 바꿈되지 않도록 */
+    overflow: hidden; /* 텍스트 넘침 방지 */
+    text-overflow: ellipsis; /* 넘치는 텍스트는 생략 (...) */
+    display: inline-block;
 }
 
 .sidebar-auth-button:hover {
@@ -114,6 +132,7 @@
     bottom: 40px;
     left: 80px; /* 수평 가운데 정렬 */
     transform: translateX(-30%); /* 수평 가운데 정렬을 위한 이동 */
+    flex-direction: row;
 }
 
 
@@ -129,13 +148,19 @@
     color: #333;
     font-size: 1rem;
     font-weight: 500;
+    writing-mode: horizontal-tb; /* 텍스트를 항상 가로로 표시 */
+    white-space: nowrap; /* 텍스트 줄 바꿈 방지 */
+    display: inline-block; /* 가로 정렬 유지 */
 }
 
 .sidebar-bottom-links {
-    margin-top: 370px;
+    position: absolute; /* 부모 컨테이너 기준 */
+    bottom: 40px; /* 하단에서 40px 고정 */
+    left: 20px; /* 왼쪽에서 20px 고정 */
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    margin: 0; /* margin 제거 */
 }
 
 .sidebar-overlay {
