@@ -7,7 +7,6 @@ function SpicesList() {
     const filters = [
         { name: 'ALL', color: '#FFFFFF' },
         { name: 'Spicy', color: '#FF5757' },
-        { name: 'Chypre', color: '#FF7F43' },
         { name: 'Fruity', color: '#FFBD43' },
         { name: 'Citrus', color: '#FFE043' },
         { name: 'Green', color: '#62D66A' },

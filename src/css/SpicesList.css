@@ -33,7 +33,7 @@
 
 .spices-filters {
     display: grid;
-    grid-template-columns: repeat(9, auto); 
+    grid-template-columns: repeat(8, auto); 
     gap: 10px;
     width: 60%;
     transform: translateY(-40px);

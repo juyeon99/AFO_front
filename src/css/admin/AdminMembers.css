@@ -15,25 +15,25 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 10px;
-    transform: translateY(-60px);
+    padding: 10px 0; /* 상하 여백 */
+    position: relative;
+    z-index: 1; /* 헤더는 검색창 아래 */
 }
 
 .admin-members-title {
     font-family: 'NanumMyeongjo', serif;
     font-size: 24px;
     font-weight: bold;
-    translate: 5px 50px;
-    margin-left: -40px;
-    margin-bottom: 8px;
+    translate: -30px -5px;
 }
 
 .admin-members-search-container {
-    position: absolute;
-    max-width: 200px;
-    width: 100%;
-    translate: 750px 50px;
-    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    position: relative; /* 검색창 위치 설정 */
+    max-width: 300px; /* 검색창 최대 너비 */
+    z-index: 10; /* 헤더 위로 배치 */
+    margin-left: auto; /* 오른쪽 정렬 */
 }
 
 .admin-members-search {
@@ -45,6 +45,7 @@
     border-radius: 20px;
     margin-bottom: 20px;
     position: relative;
+    z-index: 15;
 }
 
 .admin-members-search-icon {
@@ -53,6 +54,7 @@
     top: 50%;
     transform: translate(0px, -20px);
     cursor: pointer;
+    z-index: 15;
 }
 
 .admin-members-divider-line {
