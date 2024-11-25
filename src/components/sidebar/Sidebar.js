@@ -64,7 +64,7 @@ const Sidebar = () => {
     const isActive = location.pathname === '/';
 
     return (
-        <div className="sidebar-wrapper">
+        <>
             <div className="sidebar-container">
                 <button
                     onClick={toggleSidebar}
@@ -76,18 +76,20 @@ const Sidebar = () => {
 
             <div className={`sidebar-sidebar ${isOpen ? 'sidebar-sidebar-open' : ''}`}>
                 <nav className="sidebar-nav">
-                    <a href="#" className="sidebar-link" onClick={handleScrollToIntro}>
-                        소개
-                    </a>
-                    <a href="/spiceslist" className="sidebar-link">향료 알아가기</a>
-                    <a href="/perfumelist" className="sidebar-link">향수 알아가기</a>
-                    <a href="/chat" className="sidebar-link">향수 추천</a>
-                    <a href="/history" className="sidebar-link">향기 히스토리</a>
+                    <div className="sidebar-links">
+                        <a href="#" className="sidebar-link" onClick={handleScrollToIntro}>
+                            소개
+                        </a>
+                        <a href="/spiceslist" className="sidebar-link">향료 알아가기</a>
+                        <a href="/perfumelist" className="sidebar-link">향수 알아가기</a>
+                        <a href="/chat" className="sidebar-link">향수 추천</a>
+                        <a href="/history" className="sidebar-link">향기 히스토리</a>
 
-                    {/* 관리자 전용 링크 */}
-                    {isAdmin && (
-                        <a href="/member" className="admin-sidebar-link">회원 조회</a>
-                    )}
+                        {/* 관리자 전용 링크 */}
+                        {isAdmin && (
+                            <a href="/member" className="admin-sidebar-link">회원 조회</a>
+                        )}
+                    </div>
 
                     <div className="sidebar-bottom-links">
                         {!isLoggedIn ? (
@@ -142,7 +144,7 @@ const Sidebar = () => {
                     onClick={toggleSidebar}
                 />
             )}
-        </div>
+        </>
     );
 };
 
