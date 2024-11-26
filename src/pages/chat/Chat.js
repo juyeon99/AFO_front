@@ -36,6 +36,13 @@ function Chat() {
         return brightness < 128;
     };
 
+    useEffect(() => {
+        if (messageEndRef.current) {
+            messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages, isLoading]);
+
+
     const handleSendMessage = () => {
         if (!input.trim() && selectedImages.length === 0) return;
 
@@ -50,6 +57,10 @@ function Chat() {
         setSelectedImages([]);
         setIsLoading(true); // 로딩 시작
 
+        // 향수 관련 질문인지 확인
+        const isPerfumeRelated = generateBotResponse(newMessage.text);
+
+        const responseDelay = isPerfumeRelated ? 5000 : 1000;
         setTimeout(() => {
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
             setColor(randomColor);
@@ -59,11 +70,11 @@ function Chat() {
             // 추천 리스트가 있으면 추천 메시지만 추가하고, 없으면 기본 텍스트 메시지 추가
             const botMessage = Array.isArray(botResponse) && botResponse.length > 0
                 ? { sender: 'bot', recommendations: botResponse }
-                : { sender: 'bot', text: botResponse[0]?.description || "죄송합니다, 해당하는 추천이 없습니다." };
+                : { sender: 'bot', text: botResponse };
 
             setMessages(prevMessages => [...prevMessages, botMessage]);
             setIsLoading(false); // 로딩 종료
-        }, 18000); // 로딩을 테스트하기 위해 지연 시간 증가 (실제 코드에서는 적절히 수정)
+        }, responseDelay);
     };
 
 
@@ -160,14 +171,12 @@ function Chat() {
                     description: '바닐라와 담배 잎의 깊고 따뜻한 향수.',
                 }
             ];
+        } else if (lowerInput.includes('안녕') || lowerInput.includes('헬로')) {
+            return '안녕하세요! 무엇을 도와드릴까요?';
+        } else if (lowerInput.includes('고마워') || lowerInput.includes('감사')) {
+            return '천만에요! 더 궁금한 게 있으신가요?';
         } else {
-            // 기본 메시지
-            return [
-                {
-                    name: '알 수 없음',
-                    description: '죄송합니다, 아직 준비되지 않은 추천입니다. "달콤한", "우디한" 등을 입력해 주세요.',
-                }
-            ];
+            return '죄송합니다, 질문에 대한 답변을 준비 중입니다. "달콤한", "플로럴" 등을 입력해 주세요.';
         }
     };
 
@@ -430,8 +439,12 @@ function Chat() {
                             <div className="chat-message chat-bot-message">
                                 <img src="/images/logo-bot.png" alt="Bot Avatar" className="chat-avatar" />
                                 <div className="chat-message-text-wrapper">
-                                    <img src="/images/loading.gif" alt="Loading" className="chat-loading-gif" />
-                                    <div className={`chat-color-bar ${color === '#FFFFFF' ? 'highlighted-border' : ''}`} style={{ backgroundColor: color }}></div>
+                                    <div className="chat-loading-enhanced-loader">
+                                        <div className="chat-loading-floating-smoke chat-loading-smoke-1"></div>
+                                        <div className="chat-loading-floating-smoke chat-loading-smoke-2"></div>
+                                        <div className="chat-loading-floating-smoke chat-loading-smoke-3"></div>
+                                        <div className="chat-loading-floating-smoke chat-loading-smoke-4"></div>
+                                    </div>
                                 </div>
                             </div>
                         )}
