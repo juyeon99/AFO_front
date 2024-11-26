@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../../css/components/Footer.css';
 import { FaInstagram, FaFacebook, FaTwitter, FaYoutube, FaGithub } from "react-icons/fa";
 
@@ -23,26 +23,22 @@ const Footer = () => {
         }
     };
 
+    const navigate = useNavigate();
+
     return (
         <>
-            {!isMainPage && (
-                <div className="footer-logo-outer">
-                    <img
-                        src="/images/footerLogo.png"
-                        alt="상단 푸터 로고"
-                        className="footer-top-logo"
-                    />
-                </div>
-            )}
             <footer className="footer">
+            <img 
+                src="/images/logo.png" 
+                alt="로고 이미지" 
+                className="footer-main-logo-image"
+                onClick={() => {
+                    navigate('/'); // 경로 변경
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); // 스크롤 맨 위로 이동
+                }}
+                style={{ cursor: 'pointer' }}
+            />
                 <div className="footer-container">
-                    <div className="footer-logo-section">
-                        <img
-                            src="/images/footerLogo.png"
-                            alt="방향 로고"
-                            className="footer-logo"
-                        />
-                    </div>
 
                     <div className="footer-textbox">
                         <div className="footer-slogan">당신만의 특별한 향기</div>

@@ -9,7 +9,14 @@
     font-family: 'Nanum Myeongjo', serif;
 }
 
-.footer-logo-outer {
+.footer-main-logo-image{
+    width: 120px;
+    margin-left: 27px;
+    margin-bottom: -20px;
+    margin-top: -15px;
+}
+
+.footer-top-logo {
     width: 100%;
     background-color: #EFEDED;
     padding: 0px;
@@ -19,6 +26,13 @@
 .footer-top-logo {
     max-width: 700px;
     height: auto;
+}
+
+.footer-logo {
+    display: block;
+    max-width: 150px;
+    height: auto;
+    margin-bottom: 10px;
 }
 
 .footer-container {
@@ -33,13 +47,6 @@
 .footer-logo-section {
     margin-bottom: 25px;
     text-align: left;
-}
-
-.footer-logo {
-    display: block;
-    max-width: 150px;
-    height: auto;
-    margin-bottom: 10px;
 }
 
 .footer-slogan {
