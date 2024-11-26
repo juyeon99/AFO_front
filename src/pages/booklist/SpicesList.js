@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../css/SpicesList.css';
 import { Search, Trash2, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -430,63 +430,54 @@ function SpicesList() {
                                 onMouseEnter={() => setHoveredItemId(item.id)}
                                 onMouseLeave={() => setHoveredItemId(null)}
                                 onClick={() => handleCheckboxChange(item.id)}
-                                style={{
-                                    backgroundColor: hoveredItemId === item.id ? filterColor : '#FFFFFF',
-                                }}
                             >
-
-                                {/* 체크박스 표시 */}
-                                {isSelecting && (
-                                    <>
-                                        {/* 체크박스 */}
-                                        <input
-                                            type="checkbox"
-                                            id={`checkbox-${item.id}`} // 고유 ID 부여
-                                            className="admin-spices-item-select-checkbox"
-                                            checked={selectedItems.has(item.id)}
-                                            onClick={(e) => e.stopPropagation()}
-                                            onChange={(e) => {
-                                                e.stopPropagation(); // 카드 클릭 이벤트 방지
-                                                handleCheckboxChange(item.id); // 체크박스 상태 변경
-                                            }}
-                                        />
-                                        {/* 커스텀 레이블 */}
-                                        <label htmlFor={`checkbox-${item.id}`}></label>
-                                    </>
-                                )}
-                                {role === 'ADMIN' && (
-                                    <>
-                                        {/* Edit 아이콘 버튼 */}
+                                {/* 카드의 앞면 */}
+                                <div className="spices-item-front">
+                                    {isSelecting && (
+                                        <>
+                                            <input
+                                                type="checkbox"
+                                                id={`checkbox-${item.id}`} // 고유 ID 부여
+                                                className="admin-spices-item-select-checkbox"
+                                                checked={selectedItems.has(item.id)}
+                                                onClick={(e) => e.stopPropagation()}
+                                                onChange={(e) => {
+                                                    e.stopPropagation(); // 카드 클릭 이벤트 방지
+                                                    handleCheckboxChange(item.id); // 체크박스 상태 변경
+                                                }}
+                                            />
+                                            <label htmlFor={`checkbox-${item.id}`}></label>
+                                        </>
+                                    )}
+                                    {role === 'ADMIN' && (
                                         <button
                                             className="admin-spices-edit-button"
-                                            onClick={() => handleEditClick(item)} // 수정 버튼 클릭 시 실행
+                                            onClick={() => handleEditClick(item)}
                                         >
-                                            <Edit size={16} color="#333" /> {/* Edit 아이콘 사용 */}
+                                            <Edit size={16} color="#333" />
                                         </button>
-                                    </>
-                                )}
+                                    )}
+                                    <img src={item.image} alt={item.name} />
+                                    <div className="spices-name">{item.name}</div>
+                                    <div className="spices-divider-small"></div>
+                                    <div className="spices-category">{item.category}</div>
+                                </div>
 
-                                {hoveredItemId === item.id ? (
-                                    <div
-                                        className="spices-description"
-                                        style={{
-                                            color: getTextColor(filterColor), // 밝기에 따라 텍스트 색상 결정
-                                        }}
-                                    >
-                                        {item.description}
-                                    </div>
-                                ) : (
-                                    <>
-                                        <img src={item.image} alt={item.name} />
-                                        <div className="spices-name">{item.name}</div>
-                                        <div className="spices-divider-small"></div>
-                                        <div className="spices-category">{item.category}</div>
-                                    </>
-                                )}
+                                {/* 카드의 뒷면 */}
+                                <div
+                                    className="spices-item-back"
+                                    style={{
+                                        backgroundColor: filterColor,
+                                        color: getTextColor(filterColor),
+                                    }}
+                                >
+                                    {item.description}
+                                </div>
                             </div>
                         );
                     })}
                 </div>
+
 
                 <div className="spices-pagination">
                     {/* 처음으로 이동 버튼 */}
