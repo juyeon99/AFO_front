@@ -37,6 +37,7 @@
     gap: 10px;
     width: 60%;
     transform: translateY(-40px);
+    position: relative;
 }
 
 .spices-filter-item {
@@ -210,10 +211,11 @@
 }
 
 .admin-spices-controls {
-    display: flex;
     gap: 5px;
     margin-left: 20px;
-    translate: 280px -60px;
+    translate: 1000px -20px;
+    display: flex;
+    position: absolute;
 }
 
 .admin-spices-add-button,

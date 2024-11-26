@@ -200,52 +200,6 @@
     opacity: 1;
 }
 
-.admin-spices-select-icon,
-.admin-spices-delete-icon {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.admin-spices-controls {
-    display: flex;
-    gap: 5px;
-    margin-left: 20px;
-    translate: 280px -60px;
-}
-
-.admin-spices-add-button,
-.admin-spices-select-button {
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    background-color: #EFEDED;
-    border: 1px solid black;
-}
-
-.admin-spices-add-button:hover,
-.admin-spices-select-button:hover {
-    background-color: #ccc;
-}
-
-.admin-spices-delete-button {
-    background: none;
-    border: 1px solid black;
-    cursor: pointer;
-    padding: 5px;
-    transition: transform 0.2s;
-}
-
-.admin-spices-delete-button:hover {
-    transform: scale(1.1);
-}
-
-.admin-spices-delete-button svg {
-    color: black
-}
-
 .admin-spices-item-select-checkbox {
     z-index: 10;
     width: 15px;

@@ -8,11 +8,9 @@ const Layout = () => {
         <>
             <div className="layout-container">
                 <Sidebar/>
-                <div className="layout-content-wrapper">
                     <div className="layout-main">
                         <Outlet />
                     </div>
-                </div>
                 <Footer />
             </div>
             
