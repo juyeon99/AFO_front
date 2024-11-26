@@ -45,7 +45,6 @@
     border-radius: 20px;
     margin-bottom: 20px;
     position: relative;
-    z-index: 15;
 }
 
 .admin-members-search-icon {
@@ -54,7 +53,6 @@
     top: 50%;
     transform: translate(0px, -20px);
     cursor: pointer;
-    z-index: 15;
 }
 
 .admin-members-divider-line {
