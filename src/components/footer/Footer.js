@@ -30,7 +30,7 @@ const Footer = () => {
             <footer className="footer">
             <img 
                 src="/images/logo.png" 
-                alt="1번 이미지" 
+                alt="로고 이미지" 
                 className="footer-main-logo-image"
                 onClick={() => {
                     navigate('/'); // 경로 변경
