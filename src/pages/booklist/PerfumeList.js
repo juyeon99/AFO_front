@@ -2,141 +2,68 @@ import '../../css/PerfumeList.css';
 import React, { useState, useEffect } from 'react';
 import { Search, Edit, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from "react-redux";
+import { fetchPerfumes, selectPerfumes } from '../../module/PerfumeModule';
 
 const PerfumeList = () => {
-    // 임시 데이터
-    const tempPerfumes = [
-        {
-            id: 1,
-            imageUrl: '/images/chanel-orange.jpg',
-            brandEn: 'CHANEL',
-            brandKr: '샤넬',
-            name: 'N°5 EDP',
-            concentration: '뿌리오 드 퍼퓸'
-        },
-        {
-            id: 2,
-            imageUrl: '/images/chanel-white.jpg',
-            brandEn: 'CHANEL',
-            brandKr: '샤넬',
-            name: 'N°5 EDP',
-            concentration: '뿌리오 드 퍼퓸'
-        },
-        {
-            id: 3,
-            imageUrl: '/images/chanel-cream.jpg',
-            brandEn: 'CHANEL',
-            brandKr: '샤넬',
-            name: 'N°5 EDP',
-            concentration: '뿌리오 드 퍼퓸'
-        },
-        {
-            id: 4,
-            imageUrl: '/images/chanel-blue.jpg',
-            brandEn: 'CHANEL',
-            brandKr: '샤넬',
-            name: 'N°5 EDP',
-            concentration: '뿌리오 드 퍼퓸'
-        },
-        {
-            id: 5,
-            imageUrl: '/images/chanel-black.jpg',
-            brandEn: 'CHANEL',
-            brandKr: '샤넬',
-            name: 'N°5 EDP',
-            concentration: '뿌리오 드 퍼퓸'
-        },
-        {
-            id: 6,
-            imageUrl: '/images/chanel-orange2.jpg',
-            brandEn: 'CHANEL',
-            brandKr: '샤넬',
-            name: 'N°5 EDP',
-            concentration: '뿌리오 드 퍼퓸'
-        },
-        {
-            id: 7,
-            imageUrl: '/images/dior-pink.jpg',
-            brandEn: 'DIOR',
-            brandKr: '디올',
-            name: 'MISS DIOR BLOOMING BOUQUET EDT',
-            concentration: '미스 디올 블루밍 뿌리오 드 뚜왈렛'
-        },
-        {
-            id: 8,
-            imageUrl: '/images/dior-pink.jpg',
-            brandEn: 'DIOR',
-            brandKr: '디올',
-            name: 'MISS DIOR BLOOMING BOUQUET EDT',
-            concentration: '미스 디올 블루밍 뿌리오 드 뚜왈렛'
-        },
-        {
-            id: 9,
-            imageUrl: '/images/dior-pink.jpg',
-            brandEn: 'DIOR',
-            brandKr: '디올',
-            name: 'MISS DIOR BLOOMING BOUQUET EDT',
-            concentration: '미스 디올 블루밍 뿌리오 드 뚜왈렛'
-        },
-        {
-            id: 10,
-            imageUrl: '/images/dior-pink.jpg',
-            brandEn: 'DIOR',
-            brandKr: '디올',
-            name: 'MISS DIOR BLOOMING BOUQUET EDT',
-            concentration: '미스 디올 블루밍 뿌리오 드 뚜왈렛'
-        },
-        {
-            id: 11,
-            imageUrl: '/images/dior-pink.jpg',
-            brandEn: 'DIOR',
-            brandKr: '디올',
-            name: 'MISS DIOR BLOOMING BOUQUET EDT',
-            concentration: '미스 디올 블루밍 뿌리오 드 뚜왈렛'
-        },
-        {
-            id: 12,
-            imageUrl: '/images/dior-pink.jpg',
-            brandEn: 'DIOR',
-            brandKr: '디올',
-            name: 'MISS DIOR BLOOMING BOUQUET EDT',
-            concentration: '미스 디올 블루밍 뿌리오 드 뚜왈렛'
-        },
-        {
-            id: 13,
-            imageUrl: '/images/dior-pink.jpg',
-            brandEn: 'DIOR',
-            brandKr: '디올',
-            name: 'MISS DIOR BLOOMING BOUQUET EDT',
-            concentration: '미스 디올 블루밍 뿌리오 드 뚜왈렛'
-        }
-    ];
 
-    const [perfumes] = useState(tempPerfumes);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [activeFilters, setActiveFilters] = useState("");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const perfumes = useSelector(selectPerfumes) || [];
     const [searchTerm, setSearchTerm] = useState('');
+    const [activeFilters, setActiveFilters] = useState('');
     const [showCheckboxes, setShowCheckboxes] = useState(false); // 체크박스 표시 여부
+    const [role, setRole] = useState(null);
     const [checkedCards, setCheckedCards] = useState([]); // 선택된 카드 목록
+    console.log("현재 선택된 카드 ID:", checkedCards);
+
     const [showAddModal, setShowAddModal] = useState(false); // 추가 모달 표시
     const [showDeleteModal, setShowDeleteModal] = useState(false); // 삭제 모달 표시
     const [showEditModal, setShowEditModal] = useState(false);
+
     const [selectedPerfume, setSelectedPerfume] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+
     const [successMessage, setSuccessMessage] = useState('');
     const [editingItem, setEditingItem] = useState(null);
     const [isAdding, setIsAdding] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [role, setRole] = useState(null);
+    const [paginationGroup, setPaginationGroup] = useState(0); // 페이지네이션 그룹 관리
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const filteredPerfumes = perfumes.filter((perfume) => {
+        // 안전하게 perfume.name을 처리
+        const name = perfume?.name || '';
+        const brand = perfume?.brand || '';
+
+        // 검색 조건 (searchTerm)
+        const matchesSearch =
+        name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        brand.toLowerCase().includes(searchTerm.toLowerCase());
+
+        // 필터 조건 (activeFilters)
+        const matchesFilter =
+        activeFilters.length === 0 || // 필터가 없으면 true
+        activeFilters.some((filter) => name.includes(filter) || brand.includes(filter)); // 이름 또는 브랜드와 일치
+
+    return matchesSearch && matchesFilter;
+    });
+
     const itemsPerPage = 12;
 
-    const filterButtons = [
-        { id: 'EDP', label: 'Eau de Parfum' },
-        { id: 'EDT', label: 'Eau de Toilette' },
-        { id: 'EDC', label: 'Eau de Cologne' },
-        { id: 'PARFUM', label: 'Parfum' }
-    ];
+    const totalPages = filteredPerfumes.length
+        ? Math.ceil(filteredPerfumes.length / itemsPerPage)
+        : 1;
+
+    const pageStart = paginationGroup * 15 + 1;
+    const pageEnd = Math.min((paginationGroup + 1) * 15, totalPages);
+
+    useEffect(() => {
+        // 향수 목록 가져오기
+        dispatch(fetchPerfumes());
+    }, [dispatch]);
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem('auth'));
@@ -145,9 +72,57 @@ const PerfumeList = () => {
         }
     }, []);
 
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => setImagePreview(reader.result);
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleEditButtonClick = (perfume) => {
+        setSelectedPerfume(perfume);
+        setShowEditModal(true);
+        setIsEditing(true); // 수정 모드 활성화
+        setIsAdding(false); // 추가 모드 비활성화
+    };
+
+    const handleSuccessClose = () => setSuccessMessage('');
+
+    const handleFilterClick = (filterId) => {
+        setActiveFilters(prev => {
+            if (prev.includes(filterId)) {
+                return prev.filter(id => id !== filterId);
+            } else {
+                return [...prev, filterId];
+            }
+        });
+        setCurrentPage(1);
+    };
+
+    const handleReset = () => {
+        setImagePreview(null); // 파일 선택 영역 초기화
+    };
+
+    const filterButtons = [
+        { id: '오 드 퍼퓸', label: 'Eau de Perfume' },
+        { id: '오 드 뚜왈렛', label: 'Eau de Toilette' },
+        { id: '오 드 코롱', label: 'Eau de Cologne' },
+        { id: '퍼퓸', label: 'Perfume' },
+        { id: '솔리드 퍼퓸', label: 'Solid Perfume'}
+
+    ];
+
     const handleCheckboxToggle = () => setShowCheckboxes(!showCheckboxes);
 
     const handleCardCheckboxChange = (id) => {
+        console.log("체크박스 클릭됨, ID:", id); // 디버깅 메시지
         setCheckedCards((prev) =>
             prev.includes(id) ? prev.filter((cardId) => cardId !== id) : [...prev, id]
         );
@@ -213,63 +188,39 @@ const PerfumeList = () => {
         setSelectedPerfume(null);
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => setImagePreview(reader.result);
-            reader.readAsDataURL(file);
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    
+        // 페이지 그룹 변경 로직
+        const groupStart = paginationGroup * 15 + 1;
+        const groupEnd = groupStart + 14;
+        if (page < groupStart) {
+            setPaginationGroup(paginationGroup - 1);
+        } else if (page > groupEnd) {
+            setPaginationGroup(paginationGroup + 1);
         }
     };
 
-    const handleEditButtonClick = (perfume) => {
-        setSelectedPerfume(perfume);
-        setShowEditModal(true);
-        setIsEditing(true); // 수정 모드 활성화
-        setIsAdding(false); // 추가 모드 비활성화
+    const handleNextGroup = () => {
+        if ((paginationGroup + 1) * 15 < totalPages) {
+            setPaginationGroup(paginationGroup + 1);
+        }
+    };
+    
+    const handlePreviousGroup = () => {
+        if (paginationGroup > 0) {
+            setPaginationGroup(paginationGroup - 1);
+        }
     };
 
-    const handleSuccessClose = () => setSuccessMessage('');
-
-    const handleFilterClick = (filterId) => {
-        setActiveFilters(prev => {
-            if (prev.includes(filterId)) {
-                return prev.filter(id => id !== filterId);
-            } else {
-                return [...prev, filterId];
-            }
-        });
-        setCurrentPage(1);
-    };
-
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
-        setCurrentPage(1);
-    };
-
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
-
-    const filteredPerfumes = perfumes.filter(perfume => {
-        const matchesSearch = perfume.brandEn.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            perfume.brandKr.includes(searchTerm);
-        const matchesFilter = activeFilters.length === 0 ||
-            activeFilters.some(filter => perfume.name.includes(filter));
-        return matchesSearch && matchesFilter;
-    });
-
-    const totalPages = Math.ceil(filteredPerfumes.length / itemsPerPage);
-
-    const navigate = useNavigate();
-
-    const handleReset = () => {
-        setImagePreview(null); // 파일 선택 영역 초기화
-    };
+    // 데이터가 비어 있는 경우 처리
+    if (!perfumes || perfumes.length === 0) {
+        return <p>데이터를 불러오는 중입니다...</p>;
+    }
 
     return (
         <>
-            <img src="/images/logo.png" alt="1번 이미지" className="main-logo-image"
+            <img src="/images/logo.png" alt="로고 이미지" className="main-logo-image"
                 onClick={() => navigate('/')}
                 style={{ cursor: 'pointer' }}
             />
@@ -280,7 +231,7 @@ const PerfumeList = () => {
                         <input
                             type="text"
                             className="perfume-list-search"
-                            placeholder="브랜드명"
+                            placeholder="브랜드명, 향수 이름 검색"
                             value={searchTerm}
                             onChange={handleSearch}
                         />
@@ -321,14 +272,14 @@ const PerfumeList = () => {
                         .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                         .map((perfume) => (
                             <div key={perfume.id} className="perfume-item-card">
-
                                 {showCheckboxes && (
                                     <input
                                         type="checkbox"
                                         className="admin-perfume-card-select-circle"
-                                        name="perfume-select"
+                                        name={`perfume-select-${perfume.id}`}
                                         checked={checkedCards.includes(perfume.id)}
                                         onChange={() => handleCardCheckboxChange(perfume.id)}
+                                        
                                     />
                                 )}
 
@@ -349,11 +300,21 @@ const PerfumeList = () => {
                                     alt={perfume.name}
                                     className="perfume-item-image"
                                 />
-                                <div className="perfume-item-name">{perfume.name}</div>
-                                <div className="perfume-divider-small"></div>
-                                <div className="perfume-category">{perfume.brandEn}</div>
+                                <div className="perfume-item-name"><strong>{perfume.name}</strong></div>
+                                <div className="perfume-divider-small"></div>  {/* 중간 선임 */}
+                                <div className="perfume-category">{perfume.brand}</div>
+                                <div className="perfume-grade">{perfume.grade}</div>
                                 <div className="perfume-description">
-                                    {perfume.concentration}
+                                <p>"{perfume.description}"</p>
+                                <br/>
+                                <div className='perfume-description-singleNote'>
+                                    {perfume.singleNote && <p><strong>싱글 노트 | </strong> {perfume.singleNote}</p>}
+                                </div>
+                                <div className='perfume-description-multiNote'>
+                                    {perfume.topNote && <p><strong>탑 노트 | </strong> {perfume.topNote}</p>}
+                                    {perfume.middleNote && <p><strong>미들 노트 | </strong> {perfume.middleNote}</p>}
+                                    {perfume.baseNote && <p><strong>베이스 노트 | </strong> {perfume.baseNote}</p>}
+                                </div>
                                 </div>
                             </div>
                         ))}
@@ -361,9 +322,9 @@ const PerfumeList = () => {
 
                 <div className="perfume-pagination">
                     <button
-                        className={`perfume-pagination-button ${currentPage === 1 ? 'disabled' : ''}`}
-                        onClick={() => handlePageChange(1)}
-                        disabled={currentPage === 1}
+                        className={`perfume-pagination-button ${paginationGroup === 1 ? 'disabled' : ''}`}
+                        onClick={handlePreviousGroup}
+                        disabled={paginationGroup === 0}
                     >
                         {'<<'}
                     </button>
@@ -376,13 +337,13 @@ const PerfumeList = () => {
                         {'<'}
                     </button>
 
-                    {Array.from({ length: totalPages }, (_, index) => (
+                    {Array.from({ length: pageEnd - pageStart + 1 }, (_, index) => (
                         <button
-                            key={index + 1}
-                            className={`perfume-pagination-button ${currentPage === index + 1 ? 'active' : ''}`}
-                            onClick={() => handlePageChange(index + 1)}
+                            key={index + pageStart}
+                            className={`perfume-pagination-button ${currentPage === index + pageStart ? 'active' : ''}`}
+                            onClick={() => handlePageChange(index + pageStart)}
                         >
-                            {index + 1}
+                            {index + pageStart}
                         </button>
                     ))}
 
@@ -395,9 +356,9 @@ const PerfumeList = () => {
                     </button>
 
                     <button
-                        className={`perfume-pagination-button ${currentPage === totalPages ? 'disabled' : ''}`}
-                        onClick={() => handlePageChange(totalPages)}
-                        disabled={currentPage === totalPages}
+                        className={`perfume-pagination-button ${pageEnd === totalPages ? 'disabled' : ''}`}
+                        onClick={handleNextGroup}
+                        disabled={pageEnd === totalPages}
                     >
                         {'>>'}
                     </button>
@@ -431,10 +392,10 @@ const PerfumeList = () => {
                                         부향률
                                     </label>
                                     <select className="admin-perfume-form-select" required>
-                                        <option value="Eau de Parfum">Eau de Parfum</option>
+                                        <option value="Eau de Perfume">Eau de Perfume</option>
                                         <option value="Eau de Toilette">Eau de Toilette</option>
                                         <option value="Eau de Cologne">Eau de Cologne</option>
-                                        <option value="Parfum">Parfum</option>
+                                        <option value="Perfume">Perfume</option>
                                     </select>
                                 </div>
                                 <div className="admin-perfume-modal-row-description">
@@ -524,7 +485,7 @@ const PerfumeList = () => {
                                     <label>부향률</label>
                                     <select
                                         className="admin-perfume-modal-row-concentration"
-                                        value={selectedPerfume?.concentration || "Eau de Parfum"}
+                                        value={selectedPerfume?.concentration || "Eau de perfume"}
                                         onChange={(e) =>
                                             setSelectedPerfume((prev) => ({
                                                 ...prev,
@@ -532,10 +493,10 @@ const PerfumeList = () => {
                                             }))
                                         }
                                     >
-                                        <option value="Eau de Parfum">Eau de Parfum</option>
+                                        <option value="Eau de perfume">Eau de perfume</option>
                                         <option value="Eau de Toilette">Eau de Toilette</option>
                                         <option value="Eau de Cologne">Eau de Cologne</option>
-                                        <option value="Parfum">Parfum</option>
+                                        <option value="perfume">perfume</option>
                                     </select>
                                 </div>
                                 <div className="admin-perfume-modal-row-description">

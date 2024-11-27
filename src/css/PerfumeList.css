@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
+
 .perfume-list-container {
     position: relative;
     width: 1200px; /* 고정된 폭 */
@@ -6,6 +9,7 @@
     padding: 20px;
     box-sizing: border-box;
     margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .perfume-header {
@@ -117,6 +121,7 @@
     justify-content: center;
     overflow: hidden; /* 설명이 카드 밖으로 넘치지 않도록 설정 */
     transition: all 0.3s ease-in-out; /* 부드러운 효과 */
+    margin-bottom: 10px;
 }
 
 .perfume-item-card:hover {
@@ -126,18 +131,26 @@
 }
 
 .perfume-description {
+    font-family: 'Nanum Gothic', sans-serif;
     position: absolute;
     bottom: -100%; /* 기본적으로 카드 아래 숨겨둠 */
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #fff2f2;
-    font-size: 14px;
-    text-align: center;
+    background-color: #ffffff;
+    font-size: 14px; 
+    padding: 20px 25px 10px 25px; /*상, 우, 하, 좌 순서*/
     display: flex;
-    align-items: center; /* 세로 중앙 정렬 */
-    justify-content: center; /* 가로 중앙 정렬 */
+    flex-direction: column;
+    justify-content: center;
     transition: all 0.3s ease-in-out;
+    line-height: 1.8;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.perfume-description p {
+    margin: 8px 0; /* 항목 간의 여백 */
 }
 
 .perfume-item-card:hover .perfume-description {
@@ -158,12 +171,20 @@
     margin: 0 auto 10px auto;
 }
 
-.perfume-category {
-    font-family: 'Inter', sans-serif;
+.perfume-divider-back {
+    width: 80%;
+    height: 1px;
+    background-color: #616161;
+    margin: 0 auto 10px auto;
+}
+
+.perfume-category,
+.perfume-grade {
     font-size: 14px;
     text-align: center;
     color: #000000;
     margin-top: 10px;
+    font-family: 'Nanum Gothic';
 }
 
 .perfume-pagination {
@@ -185,8 +206,8 @@
 }
 
 .perfume-pagination-button.active {
-    background-color: #EFEDED;
-    color: black;
+    background-color: #CDC6CE;
+    color: white;
     font-weight: bold;
 }
 
@@ -234,7 +255,15 @@
     background-color: white; 
     cursor: pointer;
     transition: all 0.3s ease;
+    z-index: 20;
     translate: 7px 10px;
+    transition: all 0.3s ease;
+}
+
+
+.perfume-description-multiNote,
+.perfume-description-singleNote{
+    font-size: 12px;   
 }
 
 .admin-perfume-card-select-circle:checked {
@@ -301,6 +330,22 @@
     display: flex;
     justify-content: space-evenly;
     margin-bottom: 40px;
+}
+
+.perfume-description, 
+.perfume-description p, 
+.perfume-description span{
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 13 px; /* 기본 글꼴 크기 */
+    line-height: 1.6; /* 가독성을 위한 줄 간격 */
+}
+
+.perfume-description strong {
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 13 px; /* 기본 글꼴 크기 */
+    line-height: 1.6; /* 가독성을 위한 줄 간격 */
+    color: #a73cff; /* 기본 글자 색상 */
+    font-weight: bold;
 }
 
 .admin-perfume-modal-row input,

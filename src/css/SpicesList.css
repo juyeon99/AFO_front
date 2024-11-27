@@ -6,6 +6,7 @@
     padding: 20px;
     box-sizing: border-box;
     margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .spices-header {
@@ -111,6 +112,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    margin-bottom: 10px;
 }
 
 .spices-item-card img {
