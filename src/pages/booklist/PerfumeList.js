@@ -4,6 +4,7 @@ import { Search, Edit, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { fetchPerfumes, selectPerfumes } from '../../module/PerfumeModule';
+import LoadingScreen from '../../components/loading/LoadingScreen';
 
 const PerfumeList = () => {
 
@@ -215,7 +216,7 @@ const PerfumeList = () => {
 
     // 데이터가 비어 있는 경우 처리
     if (!perfumes || perfumes.length === 0) {
-        return <p>데이터를 불러오는 중입니다...</p>;
+        return <LoadingScreen message="항수를 불러오는 중..." />;
     }
 
     return (
