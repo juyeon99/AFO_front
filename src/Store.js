@@ -3,12 +3,14 @@ import thunk from "redux-thunk";
 import authReducer from "./module/AuthModule";
 import memberReducer from "./module/MemberModule";
 import spiceReducer from "./module/SpicesModule";
+import perfumeReducer from "./module/PerfumeModule";
 
 // 여러 리듀서를 합치는 경우
 const rootReducer = combineReducers({
     auth: authReducer,
     members: memberReducer,
-    spices: spiceReducer
+    spices: spiceReducer,
+    perfumes: perfumeReducer,
 });
 
 // 스토어 생성
