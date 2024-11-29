@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Edit, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
-import { fetchPerfumes, selectPerfumes } from '../../module/PerfumeModule';
+import { fetchPerfumes, selectPerfumes, modifyPerfume, deletePerfume } from '../../module/PerfumeModule';
 import LoadingScreen from '../../components/loading/LoadingScreen';
 
 const PerfumeList = () => {
@@ -38,16 +38,18 @@ const PerfumeList = () => {
         // 안전하게 perfume.name을 처리
         const name = perfume?.name || '';
         const brand = perfume?.brand || '';
+        const description = perfume?.description || '';
 
         // 검색 조건 (searchTerm)
         const matchesSearch =
         name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        brand.toLowerCase().includes(searchTerm.toLowerCase());
+        brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        description.toLowerCase().includes(searchTerm.toLowerCase());
 
         // 필터 조건 (activeFilters)
         const matchesFilter =
         activeFilters.length === 0 || // 필터가 없으면 true
-        activeFilters.some((filter) => name.includes(filter) || brand.includes(filter)); // 이름 또는 브랜드와 일치
+        activeFilters.some((filter) => name.includes(filter) || brand.includes(filter) || description.includes(filter)); // 이름 또는 브랜드와 일치
 
     return matchesSearch && matchesFilter;
     });
@@ -94,7 +96,10 @@ const PerfumeList = () => {
         setIsAdding(false); // 추가 모드 비활성화
     };
 
-    const handleSuccessClose = () => setSuccessMessage('');
+    const handleSuccessClose = () => {
+        setSuccessMessage(''); // 메시지 초기화
+        dispatch(fetchPerfumes()); // 최신 데이터 가져오기
+    };
 
     const handleFilterClick = (filterId) => {
         setActiveFilters(prev => {
@@ -163,23 +168,25 @@ const PerfumeList = () => {
         setShowDeleteModal(false); // 추가 안전을 위해 모달 닫기
     };
 
-    const handleSubmit = () => {
-        if (isAdding) {
-            // 추가 로직
-            setSuccessMessage('향수가 성공적으로 등록되었습니다!'); // 추가 성공 메시지
-            setShowAddModal(false); // 추가 모달 닫기
-            setIsAdding(false); // 추가 상태 초기화
+    const handleSubmit = async () => {
+        if (isEditing && selectedPerfume) {
+            try {
+                // API 요청
+                await dispatch(modifyPerfume(selectedPerfume));
+                
+                // 성공 메시지 설정
+                setSuccessMessage('향수가 성공적으로 수정되었습니다!');
+                
+                // 모달 닫기
+                setShowEditModal(false);
+            } catch (error) {
+                console.error("향수 수정 실패:", error);
+                alert("향수 수정에 실패했습니다. 다시 시도해주세요.");
+            }
         }
-
-        if (isEditing) {
-            // 수정 로직
-            console.log("수정된 데이터:", editingItem); // 수정 데이터 확인
-            setSuccessMessage('향수가 성공적으로 수정되었습니다!'); // 수정 성공 메시지
-            setShowEditModal(false); // 수정 모달 닫기
-            setIsEditing(false); // 수정 상태 초기화
-        }
-
-        // 상태 초기화 (공통)
+    
+        // 상태 초기화
+        setIsEditing(false);
         setEditingItem(null);
     };
 
@@ -369,7 +376,6 @@ const PerfumeList = () => {
                     <div className="admin-perfume-modal-backdrop">
                         <div className="admin-perfume-modal-container">
                             <h2 className="admin-perfume-modal-title">향수 카드 추가하기</h2>
-                            <div className="admin-perfume-modal-content">
                                 <div className="admin-perfume-modal-row">
                                     <label>향수명</label>
                                     <input
@@ -393,10 +399,11 @@ const PerfumeList = () => {
                                         부향률
                                     </label>
                                     <select className="admin-perfume-form-select" required>
-                                        <option value="Eau de Perfume">Eau de Perfume</option>
-                                        <option value="Eau de Toilette">Eau de Toilette</option>
-                                        <option value="Eau de Cologne">Eau de Cologne</option>
-                                        <option value="Perfume">Perfume</option>
+                                        <option value="오 드 퍼퓸">Eau de perfume</option>
+                                        <option value="오 드 뚜왈렛">Eau de Toilette</option>
+                                        <option value="오 드 코롱">Eau de Cologne</option>
+                                        <option value="퍼퓸">perfume</option>
+                                        <option value="솔리드 퍼퓸">solid Perfume</option>
                                     </select>
                                 </div>
                                 <div className="admin-perfume-modal-row-description">
@@ -406,6 +413,54 @@ const PerfumeList = () => {
                                         placeholder="향수 설명을 입력하세요"
                                         required
                                     ></textarea>
+                                </div>
+                                <div className="admin-perfume-modal-row">
+                                    <label>싱글노트</label>
+                                    <input
+                                        type="text"
+                                        className="admin-perfume-modal-row-singleNote"
+                                        value={selectedPerfume?.singleNote || ""}
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({ ...prev, singleNote: e.target.value }))
+                                        }
+                                        placeholder="싱글노트를 입력하세요"
+                                    />
+                                </div>
+                                <div className="admin-perfume-modal-row">
+                                    <label>탑노트</label>
+                                    <input
+                                        type="text"
+                                        className="admin-perfume-modal-row-topNote"
+                                        value={selectedPerfume?.topNote || ""}
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({ ...prev, topNote: e.target.value }))
+                                        }
+                                        placeholder="탑노트를 입력하세요"
+                                    />
+                                </div>
+                                <div className="admin-perfume-modal-row">
+                                    <label>미들노트</label>
+                                    <input
+                                        type="text"
+                                        className="admin-perfume-modal-row-middleNote"
+                                        value={selectedPerfume?.middleNote || ""}
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({ ...prev, middleNote: e.target.value }))
+                                        }
+                                        placeholder="미들노트를 입력하세요"
+                                    />
+                                </div>
+                                <div className="admin-perfume-modal-row">
+                                    <label>베이스노트</label>
+                                    <input
+                                        type="text"
+                                        className="admin-perfume-modal-row-baseNote"
+                                        value={selectedPerfume?.baseNote || ""}
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({ ...prev, baseNote: e.target.value }))
+                                        }
+                                        placeholder="베이스노트를 입력하세요"
+                                    />
                                 </div>
                                 <div className="admin-perfume-modal-row">
                                     <label className="admin-perfume-modal-row-image-label">이미지</label>
@@ -431,8 +486,7 @@ const PerfumeList = () => {
                                         />
                                     </div>
                                 </div>
-                            </div>
-                            <div className="admin-perfume-modal-actions">
+                                <div className="admin-perfume-modal-actions">
                                 <button
                                     onClick={() => {
                                         handleSubmit(); handleReset();
@@ -448,8 +502,8 @@ const PerfumeList = () => {
                                     취소
                                 </button>
                             </div>
+                            </div>
                         </div>
-                    </div>
                 )}
 
 
@@ -457,7 +511,6 @@ const PerfumeList = () => {
                     <div className="admin-perfume-modal-backdrop">
                         <div className="admin-perfume-modal-container">
                             <h2 className="admin-perfume-modal-title">향수 카드 수정하기</h2>
-                            <div className="admin-perfume-modal-content">
                                 <div className="admin-perfume-modal-row">
                                     <label>향수명</label>
                                     <input
@@ -475,9 +528,9 @@ const PerfumeList = () => {
                                     <input
                                         type="text"
                                         className="admin-perfume-modal-row-brand"
-                                        value={selectedPerfume?.brandEn || ""}
+                                        value={selectedPerfume?.brand || ""}
                                         onChange={(e) =>
-                                            setSelectedPerfume((prev) => ({ ...prev, brandEn: e.target.value }))
+                                            setSelectedPerfume((prev) => ({ ...prev, brand: e.target.value }))
                                         }
                                         placeholder="브랜드명 수정"
                                     />
@@ -486,18 +539,19 @@ const PerfumeList = () => {
                                     <label>부향률</label>
                                     <select
                                         className="admin-perfume-modal-row-concentration"
-                                        value={selectedPerfume?.concentration || "Eau de perfume"}
+                                        value={selectedPerfume?.grade || ""}
                                         onChange={(e) =>
                                             setSelectedPerfume((prev) => ({
                                                 ...prev,
-                                                concentration: e.target.value,
+                                                grade: e.target.value,
                                             }))
                                         }
                                     >
-                                        <option value="Eau de perfume">Eau de perfume</option>
-                                        <option value="Eau de Toilette">Eau de Toilette</option>
-                                        <option value="Eau de Cologne">Eau de Cologne</option>
-                                        <option value="perfume">perfume</option>
+                                        <option value="오 드 퍼퓸">Eau de perfume</option>
+                                        <option value="오 드 뚜왈렛">Eau de Toilette</option>
+                                        <option value="오 드 코롱">Eau de Cologne</option>
+                                        <option value="퍼퓸">perfume</option>
+                                        <option value="솔리드 퍼퓸">solid Perfume</option>
                                     </select>
                                 </div>
                                 <div className="admin-perfume-modal-row-description">
@@ -512,6 +566,54 @@ const PerfumeList = () => {
                                             }))
                                         }
                                         placeholder="향수 설명 수정"
+                                    />
+                                </div>
+                                <div className="admin-perfume-modal-row">
+                                    <label>싱글노트</label>
+                                    <input
+                                        type="text"
+                                        className="admin-perfume-modal-row-singleNote"
+                                        value={selectedPerfume?.singleNote || ""}
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({ ...prev, singleNote: e.target.value }))
+                                        }
+                                        placeholder="싱글노트 수정"
+                                    />
+                                </div>
+                                <div className="admin-perfume-modal-row">
+                                    <label>탑노트</label>
+                                    <input
+                                        type="text"
+                                        className="admin-perfume-modal-row-topNote"
+                                        value={selectedPerfume?.topNote || ""}
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({ ...prev, topNote: e.target.value }))
+                                        }
+                                        placeholder="탑노트 수정"
+                                    />
+                                </div>
+                                <div className="admin-perfume-modal-row">
+                                    <label>미들노트</label>
+                                    <input
+                                        type="text"
+                                        className="admin-perfume-modal-row-middleNote"
+                                        value={selectedPerfume?.middleNote || ""}
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({ ...prev, middleNote: e.target.value }))
+                                        }
+                                        placeholder="미들노트 수정"
+                                    />
+                                </div>
+                                <div className="admin-perfume-modal-row">
+                                    <label>베이스노트</label>
+                                    <input
+                                        type="text"
+                                        className="admin-perfume-modal-row-baseNote"
+                                        value={selectedPerfume?.baseNote || ""}
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({ ...prev, baseNote: e.target.value }))
+                                        }
+                                        placeholder="베이스노트 수정"
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
@@ -550,8 +652,7 @@ const PerfumeList = () => {
                                         />
                                     </div>
                                 </div>
-                            </div>
-                            <div className="admin-perfume-modal-actions">
+                                <div className="admin-perfume-modal-actions">
                                 <button
                                     onClick={() => {
                                         handleSubmit(); handleReset();
@@ -564,8 +665,8 @@ const PerfumeList = () => {
                                     취소
                                 </button>
                             </div>
+                            </div>
                         </div>
-                    </div>
                 )}
 
                 {/* 삭제 모달 */}

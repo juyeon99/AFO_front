@@ -109,7 +109,7 @@
 .perfume-item-card {
     position: relative; /* 자식 요소 위치를 기준으로 설정 */
     width: 200px;
-    height: 300px;
+    height: 320px;
     background: #FFFFFF;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 20px;
@@ -289,13 +289,25 @@
     justify-content: center; /* 가로 중앙 정렬 */
     align-items: center; /* 세로 중앙 정렬 */
     z-index: 100; /* 화면 위에 표시 */
+    overflow: hidden; /* 스크롤 방지 */
 }
 
 .admin-perfume-modal-container {
+    width: 500px; /* 모달 창의 너비 */
+    max-height: 90vh; /* 화면 높이의 90%로 제한 */
+    overflow-y: auto; /* 내용이 많아지면 스크롤 추가 */
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+}
+
+.admin-perfume-modal-content {
     background: #fff;
     padding: 20px;
     border-radius: 10px;
     width: 400px; /* 모달 창의 고정된 너비 */
+    height: 800px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
     font-family: Arial, sans-serif;
     position: relative;
@@ -326,10 +338,10 @@
     margin-bottom: 30px;
 }
 
-.admin-perfume-modal-row-description {
+.admin-perfume-modal-row {
     display: flex;
     justify-content: space-evenly;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
 .perfume-description, 
@@ -351,7 +363,11 @@
 .admin-perfume-modal-row input,
 .admin-perfume-modal-row-description textarea,
 .admin-perfume-form-select,
-.admin-perfume-modal-row-concentration {
+.admin-perfume-modal-row-grade,
+.admin-perfume-modal-row-singleNote,
+.admin-perfume-modal-row-topNote,
+.admin-perfume-modal-row-middleNote,
+.admin-perfume-modal-row-baseNote {
     flex-basis: 65%;
     padding: 10px;
     border: 1px solid #ddd;
