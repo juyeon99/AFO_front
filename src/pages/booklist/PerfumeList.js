@@ -80,6 +80,7 @@ const PerfumeList = () => {
     };
 
     const handleEditButtonClick = (perfume) => {
+
         setSelectedPerfume(perfume);
         setShowEditModal(true);
         setIsEditing(true); // 수정 모드 활성화
@@ -128,15 +129,15 @@ const PerfumeList = () => {
 
     const handleAddButtonClick = () => {
         setSelectedPerfume({
-            name: "", // 향수명 입력 필요
-            description: "", // 설명 입력 필요
-            brand: "", // 브랜드 입력 필요
-            grade: "", // 기본값 설정
-            singleNote: "", // 싱글 노트
-            topNote: "", // 복합 노트
-            middleNote: "",
-            baseNote: "",
-            imageUrl: "" // 이미지 URL
+            name: null,
+            description: null,
+            brand: null,
+            grade: null,
+            singleNote: null,
+            topNote: null,
+            middleNote: null,
+            baseNote: null,
+            imageUrl: null,
         }); 
     
         setShowAddModal(true); // 모달 열기
@@ -189,19 +190,19 @@ const PerfumeList = () => {
             alert("부향률을 선택하세요."); // 부향률 값 확인
             return;
         }
+
         if (isAdding && selectedPerfume) {
             
-    
             // 싱글 노트 또는 탑/미들/베이스 노트 중 하나만 포함
             const newPerfumeData = {
                 name: selectedPerfume?.name || "",
                 description: selectedPerfume?.description || "",
                 brand: selectedPerfume?.brand || "",
                 grade: selectedPerfume?.grade, 
-                singleNote: selectedPerfume?.singleNote || null, // 싱글 노트
-                topNote: selectedPerfume?.topNote || "" || null, // 싱글 노트가 없으면 탑 노트
-                middleNote: selectedPerfume?.middleNote || "" || null, // 싱글 노트가 없으면 미들 노트
-                baseNote: selectedPerfume?.baseNote || "" || null, // 싱글 노트가 없으면 베이스 노트
+                singleNote: selectedPerfume?.singleNote || null, 
+                topNote: selectedPerfume?.topNote || "" || null,
+                middleNote: selectedPerfume?.middleNote || "" || null, 
+                baseNote: selectedPerfume?.baseNote || "" || null, 
                 imageUrl: selectedPerfume?.imageUrl || "", // 이미지 URL
             };
             console.log("grade 값:", selectedPerfume?.grade);
@@ -481,10 +482,10 @@ const PerfumeList = () => {
                                         <option value="솔리드 퍼퓸">Solid Perfume</option>
                                     </select>
                                 </div>
-                                <div className="admin-perfume-modal-row-description">
+                                <div className="admin-perfume-modal-row">
                                     <label>향수 설명</label>
                                     <textarea
-                                        className="admin-perfume-modal-row-textarea"
+                                        className="admin-perfume-modal-row-description"
                                         value={selectedPerfume?.description || ""}
                                         onChange={(e) =>
                                             setSelectedPerfume((prev) => ({ ...prev, description: e.target.value }))
@@ -673,10 +674,10 @@ const PerfumeList = () => {
                                         <option value="솔리드 퍼퓸">solid Perfume</option>
                                     </select>
                                 </div>
-                                <div className="admin-perfume-modal-row-description">
+                                <div className="admin-perfume-modal-row">
                                     <label>향수 설명</label>
                                     <textarea
-                                        className="admin-perfume-modal-row-textarea"
+                                        className="admin-perfume-modal-row-description"
                                         value={selectedPerfume?.description || ""}
                                         onChange={(e) =>
                                             setSelectedPerfume((prev) => ({
