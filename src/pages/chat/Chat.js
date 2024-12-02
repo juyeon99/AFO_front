@@ -2,7 +2,9 @@ import '../../css/Chat.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchChatResponse, selectChatMode, selectRecommendedPerfumes, selectResponse, selectLoading, selectError } from "../../module/ChatModule";
+import { fetchChatResponse, selectChatMode, selectResponse, selectLoading, selectError } from "../../module/ChatModule";
+import NonMemberLoginModal from '../../components/login/LoginModal';
+
 
 function Chat() {
 
@@ -31,6 +33,11 @@ function Chat() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const fileInputRef = useRef(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 여부 상태
+    const [hasReceivedRecommendation, setHasReceivedRecommendation] = useState(false); // 추천 여부
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [retryAvailable, setRetryAvailable] = useState(false);
+
 
     const filters = [
         { name: 'Spicy', color: '#FF5757' },
@@ -68,22 +75,72 @@ function Chat() {
     // 향수 추천 데이터 처리
     useEffect(() => {
         if (chatMode === "recommendation") {
+            if (response?.error) {
+                console.error("추천 데이터 처리 중 오류 발생:", response.error);
+                return;
+            }
+
             if (response?.commonFeeling) {
                 const newColor = getColorForCategory(response.commonFeeling);
+                console.log("새로운 색상 설정:", newColor);
                 setColor(newColor);
             }
 
-            if (response?.recommendedPerfumes) {
-                // recommendedPerfumes가 배열인지 확인하고 변환
-                const recommendations = Array.isArray(response.recommendedPerfumes)
-                    ? response.recommendedPerfumes
-                    : response.recommendedPerfumes.recommendations || [];
-                setRecommendedPerfumes(recommendations);
+            // recommendedPerfumes를 조건부로 업데이트
+            if (Array.isArray(response?.recommendedPerfumes?.recommendations)) {
+                setRecommendedPerfumes((prevPerfumes) => {
+                    // 상태가 이전 값과 동일한 경우 업데이트하지 않음 (무한 루프 방지)
+                    if (JSON.stringify(prevPerfumes) !== JSON.stringify(response.recommendedPerfumes.recommendations)) {
+                        return response.recommendedPerfumes.recommendations;
+                    }
+                    return prevPerfumes; // 동일하면 이전 상태 유지
+                });
+            } else {
+                setRecommendedPerfumes([]); // 데이터가 없으면 빈 배열로 설정
             }
         } else if (chatMode === "chat") {
             setColor('#D9D9D9'); // 일반 대화 기본 색상
         }
-    }, [chatMode, recommendedPerfumes, response]);
+    }, [chatMode, response]); // 의존성 배열에 불필요한 상태 추가하지 않음
+
+    useEffect(() => {
+        window.addEventListener("paste", handlePaste);
+        return () => {
+            window.removeEventListener("paste", handlePaste);
+        };
+    }, []);
+
+    useEffect(() => {
+        console.log("hasReceivedRecommendation 상태:", hasReceivedRecommendation);
+        if (!isLoggedIn && hasReceivedRecommendation) {
+            setShowLoginModal(true); // 로그인 모달 띄우기
+        }
+    }, [hasReceivedRecommendation, isLoggedIn]);
+
+    useEffect(() => {
+        const handleArrowKeyPress = (e) => {
+            if (e.key === 'ArrowUp') {
+                goToPreviousHighlight();
+            } else if (e.key === 'ArrowDown') {
+                goToNextHighlight();
+            }
+        };
+
+        document.addEventListener('keydown', handleArrowKeyPress);
+        return () => {
+            document.removeEventListener('keydown', handleArrowKeyPress);
+        };
+    }, [currentHighlightedIndex, highlightedMessageIndexes]);
+
+    useEffect(() => {
+        console.log("Chat Mode has changed:", chatMode);
+    }, [chatMode]);
+
+    useEffect(() => {
+        if (messageEndRef.current) {
+            messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages]);
 
     const isDarkColor = (color) => {
         const hex = color.replace("#", "");
@@ -94,13 +151,23 @@ function Chat() {
         return brightness < 128;
     };
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (!input.trim() && selectedImages.length === 0) return;
+
+        setRetryAvailable(false);
+        setIsLoading(true);
+
+        if (!isLoggedIn && hasReceivedRecommendation) {
+            // 비회원이고 이미 추천을 받은 경우
+            setShowLoginModal(true); // 로그인 요청 모달 표시
+            return;
+        }
 
         const newMessage = {
             sender: 'user',
             text: input.trim() || '',
-            images: selectedImages.map(img => img.url)
+            images: selectedImages.map(img => img.url),
+            retryAvailable: false,
         };
 
         setMessages([...messages, newMessage]);
@@ -110,31 +177,50 @@ function Chat() {
 
         const imageFile = selectedImages.length > 0 ? selectedImages[0].file : null;
 
-        dispatch(fetchChatResponse(input, imageFile))
-            .then((response) => {
-                console.log("API 응답 데이터:", response);
-                if (response.mode === "recommendation") {
-                    // 추천 메시지 처리
-                    const botMessage = {
-                        sender: 'bot',
-                        recommendations: response.payload.recommendedPerfumes,
-                    };
-                    setMessages((prevMessages) => [...prevMessages, botMessage]);
-                } else if (response.mode === "chat") {
-                    // 일반 메시지 처리
-                    const botMessage = {
-                        sender: 'bot',
-                        text: response.response,
-                    };
-                    setMessages((prevMessages) => [...prevMessages, botMessage]);
-                }
-            })
-            .catch((error) => {
-                console.error("Error handling chat response:", error);
-            })
-            .finally(() => {
-                setIsLoading(false); // 로딩 종료
-            });
+        try {
+            // API 호출
+            const response = await dispatch(fetchChatResponse(input, imageFile));
+
+            if (response?.error) {
+                // 에러 처리
+                console.error('서버 에러 발생:', response.error);
+                setRetryAvailable(true); // 실패 시 재시도 버튼 표시
+                setMessages((prevMessages) => [
+                    ...prevMessages,
+                    { sender: 'bot', text: '추천 데이터를 처리하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.' },
+                ]);
+                return;
+            }
+
+            setRetryAvailable(false);
+            if (response?.mode === "recommendation") {
+                // 추천 메시지 처리
+                const recommendationMessage = {
+                    sender: 'bot',
+                    text: '향수 추천 결과를 확인하세요.',
+                    recommendations: response.recommendedPerfumes?.recommendations || [],
+                    generatedImage: response.generatedImage.output_path,
+                };
+                setMessages((prevMessages) => [...prevMessages, recommendationMessage]);
+            } else if (response?.mode === "chat") {
+                // 일반 메시지 처리
+                const chatMessage = {
+                    sender: 'bot',
+                    text: response.response,
+                };
+                setMessages((prevMessages) => [...prevMessages, chatMessage]);
+            }
+
+        } catch (error) {
+            console.error("Error handling chat response:", error);
+            setRetryAvailable(true); // 실패 시 재시도 버튼 표시
+            setMessages((prevMessages) => [
+                ...prevMessages,
+                { sender: 'bot', text: '문제가 발생했습니다. 네트워크 연결을 확인하거나 다시 시도해주세요.' },
+            ]);
+        } finally {
+            setIsLoading(false); // 로딩 종료
+        }
     };
 
     const handlePaste = (event) => {
@@ -153,13 +239,6 @@ function Chat() {
             setSelectedImages(prevImages => [...prevImages, ...images]);
         }
     };
-
-    useEffect(() => {
-        window.addEventListener("paste", handlePaste);
-        return () => {
-            window.removeEventListener("paste", handlePaste);
-        };
-    }, []);
 
     const handleInputChange = (e) => setInput(e.target.value);
 
@@ -267,25 +346,6 @@ function Chat() {
         }
     };
 
-    useEffect(() => {
-        const handleArrowKeyPress = (e) => {
-            if (e.key === 'ArrowUp') {
-                goToPreviousHighlight();
-            } else if (e.key === 'ArrowDown') {
-                goToNextHighlight();
-            }
-        };
-
-        document.addEventListener('keydown', handleArrowKeyPress);
-        return () => {
-            document.removeEventListener('keydown', handleArrowKeyPress);
-        };
-    }, [currentHighlightedIndex, highlightedMessageIndexes]);
-
-    useEffect(() => {
-        console.log("Chat Mode has changed:", chatMode);
-    }, [chatMode]);
-
     const toggleSearchMode = () => {
         setIsSearchMode((prevMode) => !prevMode);
     };
@@ -294,18 +354,23 @@ function Chat() {
         navigate(-1); // 이전 페이지로 이동
     };
 
-    const RecommendationCard = ({ perfume }) => (
-        <div className="chat-recommendation-card">
-            <img src={perfume.imageUrl || '/images/default-perfume.png'} alt={perfume.name} className="chat-recommendation-image" />
-            <div className="chat-recommendation-content">
-                <p className="chat-recommendation-name"><strong>이름:</strong> {perfume.name}</p>
-                <p className="chat-recommendation-line"><strong>계열:</strong> {perfume.line}</p>
-                <p className="chat-recommendation-brand"><strong>브랜드:</strong> {perfume.brand}</p>
-                <p className="chat-recommendation-reason"><strong>추천 이유:</strong> {perfume.reason}</p>
-                <p className="chat-recommendation-situation"><strong>추천 상황:</strong> {perfume.situation}</p>
+    const RecommendationCard = ({ perfume }) => {
+        if (!perfume || Object.keys(perfume).length === 0) {
+            return <div className="chat-recommendation-card">추천된 향수 정보를 불러올 수 없습니다.</div>;
+        }
+
+        return (
+            <div className="chat-recommendation-card">
+                <div className="chat-recommendation-content">
+                    <p className="chat-recommendation-name"><strong>이름:</strong> {perfume.name || 'N/A'}</p>
+                    <p className="chat-recommendation-line"><strong>계열:</strong> {perfume.line || 'N/A'}</p>
+                    <p className="chat-recommendation-brand"><strong>브랜드:</strong> {perfume.brand || 'N/A'}</p>
+                    <p className="chat-recommendation-reason"><strong>추천 이유:</strong> {perfume.reason || 'N/A'}</p>
+                    <p className="chat-recommendation-situation"><strong>추천 상황:</strong> {perfume.situation || 'N/A'}</p>
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className="chat-container-wrapper">
@@ -419,6 +484,23 @@ function Chat() {
                                                         <img key={idx} src={image} alt="Uploaded" className="chat-uploaded-image" onClick={() => openModal(image)} />
                                                     ))}
                                                     <div className={`chat-color-circle ${color === '#FFFFFF' ? 'highlighted-border' : ''}`} style={{ backgroundColor: color }}></div>
+
+
+
+                                                    {/* 재시도 버튼 */}
+                                                    {retryAvailable && (
+                                                        <div className="chat-input-area-wrapper-retry">
+                                                            <button
+                                                                className="chat-retry-button"
+                                                                onClick={() => {
+                                                                    setRetryAvailable(false); // 재시도 버튼 숨기기
+                                                                    handleSendMessage(); // 메시지 재전송
+                                                                }}
+                                                            >
+                                                                재시도하기
+                                                            </button>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
@@ -492,6 +574,9 @@ function Chat() {
                     </div>
                 </div>
             )}
+
+            {showLoginModal && <NonMemberLoginModal navigate={navigate} setShowLoginModal={setShowLoginModal} />}
+
         </div>
     );
 }
