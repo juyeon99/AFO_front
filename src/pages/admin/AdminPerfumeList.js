@@ -1,4 +1,3 @@
-import '../../css/admin/AdminPerfumeList.css';
 import React, { useState } from 'react';
 import { Search, Trash2, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

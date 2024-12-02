@@ -293,7 +293,7 @@
 }
 
 .admin-perfume-modal-container {
-    width: 500px; /* 모달 창의 너비 */
+    width: 600px; /* 모달 창의 너비 */
     max-height: 90vh; /* 화면 높이의 90%로 제한 */
     overflow-y: auto; /* 내용이 많아지면 스크롤 추가 */
     padding: 20px;
@@ -302,25 +302,11 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
 }
 
-.admin-perfume-modal-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    width: 400px; /* 모달 창의 고정된 너비 */
-    height: 800px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
-    font-family: Arial, sans-serif;
-    position: relative;
-    text-align: left;
-    height: 600px;
-}
-
 .admin-perfume-modal-container-success {
     background-color: #EFEDED;
     padding: 20px;
     border-radius: 10px;
-    width: 400px; /* 모달 창의 고정된 너비 */
-    font-family: Arial, sans-serif;
+    width: 600px; /* 모달 창의 고정된 너비 */
     position: relative;
     text-align: center;
 }

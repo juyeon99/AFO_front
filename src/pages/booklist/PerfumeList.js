@@ -20,19 +20,18 @@ const PerfumeList = () => {
     console.log("현재 선택된 카드 ID:", selectedCard);
 
     const [showAddModal, setShowAddModal] = useState(false); // 추가 모달 표시
-    const [showDeleteModal, setShowDeleteModal] = useState(false); // 삭제 모달 표시
     const [showEditModal, setShowEditModal] = useState(false);
 
     const [selectedPerfume, setSelectedPerfume] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
 
     const [successMessage, setSuccessMessage] = useState('');
-    const [editingItem, setEditingItem] = useState(null);
     const [isAdding, setIsAdding] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [paginationGroup, setPaginationGroup] = useState(0); // 페이지네이션 그룹 관리
     const [currentPage, setCurrentPage] = useState(1);
+    const [editingImage, setEditingImage] = useState(false); 
 
     const filteredPerfumes = perfumes.filter((perfume) => {
         // 안전하게 perfume.name을 처리
@@ -51,7 +50,7 @@ const PerfumeList = () => {
         activeFilters.length === 0 || // 필터가 없으면 true
         activeFilters.some((filter) => name.includes(filter) || brand.includes(filter) || description.includes(filter)); // 이름 또는 브랜드와 일치
 
-    return matchesSearch && matchesFilter;
+        return matchesSearch && matchesFilter;
     });
 
     const itemsPerPage = 12;
@@ -60,8 +59,8 @@ const PerfumeList = () => {
         ? Math.ceil(filteredPerfumes.length / itemsPerPage)
         : 1;
 
-    const pageStart = paginationGroup * 15 + 1;
-    const pageEnd = Math.min((paginationGroup + 1) * 15, totalPages);
+    const pageStart = paginationGroup * 10 + 1;
+    const pageEnd = Math.min((paginationGroup + 1) * 10, totalPages);
 
     useEffect(() => {
         // 향수 목록 가져오기
@@ -78,15 +77,6 @@ const PerfumeList = () => {
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
         setCurrentPage(1);
-    };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => setImagePreview(reader.result);
-            reader.readAsDataURL(file);
-        }
     };
 
     const handleEditButtonClick = (perfume) => {
@@ -141,7 +131,7 @@ const PerfumeList = () => {
             name: "", // 향수명 입력 필요
             description: "", // 설명 입력 필요
             brand: "", // 브랜드 입력 필요
-            grade: "오 드 퍼퓸", // 기본값 설정
+            grade: "", // 기본값 설정
             singleNote: "", // 싱글 노트
             topNote: "", // 복합 노트
             middleNote: "",
@@ -180,7 +170,6 @@ const PerfumeList = () => {
     
             // 삭제 모달 닫기
             setIsDeleting(false);
-            setShowDeleteModal(false);
             setSelectedPerfume(null);
         } catch (error) {
             console.error("향수 삭제 실패:", error);
@@ -190,27 +179,32 @@ const PerfumeList = () => {
 
     const handleDeleteClose = () => {
         setIsDeleting(false); // 삭제 모달 닫기
-        setShowDeleteModal(false); 
         setSelectedPerfume(null); 
         setSelectedCard(null); // 선택 초기화
     };
 
     const handleSubmit = async () => {
+        console.log("추가할 향수 데이터:", selectedPerfume);
+        if (!selectedPerfume.grade) {
+            alert("부향률을 선택하세요."); // 부향률 값 확인
+            return;
+        }
         if (isAdding && selectedPerfume) {
-            console.log("추가할 향수 데이터:", selectedPerfume);
+            
     
             // 싱글 노트 또는 탑/미들/베이스 노트 중 하나만 포함
             const newPerfumeData = {
                 name: selectedPerfume?.name || "",
                 description: selectedPerfume?.description || "",
                 brand: selectedPerfume?.brand || "",
-                grade: selectedPerfume?.grade || "오 드 퍼퓸", // 기본값 설정
+                grade: selectedPerfume?.grade, 
                 singleNote: selectedPerfume?.singleNote || null, // 싱글 노트
                 topNote: selectedPerfume?.topNote || "" || null, // 싱글 노트가 없으면 탑 노트
                 middleNote: selectedPerfume?.middleNote || "" || null, // 싱글 노트가 없으면 미들 노트
                 baseNote: selectedPerfume?.baseNote || "" || null, // 싱글 노트가 없으면 베이스 노트
-                imageUrl: imagePreview || "", // 이미지가 선택된 경우 사용
+                imageUrl: selectedPerfume?.imageUrl || "", // 이미지 URL
             };
+            console.log("grade 값:", selectedPerfume?.grade);
     
             // 유효성 검사: 싱글 노트 또는 탑/미들/베이스 노트 중 하나는 반드시 있어야 함
             if (
@@ -249,7 +243,7 @@ const PerfumeList = () => {
         // 공통 처리
         setIsEditing(false);
         setIsAdding(false);
-        setEditingItem(null);
+        setSelectedPerfume(null);
     };
 
     const closeModal = () => {
@@ -265,8 +259,8 @@ const PerfumeList = () => {
         setCurrentPage(page);
     
         // 페이지 그룹 변경 로직
-        const groupStart = paginationGroup * 15 + 1;
-        const groupEnd = groupStart + 14;
+        const groupStart = paginationGroup * 10 + 1;
+        const groupEnd = groupStart + 9;
         if (page < groupStart) {
             setPaginationGroup(paginationGroup - 1);
         } else if (page > groupEnd) {
@@ -275,7 +269,7 @@ const PerfumeList = () => {
     };
 
     const handleNextGroup = () => {
-        if ((paginationGroup + 1) * 15 < totalPages) {
+        if ((paginationGroup + 1) * 10 < totalPages) {
             setPaginationGroup(paginationGroup + 1);
         }
     };
@@ -468,15 +462,23 @@ const PerfumeList = () => {
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label className="perfume-form-label">
-                                        부향률
-                                    </label>
-                                    <select className="admin-perfume-form-select" required>
+                                    <label className="perfume-form-label">부향률</label>
+                                    <select
+                                        className="admin-perfume-form-select"
+                                        value={selectedPerfume?.grade || ""} // 상태에서 grade 값을 가져옴
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({
+                                                ...prev,
+                                                grade: e.target.value, // 선택한 값을 상태에 업데이트
+                                            }))
+                                        }
+                                        required
+                                    >
                                         <option value="오 드 퍼퓸">Eau de perfume</option>
                                         <option value="오 드 뚜왈렛">Eau de Toilette</option>
                                         <option value="오 드 코롱">Eau de Cologne</option>
-                                        <option value="퍼퓸">perfume</option>
-                                        <option value="솔리드 퍼퓸">solid Perfume</option>
+                                        <option value="퍼퓸">Perfume</option>
+                                        <option value="솔리드 퍼퓸">Solid Perfume</option>
                                     </select>
                                 </div>
                                 <div className="admin-perfume-modal-row-description">
@@ -543,26 +545,65 @@ const PerfumeList = () => {
                                     <label className="admin-perfume-modal-row-image-label">이미지</label>
                                     <div
                                         className="admin-perfume-image-upload"
-                                        onClick={() => document.getElementById("admin-perfume-file-input").click()}
+                                        onClick={() => {
+                                            if (!editingImage) setEditingImage(true);
+                                        }}
                                     >
-                                        {imagePreview ? (
-                                            <img
-                                                src={imagePreview}
-                                                alt="미리보기"
-                                                className="admin-perfume-image-preview"
-                                            />
-                                        ) : (
-                                            <div className="admin-perfume-placeholder">+</div>
-                                        )}
-                                        <input
-                                            id="admin-perfume-file-input"
-                                            type="file"
-                                            className="admin-perfume-file-input"
-                                            accept="image/*"
-                                            onChange={handleImageChange}
+                                        {editingImage ? (
+                                            <input
+                                            type="text"
+                                            className="admin-perfume-image-url-input"
+                                            placeholder="이미지 URL을 입력하세요"
+                                            value={selectedPerfume?.imageUrl || ""}
+                                            onChange={(e) => {
+                                                const newUrl = e.target.value;
+                                                setSelectedPerfume((prev) => ({
+                                                    ...prev,
+                                                    imageUrl: newUrl, // URL 입력값으로 imageUrl 수정
+                                                }));
+                                            }}
+                                            onBlur={() => setEditingImage(false)} // 입력 필드 외 클릭 시 수정 모드 해제
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") setEditingImage(false); // Enter 키로 수정 모드 해제
+                                            }}
                                         />
-                                    </div>
+                                    ) : (
+                                        // 이미지 미리보기 또는 기본 플러스 버튼
+                                        <>
+                                            {imagePreview || selectedPerfume?.imageUrl ? (
+                                                <img
+                                                    src={imagePreview || selectedPerfume?.imageUrl}
+                                                    alt="미리보기"
+                                                    className="admin-perfume-image-preview"
+                                                />
+                                            ) : (
+                                                <div className="admin-perfume-placeholder">+</div>
+                                            )}
+                                        </>
+                                    )}
+                                    {/* 파일 업로드 input */}
+                                    <input
+                                        id="admin-perfume-file-input"
+                                        type="file"
+                                        className="admin-perfume-file-input"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                    setImagePreview(reader.result); // 미리보기 이미지 설정
+                                                    setSelectedPerfume((prev) => ({
+                                                        ...prev,
+                                                        imageUrl: reader.result, // 이미지 URL 업데이트
+                                                    }));
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }}
+                                    />
                                 </div>
+                            </div>
                                 <div className="admin-perfume-modal-actions">
                                 <button
                                     onClick={() => {
@@ -623,6 +664,7 @@ const PerfumeList = () => {
                                                 grade: e.target.value,
                                             }))
                                         }
+                                        required
                                     >
                                         <option value="오 드 퍼퓸">Eau de perfume</option>
                                         <option value="오 드 뚜왈렛">Eau de Toilette</option>
@@ -697,38 +739,65 @@ const PerfumeList = () => {
                                     <label className="admin-perfume-modal-row-image-label">이미지</label>
                                     <div
                                         className="admin-perfume-image-upload"
-                                        onClick={() => document.getElementById("admin-perfume-file-input-edit").click()}
+                                        onClick={() => {
+                                            if (!editingImage) setEditingImage(true);
+                                        }}
                                     >
-                                        {imagePreview || selectedPerfume?.image ? (
+                                        {editingImage ? (
+                                        <input
+                                        type="text"
+                                        className="admin-perfume-image-url-input"
+                                        placeholder="이미지 URL을 입력하세요"
+                                        value={selectedPerfume?.imageUrl || ""}
+                                        onChange={(e) => {
+                                            const newUrl = e.target.value;
+                                            setSelectedPerfume((prev) => ({
+                                                ...prev,
+                                                imageUrl: newUrl, // URL 입력값으로 imageUrl 수정
+                                            }));
+                                        }}
+                                        onBlur={() => setEditingImage(false)} // 입력 필드 외 클릭 시 수정 모드 해제
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") setEditingImage(false); // Enter 키로 수정 모드 해제
+                                        }}
+                                    />
+                                ) : (
+                                    // 이미지 미리보기 또는 기본 플러스 버튼
+                                    <>
+                                        {imagePreview || selectedPerfume?.imageUrl ? (
                                             <img
-                                                src={imagePreview || selectedPerfume?.image}
+                                                src={imagePreview || selectedPerfume?.imageUrl}
                                                 alt="미리보기"
                                                 className="admin-perfume-image-preview"
                                             />
                                         ) : (
                                             <div className="admin-perfume-placeholder">+</div>
                                         )}
-                                        <input
-                                            id="admin-perfume-file-input-edit"
-                                            type="file"
-                                            className="admin-perfume-file-input"
-                                            accept="image/*"
-                                            onChange={(e) => {
-                                                const file = e.target.files[0];
-                                                if (file) {
-                                                    const reader = new FileReader();
-                                                    reader.onloadend = () => {
-                                                        setSelectedPerfume((prev) => ({
-                                                            ...prev,
-                                                            image: reader.result,
-                                                        }));
-                                                    };
-                                                    reader.readAsDataURL(file);
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                </div>
+                                    </>
+                                )}
+                                {/* 파일 업로드 input */}
+                                <input
+                                    id="admin-perfume-file-input-edit"
+                                    type="file"
+                                    className="admin-perfume-file-input"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                setImagePreview(reader.result); // 미리보기 이미지 설정
+                                                setSelectedPerfume((prev) => ({
+                                                    ...prev,
+                                                    imageUrl: reader.result, // 이미지 URL 업데이트
+                                                }));
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </div>
                                 <div className="admin-perfume-modal-actions">
                                 <button
                                     onClick={() => {
