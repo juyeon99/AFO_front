@@ -1,5 +1,5 @@
 import { createActions, handleActions } from "redux-actions";
-import { getAllPerfumes, modifyPerfumes, deletePerfumes } from "../api/PerfumeAPICalls";
+import { getAllPerfumes, modifyPerfumes, deletePerfumes, createPerfumes } from "../api/PerfumeAPICalls";
 
 // 초기 상태
 const initialState = {
@@ -18,7 +18,12 @@ export const {
         modifyPerfumeFail,
         deletePerfumeStart,
         deletePerfumeSuccess,
-        deletePerfumeFail, },
+        deletePerfumeFail,
+        createPerfumeStart,
+        createPerfumeSuccess,
+        createPerfumeFail,
+        
+    },
 } = createActions({
     PERFUMES: {
         FETCH_PERFUME_START: () => {},
@@ -30,6 +35,9 @@ export const {
         DELETE_PERFUME_START: () => {},
         DELETE_PERFUME_SUCCESS: (perfumeId) => perfumeId,
         DELETE_PERFUME_FAIL: (error) => error,
+        CREATE_PERFUME_START: () => {},
+        CREATE_PERFUME_SUCCESS: (perfume) => perfume,
+        CREATE_PERFUME_FAIL: (error) => error,
     },
 });
 
@@ -63,6 +71,16 @@ export const deletePerfume = (perfumeId) => async (dispatch) => {
         dispatch(deletePerfumeSuccess(perfumeId));
     } catch (error) {
         dispatch(deletePerfumeFail(error.message || "향수 삭제 실패"));
+    }
+};
+
+export const createPerfume = (perfumeData) => async (dispatch) => {
+    try {
+        dispatch(createPerfumeStart());
+        const newPerfume = await createPerfumes(perfumeData); // API 호출
+        dispatch(createPerfumeSuccess(newPerfume));
+    } catch (error) {
+        dispatch(createPerfumeFail(error.message || "향수 추가 실패"));
     }
 };
 
@@ -116,6 +134,22 @@ const perfumeReducer = handleActions(
             error: null,
         }),
         [deletePerfumeFail]: (state, { payload }) => ({
+            ...state,
+            loading: false,
+            error: payload,
+        }),
+        [createPerfumeStart]: (state) => ({
+            ...state,
+            loading: true,
+            error: null,
+        }),
+        [createPerfumeSuccess]: (state, { payload }) => ({
+            ...state,
+            perfumes: [...state.perfumes, payload], // 새로 추가된 향수 포함
+            loading: false,
+            error: null,
+        }),
+        [createPerfumeFail]: (state, { payload }) => ({
             ...state,
             loading: false,
             error: payload,

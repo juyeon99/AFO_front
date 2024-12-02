@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Edit, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
-import { fetchPerfumes, selectPerfumes, modifyPerfume, deletePerfume } from '../../module/PerfumeModule';
+import { fetchPerfumes, selectPerfumes, modifyPerfume, deletePerfume, createPerfume } from '../../module/PerfumeModule';
 import LoadingScreen from '../../components/loading/LoadingScreen';
 
 const PerfumeList = () => {
@@ -16,8 +16,8 @@ const PerfumeList = () => {
     const [activeFilters, setActiveFilters] = useState('');
     const [showCheckboxes, setShowCheckboxes] = useState(false); // 체크박스 표시 여부
     const [role, setRole] = useState(null);
-    const [checkedCards, setCheckedCards] = useState([]); // 선택된 카드 목록
-    console.log("현재 선택된 카드 ID:", checkedCards);
+    const [selectedCard, setSelectedCard] = useState(null); // 선택된 단일 카드
+    console.log("현재 선택된 카드 ID:", selectedCard);
 
     const [showAddModal, setShowAddModal] = useState(false); // 추가 모달 표시
     const [showDeleteModal, setShowDeleteModal] = useState(false); // 삭제 모달 표시
@@ -128,72 +128,137 @@ const PerfumeList = () => {
     const handleCheckboxToggle = () => setShowCheckboxes(!showCheckboxes);
 
     const handleCardCheckboxChange = (id) => {
-        console.log("체크박스 클릭됨, ID:", id); // 디버깅 메시지
-        setCheckedCards((prev) =>
-            prev.includes(id) ? prev.filter((cardId) => cardId !== id) : [...prev, id]
-        );
+        if (selectedCard === id) {
+            setSelectedCard(null); // 같은 항목 클릭 시 선택 해제
+        } else {
+            setSelectedCard(id); // 새로운 항목 선택
+        }
+        console.log("현재 선택된 카드 ID:", id); // 디버깅 메시지
     };
 
     const handleAddButtonClick = () => {
-        setShowAddModal(true);
+        setSelectedPerfume({
+            name: "", // 향수명 입력 필요
+            description: "", // 설명 입력 필요
+            brand: "", // 브랜드 입력 필요
+            grade: "오 드 퍼퓸", // 기본값 설정
+            singleNote: "", // 싱글 노트
+            topNote: "", // 복합 노트
+            middleNote: "",
+            baseNote: "",
+            imageUrl: "" // 이미지 URL
+        }); 
+    
+        setShowAddModal(true); // 모달 열기
         setIsAdding(true); // 추가 모드 활성화
-        setIsEditing(false); // 수정 모드 비활성화
+        setIsEditing(false);   // 수정 모드 비활성화
     };
 
     const handleDeleteButtonClick = () => {
-        if (checkedCards.length === 0) {
+        if (!selectedCard) {
             alert("삭제할 카드를 선택하세요.");
             return;
         }
 
-        const perfumeToDelete = perfumes.find((perfume) => perfume.id === checkedCards[0]); // 첫 번째 선택된 카드
+        const perfumeToDelete = perfumes.find((perfume) => perfume.id === selectedCard);
         setSelectedPerfume(perfumeToDelete); // 삭제할 카드 설정
         setIsDeleting(true); // 삭제 모달 활성화
     };
 
-    const handleDeleteConfirm = () => {
+    const handleDeleteConfirm = async () => {
         if (!selectedPerfume) {
-            // selectedPerfume이 null일 경우 에러 방지
             console.error("선택된 향수 카드가 없습니다.");
+            alert("삭제할 카드를 선택하세요.");
             return;
         }
+        console.log("삭제 요청 ID:", selectedCard);
 
-        // 삭제 로직 실행
-        setIsDeleting(false); // 삭제 모달 닫기
-        setSuccessMessage(`${selectedPerfume.name} 향수 카드가 삭제되었습니다!`); // 성공 메시지 표시
+        try {
+            // Redux를 통해 삭제 API 호출
+            await dispatch(deletePerfume(selectedCard));
+            setSuccessMessage(`${selectedPerfume.name} 향수 카드가 삭제되었습니다!`);
+    
+            // 삭제 모달 닫기
+            setIsDeleting(false);
+            setShowDeleteModal(false);
+            setSelectedPerfume(null);
+        } catch (error) {
+            console.error("향수 삭제 실패:", error);
+            alert("향수 삭제에 실패했습니다. 다시 시도해주세요.");
+        }
     };
 
     const handleDeleteClose = () => {
         setIsDeleting(false); // 삭제 모달 닫기
-        setShowDeleteModal(false); // 추가 안전을 위해 모달 닫기
+        setShowDeleteModal(false); 
+        setSelectedPerfume(null); 
+        setSelectedCard(null); // 선택 초기화
     };
 
     const handleSubmit = async () => {
-        if (isEditing && selectedPerfume) {
+        if (isAdding && selectedPerfume) {
+            console.log("추가할 향수 데이터:", selectedPerfume);
+    
+            // 싱글 노트 또는 탑/미들/베이스 노트 중 하나만 포함
+            const newPerfumeData = {
+                name: selectedPerfume?.name || "",
+                description: selectedPerfume?.description || "",
+                brand: selectedPerfume?.brand || "",
+                grade: selectedPerfume?.grade || "오 드 퍼퓸", // 기본값 설정
+                singleNote: selectedPerfume?.singleNote || null, // 싱글 노트
+                topNote: selectedPerfume?.topNote || "" || null, // 싱글 노트가 없으면 탑 노트
+                middleNote: selectedPerfume?.middleNote || "" || null, // 싱글 노트가 없으면 미들 노트
+                baseNote: selectedPerfume?.baseNote || "" || null, // 싱글 노트가 없으면 베이스 노트
+                imageUrl: imagePreview || "", // 이미지가 선택된 경우 사용
+            };
+    
+            // 유효성 검사: 싱글 노트 또는 탑/미들/베이스 노트 중 하나는 반드시 있어야 함
+            if (
+                (!newPerfumeData.singleNote && !newPerfumeData.topNote && !newPerfumeData.middleNote && !newPerfumeData.baseNote) ||
+                (newPerfumeData.singleNote && (newPerfumeData.topNote || newPerfumeData.middleNote || newPerfumeData.baseNote))
+            ) {
+                alert("잘못 입력했습니다.");
+                return;
+            }
+    
             try {
-                // API 요청
+                await dispatch(createPerfume(newPerfumeData)); // Redux 액션 호출
+                setSuccessMessage('향수가 성공적으로 추가되었습니다!');
+                setShowAddModal(false); // 추가 모달 닫기
+                setIsAdding(false);     // 추가 모드 비활성화
+                handleReset();          // 입력 값 초기화
+            } catch (error) {
+                console.error("향수 추가 실패:", error);
+                alert("향수 추가에 실패했습니다. 다시 시도해주세요.");
+            }
+        }
+    
+        // 수정 모드 처리
+        if (isEditing && selectedPerfume) {
+            console.log("수정하려는 향수 ID:", selectedPerfume.id); // ID 확인용
+            try {
                 await dispatch(modifyPerfume(selectedPerfume));
-                
-                // 성공 메시지 설정
                 setSuccessMessage('향수가 성공적으로 수정되었습니다!');
-                
-                // 모달 닫기
-                setShowEditModal(false);
+                setShowEditModal(false); // 수정 모달 닫기
             } catch (error) {
                 console.error("향수 수정 실패:", error);
                 alert("향수 수정에 실패했습니다. 다시 시도해주세요.");
             }
         }
     
-        // 상태 초기화
+        // 공통 처리
         setIsEditing(false);
+        setIsAdding(false);
         setEditingItem(null);
     };
 
     const closeModal = () => {
-        setShowAddModal(false);
-        setShowEditModal(false);
-        setSelectedPerfume(null);
+        setShowAddModal(false); // 추가 모달 닫기
+        setShowEditModal(false); // 수정 모달 닫기
+        setIsAdding(false);      // 추가 모드 비활성화
+        setIsEditing(false);     // 수정 모드 비활성화
+        setSelectedPerfume(null); // 선택된 데이터 초기화
+        setImagePreview(null);   // 이미지 미리보기 초기화
     };
 
     const handlePageChange = (page) => {
@@ -285,7 +350,7 @@ const PerfumeList = () => {
                                         type="checkbox"
                                         className="admin-perfume-card-select-circle"
                                         name={`perfume-select-${perfume.id}`}
-                                        checked={checkedCards.includes(perfume.id)}
+                                        checked={selectedCard === perfume.id}
                                         onChange={() => handleCardCheckboxChange(perfume.id)}
                                         
                                     />
@@ -381,6 +446,10 @@ const PerfumeList = () => {
                                     <input
                                         className="admin-perfume-modal-row-name"
                                         type="text"
+                                        value={selectedPerfume?.name || ""}
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({ ...prev, name: e.target.value }))
+                                        }
                                         placeholder="향수 이름을 입력하세요"
                                         required
                                     />
@@ -390,6 +459,10 @@ const PerfumeList = () => {
                                     <input
                                         className="admin-perfume-modal-row-brand"
                                         type="text"
+                                        value={selectedPerfume?.brand || ""}
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({ ...prev, brand: e.target.value }))
+                                        }
                                         placeholder="브랜드명을 입력하세요"
                                         required
                                     />
@@ -410,6 +483,10 @@ const PerfumeList = () => {
                                     <label>향수 설명</label>
                                     <textarea
                                         className="admin-perfume-modal-row-textarea"
+                                        value={selectedPerfume?.description || ""}
+                                        onChange={(e) =>
+                                            setSelectedPerfume((prev) => ({ ...prev, description: e.target.value }))
+                                        }
                                         placeholder="향수 설명을 입력하세요"
                                         required
                                     ></textarea>

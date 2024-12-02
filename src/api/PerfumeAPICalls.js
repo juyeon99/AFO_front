@@ -11,11 +11,11 @@ export const getAllPerfumes = async () => {
     }
 };
 
-// 향수 수정
+// 향수 수정 
 export const modifyPerfumes = async (perfumeData) => {
     try {
-        // perfumeData에서 id를 추출하여 URL에 포함
-        const response = await apis.put(`/perfumes/${perfumeData.id}`, perfumeData);
+        const response = await apis.put(`/perfumes`, perfumeData);
+        console.log("꒰ঌ૮ o̴̶̷ ࿁ o̴̶̷ ა໒꒱꒰ঌ૮ o̴̶̷ ࿁ o̴̶̷ ა໒꒱", perfumeData)
         return response.data;
     } catch (error) {
         console.error("Error modifying perfume:", error);
@@ -26,11 +26,24 @@ export const modifyPerfumes = async (perfumeData) => {
 // 향수 삭제
 export const deletePerfumes = async (perfumeId) => {
     try {
-        const response = await apis.delete("/perfumes", { data: { id: perfumeId } });
+        const response = await apis.delete(`/perfumes/${perfumeId}`);
         return response.data;
     } catch (error) {
         console.error("Error deleting perfume:", error);
         throw error;
     }
 };
+
+// 향수 추가
+export const createPerfumes = async (perfumeData) => {
+    try {
+        const response = await apis.post('/perfumes', perfumeData); // POST 요청
+        console.log("향수 추가 요청 데이터:", perfumeData);
+        console.log("향수 추가 성공:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error creating perfume:", error);
+        throw error;
+    }
+}
 
