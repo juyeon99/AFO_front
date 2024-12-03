@@ -185,7 +185,7 @@ const PerfumeList = () => {
     };
 
     const handleSubmit = async () => {
-        console.log("추가할 향수 데이터:", selectedPerfume);
+        // console.log("추가할 향수 데이터:", selectedPerfume);
         if (!selectedPerfume.grade) {
             alert("부향률을 선택하세요."); // 부향률 값 확인
             return;
@@ -205,7 +205,7 @@ const PerfumeList = () => {
                 baseNote: selectedPerfume?.baseNote || "" || null, 
                 imageUrl: selectedPerfume?.imageUrl || "", // 이미지 URL
             };
-            console.log("grade 값:", selectedPerfume?.grade);
+            // console.log("grade 값:", selectedPerfume?.grade);
     
             // 유효성 검사: 싱글 노트 또는 탑/미들/베이스 노트 중 하나는 반드시 있어야 함
             if (
@@ -230,7 +230,7 @@ const PerfumeList = () => {
     
         // 수정 모드 처리
         if (isEditing && selectedPerfume) {
-            console.log("수정하려는 향수 ID:", selectedPerfume.id); // ID 확인용
+            // console.log("수정하려는 향수 ID:", selectedPerfume.id);
             try {
                 await dispatch(modifyPerfume(selectedPerfume));
                 setSuccessMessage('향수가 성공적으로 수정되었습니다!');
@@ -569,7 +569,6 @@ const PerfumeList = () => {
                                             }}
                                         />
                                     ) : (
-                                        // 이미지 미리보기 또는 기본 플러스 버튼
                                         <>
                                             {imagePreview || selectedPerfume?.imageUrl ? (
                                                 <img

@@ -16,7 +16,6 @@ export const getAllPerfumes = async () => {
 export const modifyPerfumes = async (perfumeData) => {
     try {
         const response = await apis.put(`/perfumes`, perfumeData);
-        console.log("꒰ঌ૮ o̴̶̷ ࿁ o̴̶̷ ა໒꒱꒰ঌ૮ o̴̶̷ ࿁ o̴̶̷ ა໒꒱", perfumeData)
         return response.data;
     } catch (error) {
         console.error("Error modifying perfume:", error);
@@ -38,9 +37,7 @@ export const deletePerfumes = async (perfumeId) => {
 // 향수 추가
 export const createPerfumes = async (perfumeData) => {
     try {
-        const response = await apis.post('/perfumes', perfumeData); // POST 요청
-        console.log("향수 추가 요청 데이터:", perfumeData);
-        console.log("향수 추가 성공:", response.data);
+        const response = await apis.post('/perfumes', perfumeData); 
         return response.data;
     } catch (error) {
         console.error("Error creating perfume:", error);
