@@ -193,16 +193,10 @@ export const useChatLogic = () => {
         if (!input.trim() && selectedImages.length === 0 && !isRetry) return;
 
         // 비회원 채팅 횟수 제한
-        const MAX_CHAT_COUNT = 5; // 비회원 최대 채팅 횟수
+        const MAX_CHAT_COUNT = 3; // 비회원 최대 채팅 횟수
 
         // 추천 요청을 구분
         const isRecommendationRequest = chatMode === "recommendation";
-
-        // 사용자가 추천 요청을 시도하면 chatMode를 "recommendation"으로 변경
-        if (!isRecommendationRequest) {
-            console.log("추천 요청 감지: chatMode를 recommendation으로 변경");
-            setChatMode("recommendation");
-        }
 
         // 비회원이고 이미 추천을 받은 경우 로그인 모달 표시
         if (!isLoggedIn && hasReceivedRecommendation && isRecommendationRequest || nonMemberChatCount >= MAX_CHAT_COUNT) {
