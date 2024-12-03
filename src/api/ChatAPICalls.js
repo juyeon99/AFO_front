@@ -1,9 +1,15 @@
 import apis from "./Apis";
 
-export const requestRecommendations = async (userInput, imageFile = null) => {
+export const requestRecommendations = async (userInput, imageFile = null, userId = null) => {
     try {
         const formData = new FormData();
         formData.append("user_input", userInput);
+        
+        // userId가 존재할 경우에만 추가
+        if (userId) {
+            formData.append("userId", userId);
+        }
+        
         if (imageFile) {
             formData.append("image", imageFile);
         }

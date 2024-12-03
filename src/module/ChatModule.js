@@ -22,7 +22,7 @@ export const {
     },
 } = createActions({
     CHAT: {
-        FETCH_CHAT_START: () => {},
+        FETCH_CHAT_START: () => { },
         FETCH_CHAT_SUCCESS: (response) => response,
         FETCH_CHAT_FAIL: (error) => error,
     },
@@ -33,10 +33,19 @@ export const fetchChatResponse = (userInput, imageFile = null) => async (dispatc
     try {
         dispatch(fetchChatStart()); // 로딩 상태 시작
 
+        // 로컬 스토리지에서 사용자 정보 확인
+        const localAuth = JSON.parse(localStorage.getItem("auth"));
+        const userId = localAuth?.id || null; // 로그인된 경우에만 id 가져옴
+
         // 서버 요청
-        const response = await requestRecommendations(userInput, imageFile);
+        const response = await requestRecommendations(userInput, imageFile, userId);
         console.log("API 응답 데이터:", response);
-        dispatch(fetchChatSuccess(response));
+
+        dispatch(fetchChatSuccess({
+            ...response,
+            userInput, // 유저 입력 추가
+        }));
+
         return response; // 응답 데이터 반환
 
     } catch (error) {
@@ -57,13 +66,18 @@ const chatReducer = handleActions(
             chatMode: payload.mode || payload.response?.mode || "chat",
             response: payload.response || null,
             recommendedPerfumes: Array.isArray(payload.recommendedPerfumes?.recommendations)
-            ? payload.recommendedPerfumes.recommendations
-            : [],
+                ? payload.recommendedPerfumes.recommendations
+                : [],
             commonFeeling: payload.commonFeeling || null,
             imageProcessed: payload.imageProcessed || null,
             generatedImage: payload.generatedImage || null,
             loading: false,
             error: null,
+            chatHistory: [
+                ...(state.chatHistory || []),
+                { type: "user", message: payload.userInput },
+                { type: "bot", message: payload.response },
+            ],
         }),
         [fetchChatFail]: (state, { payload }) => ({
             ...state,
