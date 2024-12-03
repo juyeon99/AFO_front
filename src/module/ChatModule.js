@@ -11,6 +11,7 @@ const initialState = {
     generatedImage: null,  // 생성된 이미지 경로
     loading: false, // 로딩 상태
     error: null,    // 에러 메시지
+    chatHistory: [],
 };
 
 // 액션 생성

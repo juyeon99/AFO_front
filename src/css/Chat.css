@@ -637,31 +637,49 @@
 }
 
 .non-member-modal-content {
-    background-color: #fff;
+    background-color: #EFEDED;
     padding: 20px;
     border-radius: 8px;
     width: 400px;
     text-align: center;
 }
 
+.non-member-modal-content-1 {
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 30px;
+}
+
 .non-member-login-button,
 .non-member-close-button {
     margin: 10px;
     padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    border: none;
+    border-radius: 5px;
 }
 
 .non-member-login-button {
-    background-color: #007bff;
-    color: #fff;
+    background-color: #fff;
+    color: #333;
+    /* border: 1px solid black; */
+    margin-right: 30px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
 .non-member-close-button {
-    background-color: #ccc;
+    background-color: #fff;
     color: #333;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.non-member-login-button:hover {
+    background-color: #CDC6CE;
+}
+
+.non-member-close-button:hover {
+    background-color: #CDC6CE;
 }
 
 /* 재시도 버튼 */
@@ -670,8 +688,8 @@
     bottom: 100px; /* 하단에서 100px 위 */
     right: 150px; /* 오른쪽에서 50% */
     transform: translateX(50%); /* 가운데 정렬 */
-    background-color: #ff5757;
-    color: white;
+    background-color: white;
+    color: black;
     border: none;
     border-radius: 8px;
     padding: 10px 20px;
@@ -681,7 +699,7 @@
 }
 
 .chat-retry-button:hover {
-    background-color: #FF4040;
+    background-color: #CDC6CE;
 }
 
 .chat-recommendation-image {
@@ -705,6 +723,23 @@
 
 .recommendation-card-context {
     color: #a73cff;
+}
+
+.chat-create-scent-card-button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.chat-create-scent-card-button:hover {
+    background-color: #0056b3;
 }
 
 

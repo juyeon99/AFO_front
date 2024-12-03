@@ -153,7 +153,22 @@ function Chat() {
                                                         }`}
                                                     style={{ backgroundColor: color }}
                                                 ></div>
+
+                                                {/* "향기 카드 만들기" 버튼 */}
+                                                <button
+                                                    className="chat-create-scent-card-button"
+                                                    onClick={() =>
+                                                        navigate('/history', {
+                                                            state: {
+                                                                recommendations: msg.recommendations, // 추천 데이터를 전달
+                                                            },
+                                                        })
+                                                    }
+                                                >
+                                                    향기 카드 만들기
+                                                </button>
                                             </div>
+
                                         ) : (
                                             <>
 
@@ -286,17 +301,19 @@ function Chat() {
                 </div>
 
             </div>
-            {isModalOpen && (
-                <div className="chat-modal-overlay" onClick={closeModal}>
-                    <div className="chat-modal-content" onClick={(e) => e.stopPropagation()}>
-                        <img src={modalImage} alt="원본 이미지" className="chat-modal-image" />
+            {
+                isModalOpen && (
+                    <div className="chat-modal-overlay" onClick={closeModal}>
+                        <div className="chat-modal-content" onClick={(e) => e.stopPropagation()}>
+                            <img src={modalImage} alt="원본 이미지" className="chat-modal-image" />
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {showLoginModal && <NonMemberLoginModal navigate={navigate} setShowLoginModal={setShowLoginModal} />}
 
-        </div>
+        </div >
     );
 }
 

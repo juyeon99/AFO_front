@@ -7,7 +7,7 @@ export const useChatLogic = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const chatMode = useSelector(selectChatMode);
+    const [chatMode, setChatMode] = useState("chat");
     const [recommendedPerfumes, setRecommendedPerfumes] = useState([]);
     const response = useSelector(selectResponse);
     const loading = useSelector(selectLoading);
@@ -33,6 +33,7 @@ export const useChatLogic = () => {
     const [hasReceivedRecommendation, setHasReceivedRecommendation] = useState(false); // 추천 여부
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [retryAvailable, setRetryAvailable] = useState(false);
+    const [nonMemberChatCount, setNonMemberChatCount] = useState(0);
 
     const filters = [
         { name: 'Spicy', color: '#FF5757' },
@@ -111,16 +112,20 @@ export const useChatLogic = () => {
         // 비회원 여부 확인
         const userData = localStorage.getItem('auth'); // 로컬스토리지에서 사용자 정보 가져오기
         const isUserLoggedIn = !!userData;
+        const hasRecommendation = localStorage.getItem('hasReceivedRecommendation') === 'true';
 
         setIsLoggedIn(isUserLoggedIn); // 로그인 상태 업데이트
+        setHasReceivedRecommendation(hasRecommendation); // 추천 상태 복원
         console.log("로그인 상태:", isUserLoggedIn);
 
-    // 비회원이고 추천을 받은 경우 로그인 모달 표시
-    if (!isUserLoggedIn && hasReceivedRecommendation) {
-        setShowLoginModal(true);
-        setHasReceivedRecommendation(false); // 모달 한 번만 표시
-    }
-    }, [hasReceivedRecommendation, isLoggedIn, setIsLoggedIn]);
+        // 비회원이고 추천을 받은 경우 로그인 모달 표시
+        if (!isUserLoggedIn && hasRecommendation) {
+            setShowLoginModal(true);
+            setChatMode("recommendation"); // 추천 모드 유지
+        } else {
+            setChatMode("chat"); // 기본 모드는 chat
+        }
+    }, []);
 
     useEffect(() => {
         const handleArrowKeyPress = (e) => {
@@ -161,6 +166,18 @@ export const useChatLogic = () => {
         }
     }, [chatMode, response]);
 
+    useEffect(() => {
+        const savedCount = parseInt(localStorage.getItem('nonMemberChatCount'), 10);
+        if (!isNaN(savedCount)) {
+            setNonMemberChatCount(savedCount);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!isLoggedIn) {
+            localStorage.setItem('nonMemberChatCount', nonMemberChatCount.toString());
+        }
+    }, [nonMemberChatCount, isLoggedIn]);
 
     const isDarkColor = (color) => {
         const hex = color.replace("#", "");
@@ -173,18 +190,28 @@ export const useChatLogic = () => {
 
     const handleSendMessage = async (isRetry = false) => {
         if (isLoading) return; // 중복 요청 방지
-        if (!input.trim() && selectedImages.length === 0) return;
+        if (!input.trim() && selectedImages.length === 0 && !isRetry) return;
+
+        // 비회원 채팅 횟수 제한
+        const MAX_CHAT_COUNT = 5; // 비회원 최대 채팅 횟수
+
+        // 추천 요청을 구분
+        const isRecommendationRequest = chatMode === "recommendation";
+
+        // 사용자가 추천 요청을 시도하면 chatMode를 "recommendation"으로 변경
+        if (!isRecommendationRequest) {
+            console.log("추천 요청 감지: chatMode를 recommendation으로 변경");
+            setChatMode("recommendation");
+        }
+
+        // 비회원이고 이미 추천을 받은 경우 로그인 모달 표시
+        if (!isLoggedIn && hasReceivedRecommendation && isRecommendationRequest || nonMemberChatCount >= MAX_CHAT_COUNT) {
+            setShowLoginModal(true); // 로그인 모달 표시
+            return; // 함수 종료
+        }
 
         setRetryAvailable(false);
         setIsLoading(true);
-
-        // 비회원이고 이미 추천을 받은 경우 로그인 모달 표시
-        if (!isLoggedIn && hasReceivedRecommendation) {
-            setShowLoginModal(true);
-            setHasReceivedRecommendation(false);
-            setIsLoading(false); // 로딩 상태 해제
-            return;
-        }
 
         // 재시도 시 이전 메시지 사용
         const userMessage = isRetry && messages[messages.length - 1]?.sender === 'user'
@@ -196,17 +223,31 @@ export const useChatLogic = () => {
                 retryAvailable: false,
             };
 
-            if (!isRetry) {
-                setMessages((prevMessages) => [...prevMessages, userMessage]);
-                setInput('');
-                setSelectedImages([]);
-            }
+        if (!isRetry) {
+            setMessages((prevMessages) => [...prevMessages, userMessage]);
+            setInput('');
+            setSelectedImages([]);
+        } else {
+            // 재시도 시에도 `messages`가 업데이트되도록 보장
+            setMessages((prevMessages) => {
+                const updatedMessages = [...prevMessages];
+                updatedMessages[updatedMessages.length - 1] = userMessage; // 마지막 메시지 업데이트
+                return updatedMessages;
+            });
+        }
+
+        // 비회원 채팅 횟수 증가
+        if (!isLoggedIn) {
+            setNonMemberChatCount((prevCount) => prevCount + 1);
+        }
 
         const imageFile = selectedImages.length > 0 ? selectedImages[0].file : null;
 
         try {
+            console.log("재요청 중입니다:", isRetry);
             // API 호출
-            const response = await dispatch(fetchChatResponse(input.trim(), imageFile));
+            const response = await dispatch(fetchChatResponse(userMessage.text, imageFile));
+            console.log("서버 응답:", response);
 
             if (response?.error) {
                 // 에러 처리
@@ -220,6 +261,7 @@ export const useChatLogic = () => {
             }
 
             setRetryAvailable(false);
+
             if (response?.mode === "recommendation") {
                 // 추천 메시지 처리
                 const recommendationMessage = {
@@ -229,6 +271,14 @@ export const useChatLogic = () => {
                     generatedImage: response.generatedImage.s3_url,
                 };
                 setMessages((prevMessages) => [...prevMessages, recommendationMessage]);
+
+                // 비회원이 추천을 받은 경우 상태 업데이트
+                if (!isLoggedIn) {
+                    setHasReceivedRecommendation(true);
+                    localStorage.setItem('hasReceivedRecommendation', 'true');
+                }
+                setChatMode("chat");
+
             } else if (response?.mode === "chat") {
                 // 일반 메시지 처리
                 const chatMessage = {

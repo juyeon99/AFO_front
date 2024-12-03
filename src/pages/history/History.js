@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation  } from 'react-router-dom';
 import '../../css/History.css';
 
 function History() {
@@ -7,6 +7,8 @@ function History() {
     const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
     const cardsPerPage = 3; // 한 번에 표시할 카드 수
+    const location = useLocation();
+    const recommendations = location.state?.recommendations || [];
 
     // 히스토리 날짜와 카드 데이터 배열
     const historyData = [
@@ -117,7 +119,7 @@ function History() {
     const handleDotClick = (index) => {
         setCurrentCardIndex(index * cardsPerPage);
     };
-    
+
 
     const { date, title, cards } = historyData[currentDateIndex];
     const visibleCards = cards.slice(currentCardIndex, currentCardIndex + cardsPerPage);
@@ -129,10 +131,10 @@ function History() {
 
     return (
         <div className="history-main-container">
-        <img src="/images/logo.png" alt="Logo" className="history-logo"
-        onClick={() => navigate('/')}
-        style={{ cursor: 'pointer' }}
-        />
+            <img src="/images/logo.png" alt="Logo" className="history-logo"
+                onClick={() => navigate('/')}
+                style={{ cursor: 'pointer' }}
+            />
             <div className="history-header">
                 {historyData.map((item, index) => (
                     <button
@@ -148,9 +150,9 @@ function History() {
             <div className="history-container">
                 <h2 className="history-title">{`"${title}"`}</h2>
                 <div className="card-container">
-                    {visibleCards.map((card, index) => (
+                    {recommendations.map((card, index) => (
                         <div className="history-card" key={index}>
-                            <img src={card.imageUrl} alt={card.title} className="card-image" />
+                            <img src={card.imageUrl || '/default-image.png'} alt={card.title} className="card-image" />
                             <div className="card-content">
                                 <h3 className="card-title">{card.title}</h3>
                                 <hr className="divider" />
