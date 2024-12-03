@@ -196,15 +196,10 @@ function Chat() {
 
                                         {/* 사용자 메시지 렌더링 */}
                                         {msg.sender === 'user' && (
-                                            <div className="chat-message-text-wrapper chat-user-message-wrapper">
-                                                {msg.text && (
-                                                    <p
-                                                        className="chat-message-text"
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: highlightSearch(msg.text, searchInput),
-                                                        }}
-                                                    ></p>
-                                                )}
+                                            <div
+                                                className={`chat-message-text-wrapper chat-user-message-wrapper ${msg.images && msg.images.length > 0 && msg.text ? 'with-image-and-text' : msg.images && msg.images.length > 0 ? 'with-image' : 'without-image'
+                                                    }`}
+                                            >
                                                 {msg.images &&
                                                     msg.images.map((image, idx) => (
                                                         <img
@@ -215,6 +210,14 @@ function Chat() {
                                                             onClick={() => openModal(image)}
                                                         />
                                                     ))}
+                                                {msg.text && (
+                                                    <p
+                                                        className="chat-message-text"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: highlightSearch(msg.text, searchInput),
+                                                        }}
+                                                    ></p>
+                                                )}
                                                 <div
                                                     className={`chat-color-circle ${color === '#FFFFFF' ? 'highlighted-border' : ''
                                                         }`}

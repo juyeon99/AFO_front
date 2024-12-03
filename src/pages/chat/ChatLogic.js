@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchChatResponse, selectChatMode, selectResponse, selectLoading, selectError, } from "../../module/ChatModule";
+import { fetchChatResponse, selectResponse, selectLoading, selectError, } from "../../module/ChatModule";
 import { useNavigate } from "react-router-dom";
 
 export const useChatLogic = () => {
@@ -444,63 +444,63 @@ export const useChatLogic = () => {
     };
 
     return {
-        chatMode,
-        response,
-        loading,
-        error,
-        recommendedPerfumes,
-        messages,
+        chatMode,                       // 현재 채팅 모드
+        response,                       // 응답 데이터
+        loading,                        // 로딩 상태
+        error,                          // 에러 상태
+        recommendedPerfumes,            //  추천된 향수 배열
+        messages,                       // 채팅 메세지 배열
         setMessages,
-        input,
+        input,                          // 사용자 입력 값
         setInput,
-        selectedImages,
+        selectedImages,                 // 사용자가 업로드한 이미지 배열
         setSelectedImages,
-        searchInput,
+        searchInput,                    // 검색 입력 값
         setSearchInput,
-        color,
+        color,                          // 현재 색상
         setColor,
-        isDarkColor,
-        highlightedMessageIndexes,
-        setHighlightedMessageIndexes,
-        currentHighlightedIndex,
+        isDarkColor,                    // 현재 색상 어두운지 여부
+        highlightedMessageIndexes,      // 검색된 메세지 인덱스 배열
+        setHighlightedMessageIndexes,   
+        currentHighlightedIndex,        // 현재 하이라이트 메세지 인덱스
         setCurrentHighlightedIndex,
-        isSearchMode,
+        isSearchMode,                   // 검색 모드 활성화 여부
         setIsSearchMode,
-        modalImage,
+        modalImage,                     // 모달에 표시할 이미지 URL
         setModalImage,
-        isModalOpen,
+        isModalOpen,                    // 모달 열림 상태
         setIsModalOpen,
-        fileInputRef,
+        fileInputRef,                   // 이미지 업로드 파일
         isLoading,
         setIsLoading,
-        isLoggedIn,
+        isLoggedIn,                     // 로그인 여부
         setIsLoggedIn,
-        hasReceivedRecommendation,
+        hasReceivedRecommendation,      // 추천 결과 받은지 여부
         setHasReceivedRecommendation,
-        showLoginModal,
+        showLoginModal,                 // 비회원 로그인 모달 표시
         setShowLoginModal,
-        retryAvailable,
+        retryAvailable,                 // 재시도 버튼 활성화
         setRetryAvailable,
-        messageEndRef,
-        getColorForCategory,
-        handleSendMessage,
-        handlePaste,
-        handleInputChange,
-        handleKeyPress,
-        handleImageUpload,
-        handleRemoveImage,
-        openModal,
+        messageEndRef,                  // 채팅 창 끝 부분 스크롤
+        getColorForCategory,            // 특정 카테고리 색상 변경
+        handleSendMessage,              // 사용자 메세지 전송 처리
+        handlePaste,                    // 붙여넣기
+        handleInputChange,              // 사용자 입력 값 변경
+        handleKeyPress,                 // 키보드 입력
+        handleImageUpload,              // 이미지 업로드 처리
+        handleRemoveImage,              // 업로드 이미지 삭제
+        openModal,                      // 이미지 모달
         closeModal,
-        handleSearchChange,
-        highlightSearch,
-        handleSearch,
-        clearSearch,
-        scrollToMessage,
-        goToPreviousHighlight,
-        goToNextHighlight,
-        toggleSearchMode,
-        handleGoBack,
-        RecommendationCard,
+        handleSearchChange,             // 검색 입력 값 변경
+        highlightSearch,                // 검색 단어 하이라이트
+        handleSearch,                   // 검색 실행
+        clearSearch,                    // 검색 초기화
+        scrollToMessage,                // 특정 메세지 스크롤
+        goToPreviousHighlight,          // 이전 하이라이트 이동
+        goToNextHighlight,              // 다음 하이라이트 이동
+        toggleSearchMode,               // 검색 모드 
+        handleGoBack,                   // 뒤로 가기
+        RecommendationCard,             // 추천 카드 렌더링
         navigate,
     };
 
