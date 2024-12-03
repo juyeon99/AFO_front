@@ -17,7 +17,7 @@ const PerfumeList = () => {
     const [showCheckboxes, setShowCheckboxes] = useState(false); // 체크박스 표시 여부
     const [role, setRole] = useState(null);
     const [selectedCard, setSelectedCard] = useState(null); // 선택된 단일 카드
-    console.log("현재 선택된 카드 ID:", selectedCard);
+    // console.log("현재 선택된 카드 ID:", selectedCard);
 
     const [showAddModal, setShowAddModal] = useState(false); // 추가 모달 표시
     const [showEditModal, setShowEditModal] = useState(false);
@@ -186,11 +186,32 @@ const PerfumeList = () => {
 
     const handleSubmit = async () => {
         // console.log("추가할 향수 데이터:", selectedPerfume);
+        if (!selectedPerfume.name) {
+            alert("이름을 입력하세요."); // 부향률 값 확인
+            return;
+        }
+        if (!selectedPerfume.brand) {
+            alert("브랜드를 입력하세요."); // 부향률 값 확인
+            return;
+        }
         if (!selectedPerfume.grade) {
             alert("부향률을 선택하세요."); // 부향률 값 확인
             return;
         }
-
+        if (!selectedPerfume.description) {
+            alert("향수의 설명을 선택하세요."); // 부향률 값 확인
+            return;
+        }
+        if (
+            !selectedPerfume.singleNote &&
+            !selectedPerfume.topNote &&
+            !selectedPerfume.middleNote &&
+            !selectedPerfume.baseNote
+        ) {
+            alert("하나의 노트는 반드시 입력해야 합니다.");
+            return;
+        }
+        
         if (isAdding && selectedPerfume) {
             
             // 싱글 노트 또는 탑/미들/베이스 노트 중 하나만 포함
@@ -200,24 +221,14 @@ const PerfumeList = () => {
                 brand: selectedPerfume?.brand || "",
                 grade: selectedPerfume?.grade || "오 드 퍼퓸", 
                 singleNote: selectedPerfume?.singleNote || null, 
-                topNote: selectedPerfume?.topNote || "" || null,
-                middleNote: selectedPerfume?.middleNote || "" || null, 
-                baseNote: selectedPerfume?.baseNote || "" || null, 
-                imageUrl: selectedPerfume?.imageUrl || "", // 이미지 URL
+                topNote: selectedPerfume?.topNote || null,
+                middleNote: selectedPerfume?.middleNote || null, 
+                baseNote: selectedPerfume?.baseNote || null, 
+                imageUrl: selectedPerfume?.imageUrl || "https://sensient-beauty.com/wp-content/uploads/2023/11/Fragrance-Trends-Alcohol-Free.jpg", // 이미지 기본 설정
             };
-            // console.log("grade 값:", selectedPerfume?.grade);
-    
-            // 유효성 검사: 싱글 노트 또는 탑/미들/베이스 노트 중 하나는 반드시 있어야 함
-            if (
-                (!newPerfumeData.singleNote && !newPerfumeData.topNote && !newPerfumeData.middleNote && !newPerfumeData.baseNote) ||
-                (newPerfumeData.singleNote && (newPerfumeData.topNote || newPerfumeData.middleNote || newPerfumeData.baseNote))
-            ) {
-                alert("잘못 입력했습니다.");
-                return;
-            }
     
             try {
-                await dispatch(createPerfume(newPerfumeData)); // Redux 액션 호출
+                await dispatch(createPerfume(newPerfumeData)); 
                 setSuccessMessage('향수가 성공적으로 추가되었습니다!');
                 setShowAddModal(false); // 추가 모달 닫기
                 setIsAdding(false);     // 추가 모드 비활성화
@@ -230,9 +241,16 @@ const PerfumeList = () => {
     
         // 수정 모드 처리
         if (isEditing && selectedPerfume) {
+            const updatedPerfumeData = {
+                ...selectedPerfume,
+                singleNote: selectedPerfume?.singleNote || null,
+                topNote: selectedPerfume?.topNote || null,
+                middleNote: selectedPerfume?.middleNote || null,
+                baseNote: selectedPerfume?.baseNote || null,
+            };
             // console.log("수정하려는 향수 ID:", selectedPerfume.id);
             try {
-                await dispatch(modifyPerfume(selectedPerfume));
+                await dispatch(modifyPerfume(updatedPerfumeData));
                 setSuccessMessage('향수가 성공적으로 수정되었습니다!');
                 setShowEditModal(false); // 수정 모달 닫기
             } catch (error) {
@@ -555,7 +573,7 @@ const PerfumeList = () => {
                                             type="text"
                                             className="admin-perfume-image-url-input"
                                             placeholder="이미지 URL을 입력하세요"
-                                            value={selectedPerfume?.imageUrl || ""}
+                                            value={selectedPerfume?.imageUrl || "https://sensient-beauty.com/wp-content/uploads/2023/11/Fragrance-Trends-Alcohol-Free.jpg"}
                                             onChange={(e) => {
                                                 const newUrl = e.target.value;
                                                 setSelectedPerfume((prev) => ({
