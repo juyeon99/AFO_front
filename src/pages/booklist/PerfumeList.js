@@ -132,7 +132,7 @@ const PerfumeList = () => {
             name: null,
             description: null,
             brand: null,
-            grade: null,
+            grade: "오 드 퍼퓸",
             singleNote: null,
             topNote: null,
             middleNote: null,
@@ -198,7 +198,7 @@ const PerfumeList = () => {
                 name: selectedPerfume?.name || "",
                 description: selectedPerfume?.description || "",
                 brand: selectedPerfume?.brand || "",
-                grade: selectedPerfume?.grade, 
+                grade: selectedPerfume?.grade || "오 드 퍼퓸", 
                 singleNote: selectedPerfume?.singleNote || null, 
                 topNote: selectedPerfume?.topNote || "" || null,
                 middleNote: selectedPerfume?.middleNote || "" || null, 
@@ -369,7 +369,7 @@ const PerfumeList = () => {
                                     className="perfume-item-image"
                                 />
                                 <div className="perfume-item-name"><strong>{perfume.name}</strong></div>
-                                <div className="perfume-divider-small"></div>  {/* 중간 선임 */}
+                                <div className="perfume-divider-small"></div>
                                 <div className="perfume-category">{perfume.brand}</div>
                                 <div className="perfume-grade">{perfume.grade}</div>
                                 <div className="perfume-description">
@@ -437,7 +437,7 @@ const PerfumeList = () => {
                         <div className="admin-perfume-modal-container">
                             <h2 className="admin-perfume-modal-title">향수 카드 추가하기</h2>
                                 <div className="admin-perfume-modal-row">
-                                    <label>향수명</label>
+                                    <label className="perfume-form-label">향수명</label>
                                     <input
                                         className="admin-perfume-modal-row-name"
                                         type="text"
@@ -450,7 +450,7 @@ const PerfumeList = () => {
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>브랜드명</label>
+                                    <label className="perfume-form-label">브랜드명</label>
                                     <input
                                         className="admin-perfume-modal-row-brand"
                                         type="text"
@@ -465,7 +465,7 @@ const PerfumeList = () => {
                                 <div className="admin-perfume-modal-row">
                                     <label className="perfume-form-label">부향률</label>
                                     <select
-                                        className="admin-perfume-form-select"
+                                        className="admin-perfume-modal-row-concentration"
                                         value={selectedPerfume?.grade || ""} // 상태에서 grade 값을 가져옴
                                         onChange={(e) =>
                                             setSelectedPerfume((prev) => ({
@@ -483,7 +483,7 @@ const PerfumeList = () => {
                                     </select>
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>향수 설명</label>
+                                    <label className="perfume-form-label">향수 설명</label>
                                     <textarea
                                         className="admin-perfume-modal-row-description"
                                         value={selectedPerfume?.description || ""}
@@ -495,7 +495,7 @@ const PerfumeList = () => {
                                     ></textarea>
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>싱글노트</label>
+                                    <label className="perfume-form-label">싱글노트</label>
                                     <input
                                         type="text"
                                         className="admin-perfume-modal-row-singleNote"
@@ -507,7 +507,7 @@ const PerfumeList = () => {
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>탑노트</label>
+                                    <label className="perfume-form-label">탑노트</label>
                                     <input
                                         type="text"
                                         className="admin-perfume-modal-row-topNote"
@@ -519,7 +519,7 @@ const PerfumeList = () => {
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>미들노트</label>
+                                    <label className="perfume-form-label">미들노트</label>
                                     <input
                                         type="text"
                                         className="admin-perfume-modal-row-middleNote"
@@ -531,7 +531,7 @@ const PerfumeList = () => {
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>베이스노트</label>
+                                    <label className="perfume-form-label">베이스노트</label>
                                     <input
                                         type="text"
                                         className="admin-perfume-modal-row-baseNote"
@@ -542,7 +542,7 @@ const PerfumeList = () => {
                                         placeholder="베이스노트를 입력하세요"
                                     />
                                 </div>
-                                <div className="admin-perfume-modal-row">
+                                <div className="admin-perfume-modal-row2">
                                     <label className="admin-perfume-modal-row-image-label">이미지</label>
                                     <div
                                         className="admin-perfume-image-upload"
@@ -582,7 +582,6 @@ const PerfumeList = () => {
                                             )}
                                         </>
                                     )}
-                                    {/* 파일 업로드 input */}
                                     <input
                                         id="admin-perfume-file-input"
                                         type="file"
@@ -631,7 +630,7 @@ const PerfumeList = () => {
                         <div className="admin-perfume-modal-container">
                             <h2 className="admin-perfume-modal-title">향수 카드 수정하기</h2>
                                 <div className="admin-perfume-modal-row">
-                                    <label>향수명</label>
+                                    <label className="perfume-form-label">향수명</label>
                                     <input
                                         type="text"
                                         className="admin-perfume-modal-row-name"
@@ -643,7 +642,7 @@ const PerfumeList = () => {
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>브랜드명</label>
+                                    <label className="perfume-form-label">브랜드명</label>
                                     <input
                                         type="text"
                                         className="admin-perfume-modal-row-brand"
@@ -655,7 +654,7 @@ const PerfumeList = () => {
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>부향률</label>
+                                    <label className="perfume-form-label">부향률</label>
                                     <select
                                         className="admin-perfume-modal-row-concentration"
                                         value={selectedPerfume?.grade || ""}
@@ -675,7 +674,7 @@ const PerfumeList = () => {
                                     </select>
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>향수 설명</label>
+                                    <label className="perfume-form-label">향수 설명</label>
                                     <textarea
                                         className="admin-perfume-modal-row-description"
                                         value={selectedPerfume?.description || ""}
@@ -689,7 +688,7 @@ const PerfumeList = () => {
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>싱글노트</label>
+                                    <label className="perfume-form-label">싱글노트</label>
                                     <input
                                         type="text"
                                         className="admin-perfume-modal-row-singleNote"
@@ -701,7 +700,7 @@ const PerfumeList = () => {
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>탑노트</label>
+                                    <label className="perfume-form-label">탑노트</label>
                                     <input
                                         type="text"
                                         className="admin-perfume-modal-row-topNote"
@@ -713,7 +712,7 @@ const PerfumeList = () => {
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>미들노트</label>
+                                    <label className="perfume-form-label">미들노트</label>
                                     <input
                                         type="text"
                                         className="admin-perfume-modal-row-middleNote"
@@ -725,7 +724,7 @@ const PerfumeList = () => {
                                     />
                                 </div>
                                 <div className="admin-perfume-modal-row">
-                                    <label>베이스노트</label>
+                                    <label className="perfume-form-label">베이스노트</label>
                                     <input
                                         type="text"
                                         className="admin-perfume-modal-row-baseNote"
@@ -736,7 +735,7 @@ const PerfumeList = () => {
                                         placeholder="베이스노트 수정"
                                     />
                                 </div>
-                                <div className="admin-perfume-modal-row">
+                                <div className="admin-perfume-modal-row2">
                                     <label className="admin-perfume-modal-row-image-label">이미지</label>
                                     <div
                                         className="admin-perfume-image-upload"
