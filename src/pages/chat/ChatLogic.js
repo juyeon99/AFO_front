@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchChatResponse, selectResponse, selectLoading, selectError, } from "../../module/ChatModule";
+import { fetchChatResponse, selectResponse, selectLoading, selectError,fetchChatHistory, selectChatHistory } from "../../module/ChatModule";
 import { useNavigate } from "react-router-dom";
 
 export const useChatLogic = () => {
@@ -34,6 +34,7 @@ export const useChatLogic = () => {
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [retryAvailable, setRetryAvailable] = useState(false);
     const [nonMemberChatCount, setNonMemberChatCount] = useState(0);
+    const chatHistory = useSelector(selectChatHistory);
 
     const filters = [
         { name: 'Spicy', color: '#FF5757' },
@@ -67,6 +68,35 @@ export const useChatLogic = () => {
         if (colors.length > 1) return `linear-gradient(90deg, ${colors.join(', ')})`; // 다중 계열
         return '#D9D9D9'; // 기본 색상
     };
+
+    useEffect(() => {
+        if (chatHistory && chatHistory.length > 0) {
+            const formattedMessages = chatHistory.map((message) => ({
+                sender: message.type === "USER" ? "user" : "bot", // 사용자와 봇 구분
+                text: message.messageText || "", // 메시지 내용
+                id: message.id, // 메시지 고유 ID
+                recommendations: message.recommendations || [], // 추천 데이터 포함
+            }));
+    
+            setMessages(formattedMessages); // 상태에 저장
+        }
+    }, [chatHistory]);
+    
+    
+    useEffect(() => {
+        if (isLoggedIn) {
+            dispatch(fetchChatHistory()) // Redux Thunk로 채팅 기록 가져오기
+                .catch((error) => {
+                    console.error("채팅 기록을 불러오는 중 오류 발생:", error);
+                });
+        }
+    }, [dispatch, isLoggedIn]);
+
+    useEffect(() => {
+        if (!isLoggedIn) {
+            setMessages([]); // 로그아웃 시 메시지 상태 초기화
+        }
+    }, [isLoggedIn]);
 
     // 향수 추천 데이터 처리
     useEffect(() => {
