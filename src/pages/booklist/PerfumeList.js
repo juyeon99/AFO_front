@@ -10,29 +10,30 @@ const PerfumeList = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
     const perfumes = useSelector(selectPerfumes) || [];
-    const [searchTerm, setSearchTerm] = useState('');
-    const [activeFilters, setActiveFilters] = useState('');
+
+    const [searchTerm, setSearchTerm] = useState(''); // 검색창
+    const [activeFilters, setActiveFilters] = useState(''); // 버튼 필터
     const [showCheckboxes, setShowCheckboxes] = useState(false); // 체크박스 표시 여부
-    const [role, setRole] = useState(null);
+    const [role, setRole] = useState(null); // 사용자 역할
     const [selectedCard, setSelectedCard] = useState(null); // 선택된 단일 카드
     // console.log("현재 선택된 카드 ID:", selectedCard);
 
     const [showAddModal, setShowAddModal] = useState(false); // 추가 모달 표시
-    const [showEditModal, setShowEditModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false); // 수정 모달
 
-    const [selectedPerfume, setSelectedPerfume] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
+    const [selectedPerfume, setSelectedPerfume] = useState(null); // 향수 데이터 값 설정
+    const [imagePreview, setImagePreview] = useState(null); // 이미지 미리보기
 
-    const [successMessage, setSuccessMessage] = useState('');
-    const [isAdding, setIsAdding] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [successMessage, setSuccessMessage] = useState(''); // 성공 메시지
+    const [isAdding, setIsAdding] = useState(false); // 추가할 값
+    const [isEditing, setIsEditing] = useState(false); // 수정할 값
+    const [isDeleting, setIsDeleting] = useState(false); // 삭제할 값
     const [paginationGroup, setPaginationGroup] = useState(0); // 페이지네이션 그룹 관리
-    const [currentPage, setCurrentPage] = useState(1);
-    const [editingImage, setEditingImage] = useState(false); 
+    const [currentPage, setCurrentPage] = useState(1); // 페이지
+    const [editingImage, setEditingImage] = useState(false);  // 이미지 수정
 
+    // 검색창
     const filteredPerfumes = perfumes.filter((perfume) => {
         // 안전하게 perfume.name을 처리
         const name = perfume?.name || '';
@@ -53,8 +54,10 @@ const PerfumeList = () => {
         return matchesSearch && matchesFilter;
     });
 
-    const itemsPerPage = 12;
 
+    // 페이지 관련 설정
+    const itemsPerPage = 12;
+    
     const totalPages = filteredPerfumes.length
         ? Math.ceil(filteredPerfumes.length / itemsPerPage)
         : 1;
@@ -62,36 +65,42 @@ const PerfumeList = () => {
     const pageStart = paginationGroup * 10 + 1;
     const pageEnd = Math.min((paginationGroup + 1) * 10, totalPages);
 
-    useEffect(() => {
-        // 향수 목록 가져오기
-        dispatch(fetchPerfumes());
-    }, [dispatch]);
-
-    useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem('auth'));
-        if (storedUser && storedUser.role) {
-            setRole(storedUser.role); // 사용자 역할 저장
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    
+        // 페이지 그룹 변경 로직
+        const groupStart = paginationGroup * 10 + 1;
+        const groupEnd = groupStart + 9;
+        if (page < groupStart) {
+            setPaginationGroup(paginationGroup - 1);
+        } else if (page > groupEnd) {
+            setPaginationGroup(paginationGroup + 1);
         }
-    }, []);
-
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
-        setCurrentPage(1);
     };
 
-    const handleEditButtonClick = (perfume) => {
-
-        setSelectedPerfume(perfume);
-        setShowEditModal(true);
-        setIsEditing(true); // 수정 모드 활성화
-        setIsAdding(false); // 추가 모드 비활성화
+    const handleNextGroup = () => {
+        if ((paginationGroup + 1) * 10 < totalPages) {
+            setPaginationGroup(paginationGroup + 1);
+        }
+    };
+    
+    const handlePreviousGroup = () => {
+        if (paginationGroup > 0) {
+            setPaginationGroup(paginationGroup - 1);
+        }
     };
 
-    const handleSuccessClose = () => {
-        setSuccessMessage(''); // 메시지 초기화
-        dispatch(fetchPerfumes()); // 최신 데이터 가져오기
-    };
+    // 필터 버튼
+    const filterButtons = [
+        { id: '오 드 퍼퓸', label: 'Eau de Perfume' },
+        { id: '오 드 뚜왈렛', label: 'Eau de Toilette' },
+        { id: '오 드 코롱', label: 'Eau de Cologne' },
+        { id: '퍼퓸', label: 'Perfume' },
+        { id: '솔리드 퍼퓸', label: 'Solid Perfume'}
 
+    ];
+
+    // 필터 버튼 핸들러
     const handleFilterClick = (filterId) => {
         setActiveFilters(prev => {
             if (prev.includes(filterId)) {
@@ -103,19 +112,51 @@ const PerfumeList = () => {
         setCurrentPage(1);
     };
 
+    // 조회 API 요청
+    useEffect(() => {
+        // 향수 목록 가져오기
+        dispatch(fetchPerfumes());
+    }, [dispatch]);
+
+    // 로그인한 사용자의 role 상태
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem('auth'));
+        if (storedUser && storedUser.role) {
+            setRole(storedUser.role); // 사용자 역할 저장
+        }
+    }, []);
+
+
+    // **핸들러들**
+
+    // 검색
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+
+
+    // 수정
+    const handleEditButtonClick = (perfume) => {
+
+        setSelectedPerfume(perfume);
+        setShowEditModal(true);
+        setIsEditing(true); // 수정 모드 활성화
+        setIsAdding(false); // 추가 모드 비활성화
+    };
+
+    // 성공 메시지
+    const handleSuccessClose = () => {
+        setSuccessMessage(''); // 메시지 초기화
+        dispatch(fetchPerfumes()); // 최신 데이터 가져오기
+    };
+
+    // 이미지 선택
     const handleReset = () => {
         setImagePreview(null); // 파일 선택 영역 초기화
     };
 
-    const filterButtons = [
-        { id: '오 드 퍼퓸', label: 'Eau de Perfume' },
-        { id: '오 드 뚜왈렛', label: 'Eau de Toilette' },
-        { id: '오 드 코롱', label: 'Eau de Cologne' },
-        { id: '퍼퓸', label: 'Perfume' },
-        { id: '솔리드 퍼퓸', label: 'Solid Perfume'}
-
-    ];
-
+    // 체크박스 선택
     const handleCheckboxToggle = () => setShowCheckboxes(!showCheckboxes);
 
     const handleCardCheckboxChange = (id) => {
@@ -127,6 +168,7 @@ const PerfumeList = () => {
         console.log("현재 선택된 카드 ID:", id); // 디버깅 메시지
     };
 
+    // 추가 버튼
     const handleAddButtonClick = () => {
         setSelectedPerfume({
             name: null,
@@ -145,6 +187,7 @@ const PerfumeList = () => {
         setIsEditing(false);   // 수정 모드 비활성화
     };
 
+    // 삭제 버튼
     const handleDeleteButtonClick = () => {
         if (!selectedCard) {
             alert("삭제할 카드를 선택하세요.");
@@ -156,6 +199,7 @@ const PerfumeList = () => {
         setIsDeleting(true); // 삭제 모달 활성화
     };
 
+    // 삭제 버튼
     const handleDeleteConfirm = async () => {
         if (!selectedPerfume) {
             console.error("선택된 향수 카드가 없습니다.");
@@ -178,12 +222,15 @@ const PerfumeList = () => {
         }
     };
 
+    // 삭제 모달창 닫기
     const handleDeleteClose = () => {
         setIsDeleting(false); // 삭제 모달 닫기
         setSelectedPerfume(null); 
         setSelectedCard(null); // 선택 초기화
     };
 
+
+    // 추가 버튼, 수정 버튼
     const handleSubmit = async () => {
         // console.log("추가할 향수 데이터:", selectedPerfume);
         if (!selectedPerfume.name) {
@@ -265,6 +312,7 @@ const PerfumeList = () => {
         setSelectedPerfume(null);
     };
 
+    // 모달 상태들
     const closeModal = () => {
         setShowAddModal(false); // 추가 모달 닫기
         setShowEditModal(false); // 수정 모달 닫기
@@ -274,32 +322,7 @@ const PerfumeList = () => {
         setImagePreview(null);   // 이미지 미리보기 초기화
     };
 
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    
-        // 페이지 그룹 변경 로직
-        const groupStart = paginationGroup * 10 + 1;
-        const groupEnd = groupStart + 9;
-        if (page < groupStart) {
-            setPaginationGroup(paginationGroup - 1);
-        } else if (page > groupEnd) {
-            setPaginationGroup(paginationGroup + 1);
-        }
-    };
-
-    const handleNextGroup = () => {
-        if ((paginationGroup + 1) * 10 < totalPages) {
-            setPaginationGroup(paginationGroup + 1);
-        }
-    };
-    
-    const handlePreviousGroup = () => {
-        if (paginationGroup > 0) {
-            setPaginationGroup(paginationGroup - 1);
-        }
-    };
-
-    // 데이터가 비어 있는 경우 처리
+    // 로딩창 - 데이터가 비어 있는 경우 처리
     if (!perfumes || perfumes.length === 0) {
         return <LoadingScreen message="항수를 불러오는 중..." />;
     }
@@ -317,7 +340,7 @@ const PerfumeList = () => {
                         <input
                             type="text"
                             className="perfume-list-search"
-                            placeholder="브랜드명, 향수 이름 검색"
+                            placeholder="브랜드명, 향수 이름 검색 가능"
                             value={searchTerm}
                             onChange={handleSearch}
                         />
