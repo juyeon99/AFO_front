@@ -64,6 +64,7 @@ function Chat() {
         handleGoBack,
         RecommendationCard,
         navigate,
+        combinedMessages,
     } = useChatLogic();
 
     return (
@@ -115,7 +116,7 @@ function Chat() {
                                     <p
                                         className="chat-search-result-text"
                                         dangerouslySetInnerHTML={{
-                                            __html: highlightSearch(messages[index].text, searchInput),
+                                            __html: highlightSearch(combinedMessages[index].text, searchInput),
                                         }}
                                     ></p>
                                 </div>
@@ -123,7 +124,7 @@ function Chat() {
                         ) : (
                             // 추천 모드 또는 일반 채팅 모드 렌더링
                             <>
-                                {messages.map((msg, index) => (
+                                {combinedMessages.map((msg, index) => (
                                     <div
                                         key={index}
                                         id={`message-${index}`}

@@ -19,7 +19,7 @@ export const requestRecommendations = async (userInput, imageFile = null, userId
             console.log(`${key}: ${value instanceof File ? value.name : value}`);
         }
 
-        const response = await apis.post("/recommend", formData, {
+        const response = await apis.post("/recommends/", formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
 
@@ -33,6 +33,6 @@ export const requestRecommendations = async (userInput, imageFile = null, userId
 
 // 로그인한 회원의 채팅 내역 가져오기
 export const getChatHistory = async (memberId) => {
-    const response = await apis.get(`/recommend/${memberId}`);
+    const response = await apis.get(`/recommends/${memberId}`);
     return response.data; // 응답 데이터 반환
 };

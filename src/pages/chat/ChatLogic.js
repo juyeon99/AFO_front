@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchChatResponse, selectResponse, selectLoading, selectError,fetchChatHistory, selectChatHistory } from "../../module/ChatModule";
+import { fetchChatResponse, selectResponse, selectLoading, selectError, fetchChatHistory, selectChatHistory } from "../../module/ChatModule";
 import { useNavigate } from "react-router-dom";
 
 export const useChatLogic = () => {
@@ -35,6 +35,9 @@ export const useChatLogic = () => {
     const [retryAvailable, setRetryAvailable] = useState(false);
     const [nonMemberChatCount, setNonMemberChatCount] = useState(0);
     const chatHistory = useSelector(selectChatHistory);
+    const chatHistoryLoaded = useRef(false); // 기록 불러오기 여부
+    const [initialMessages, setInitialMessages] = useState([]); // 초기 메시지 상태
+    const [chatMessages, setChatMessages] = useState([]); // 실시간 추가 메시지 상태
 
     const filters = [
         { name: 'Spicy', color: '#FF5757' },
@@ -69,32 +72,40 @@ export const useChatLogic = () => {
         return '#D9D9D9'; // 기본 색상
     };
 
+    // 로그인 후 최초 한 번만 채팅 기록 불러오기
     useEffect(() => {
-        if (chatHistory && chatHistory.length > 0) {
-            const formattedMessages = chatHistory.map((message) => ({
-                sender: message.type === "USER" ? "user" : "bot", // 사용자와 봇 구분
-                text: message.messageText || "", // 메시지 내용
-                id: message.id, // 메시지 고유 ID
-                recommendations: message.recommendations || [], // 추천 데이터 포함
-            }));
-    
-            setMessages(formattedMessages); // 상태에 저장
-        }
-    }, [chatHistory]);
-    
-    
-    useEffect(() => {
-        if (isLoggedIn) {
-            dispatch(fetchChatHistory()) // Redux Thunk로 채팅 기록 가져오기
+        if (isLoggedIn && !chatHistoryLoaded.current) {
+            dispatch(fetchChatHistory())
+                .then(() => {
+                    chatHistoryLoaded.current = true; // 기록 불러온 후 상태 업데이트
+                })
                 .catch((error) => {
                     console.error("채팅 기록을 불러오는 중 오류 발생:", error);
                 });
         }
-    }, [dispatch, isLoggedIn]);
+    }, [isLoggedIn, dispatch]);
 
+    // 채팅 기록 업데이트 (initialMessages 설정)
+    useEffect(() => {
+        if (chatHistory && chatHistory.length > 0) {
+            const formattedMessages = chatHistory.map((message) => ({
+                sender: message.type === "USER" ? "user" : "bot",
+                text: message.messageText || "",
+                id: message.id || null,
+                recommendations: message.recommendations || [],
+                generatedImage: message.chatImage || null,
+            }));
+
+            setInitialMessages(formattedMessages); // 초기 메시지 설정
+        }
+    }, [chatHistory]);
+
+    // 비로그인 상태 처리
     useEffect(() => {
         if (!isLoggedIn) {
-            setMessages([]); // 로그아웃 시 메시지 상태 초기화
+            // 비로그인 상태에서 기본 메시지만 표시
+            setInitialMessages([{ sender: "bot", text: "안녕하세요. 센티크입니다. 당신에게 어울리는 향을 찾아드리겠습니다." }]);
+            chatHistoryLoaded.current = false; // 다시 기록을 불러올 수 있도록 설정
         }
     }, [isLoggedIn]);
 
@@ -238,8 +249,8 @@ export const useChatLogic = () => {
         setIsLoading(true);
 
         // 재시도 시 이전 메시지 사용
-        const userMessage = isRetry && messages[messages.length - 1]?.sender === 'user'
-            ? messages[messages.length - 1]
+        const userMessage = isRetry && chatMessages[chatMessages.length - 1]?.sender === 'user'
+            ? chatMessages[chatMessages.length - 1]
             : {
                 sender: 'user',
                 text: input.trim() || '',
@@ -248,12 +259,12 @@ export const useChatLogic = () => {
             };
 
         if (!isRetry) {
-            setMessages((prevMessages) => [...prevMessages, userMessage]);
+            setChatMessages((prevMessages) => [...prevMessages, userMessage]);
             setInput('');
             setSelectedImages([]);
         } else {
             // 재시도 시에도 `messages`가 업데이트되도록 보장
-            setMessages((prevMessages) => {
+            setChatMessages((prevMessages) => {
                 const updatedMessages = [...prevMessages];
                 updatedMessages[updatedMessages.length - 1] = userMessage; // 마지막 메시지 업데이트
                 return updatedMessages;
@@ -277,7 +288,7 @@ export const useChatLogic = () => {
                 // 에러 처리
                 console.error('서버 에러 발생:', response.error);
                 setRetryAvailable(true); // 실패 시 재시도 버튼 표시
-                setMessages((prevMessages) => [
+                setChatMessages((prevMessages) => [
                     ...prevMessages,
                     { sender: 'bot', text: '추천 데이터를 처리하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.' },
                 ]);
@@ -295,7 +306,7 @@ export const useChatLogic = () => {
                     recommendations: recommendations,
                     generatedImage: response.generatedImage.s3_url,
                 };
-                setMessages((prevMessages) => [...prevMessages, recommendationMessage]);
+                setChatMessages((prevMessages) => [...prevMessages, recommendationMessage]);
 
                 // 비회원이 추천을 받은 경우 상태 업데이트
                 if (!isLoggedIn) {
@@ -310,7 +321,7 @@ export const useChatLogic = () => {
                     sender: 'bot',
                     text: response.response,
                 };
-                setMessages((prevMessages) => [...prevMessages, chatMessage]);
+                setChatMessages((prevMessages) => [...prevMessages, chatMessage]);
             }
 
         } catch (error) {
@@ -321,9 +332,18 @@ export const useChatLogic = () => {
                 { sender: 'bot', text: '문제가 발생했습니다. 네트워크 연결을 확인하거나 다시 시도해주세요.' },
             ]);
         } finally {
-            setIsLoading(false); // 로딩 종료
+            setIsLoading(false);
+            // 메시지가 추가된 후 스크롤 이동
+            setTimeout(() => {
+                if (messageEndRef.current) {
+                    messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
         }
     };
+
+    // 렌더링 시 두 상태 병합
+    const combinedMessages = [...initialMessages, ...chatMessages];
 
     const handlePaste = (event) => {
         const items = event.clipboardData.items;
@@ -492,7 +512,7 @@ export const useChatLogic = () => {
         setColor,
         isDarkColor,                    // 현재 색상 어두운지 여부
         highlightedMessageIndexes,      // 검색된 메세지 인덱스 배열
-        setHighlightedMessageIndexes,   
+        setHighlightedMessageIndexes,
         currentHighlightedIndex,        // 현재 하이라이트 메세지 인덱스
         setCurrentHighlightedIndex,
         isSearchMode,                   // 검색 모드 활성화 여부
@@ -533,6 +553,7 @@ export const useChatLogic = () => {
         handleGoBack,                   // 뒤로 가기
         RecommendationCard,             // 추천 카드 렌더링
         navigate,
+        combinedMessages,
     };
 
 };
