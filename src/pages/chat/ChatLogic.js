@@ -257,11 +257,12 @@ export const useChatLogic = () => {
             setRetryAvailable(false);
 
             if (response?.mode === "recommendation") {
+                const recommendations = response.recommendations
                 // 추천 메시지 처리
                 const recommendationMessage = {
                     sender: 'bot',
                     text: '향수 추천 결과를 확인하세요.',
-                    recommendations: response.recommendedPerfumes?.recommendations || [],
+                    recommendations: recommendations,
                     generatedImage: response.generatedImage.s3_url,
                 };
                 setMessages((prevMessages) => [...prevMessages, recommendationMessage]);

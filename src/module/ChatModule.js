@@ -42,9 +42,16 @@ export const fetchChatResponse = (userInput, imageFile = null) => async (dispatc
         const response = await requestRecommendations(userInput, imageFile, userId);
         console.log("API 응답 데이터:", response);
 
+        const { mode, recommendations, common_feeling, imageProcessed, generatedImage } = response;
+
         dispatch(fetchChatSuccess({
-            ...response,
-            userInput, // 유저 입력 추가
+            response,
+            userInput,
+            mode,
+            recommendations,
+            commonFeeling: common_feeling,
+            imageProcessed,
+            generatedImage,
         }));
 
         return response; // 응답 데이터 반환
@@ -57,34 +64,43 @@ export const fetchChatResponse = (userInput, imageFile = null) => async (dispatc
 // 리듀서
 const chatReducer = handleActions(
     {
-        [fetchChatStart]: (state) => ({
-            ...state,
-            loading: true,
-            error: null,
-        }),
-        [fetchChatSuccess]: (state, { payload }) => ({
-            ...state,
-            chatMode: payload.mode || payload.response?.mode || "chat",
-            response: payload.response || null,
-            recommendedPerfumes: Array.isArray(payload.recommendedPerfumes?.recommendations)
-                ? payload.recommendedPerfumes.recommendations
-                : [],
-            commonFeeling: payload.commonFeeling || null,
-            imageProcessed: payload.imageProcessed || null,
-            generatedImage: payload.generatedImage || null,
-            loading: false,
-            error: null,
-            chatHistory: [
-                ...(state.chatHistory || []),
-                { type: "user", message: payload.userInput },
-                { type: "bot", message: payload.response },
-            ],
-        }),
-        [fetchChatFail]: (state, { payload }) => ({
-            ...state,
-            loading: false,
-            error: payload,
-        }),
+        [fetchChatStart]: (state) => {
+            console.log("fetchChatStart 상태 변경:", state);
+            return {
+                ...state,
+                loading: true,
+                error: null,
+            };
+        },
+        [fetchChatSuccess]: (state, { payload }) => {
+            console.log("fetchChatSuccess 상태 변경:", payload);
+            return {
+                ...state,
+                chatMode: payload.mode || payload.response?.mode || "chat",
+                response: payload.response || null,
+                recommendedPerfumes: Array.isArray(payload.response?.recommendations)
+                    ? payload.response.recommendations
+                    : [],
+                commonFeeling: payload.response?.common_feeling || null,
+                imageProcessed: payload.imageProcessed || null,
+                generatedImage: payload.generatedImage || null,
+                loading: false,
+                error: null,
+                chatHistory: [
+                    ...(state.chatHistory || []),
+                    { type: "user", message: payload.userInput },
+                    { type: "bot", message: payload.response },
+                ],
+            };
+        },
+        [fetchChatFail]: (state, { payload }) => {
+            console.log("fetchChatFail 상태 변경:", payload);
+            return {
+                ...state,
+                loading: false,
+                error: payload,
+            };
+        },
     },
     initialState
 );
