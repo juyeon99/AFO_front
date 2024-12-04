@@ -15,6 +15,7 @@ export const getAllPerfumes = async () => {
 export const modifyPerfumes = async (perfumeData) => {
     try {
         const response = await apis.put(`/perfumes`, perfumeData);
+        console.log("히하이ㅏ링라ㅣ아링", response)
         return response.data;
     } catch (error) {
         console.error("Error modifying perfume:", error);

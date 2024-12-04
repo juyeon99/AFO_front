@@ -1,6 +1,6 @@
 import '../../css/SpicesList.css';
 import React, { useState, useEffect } from 'react';
-import { Search, Edit, Trash2 } from 'lucide-react';
+import { Search, Edit, Trash2, Construction } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { fetchSpices, selectSpices, modifySpices, deleteSpices, createSpices } from '../../module/SpicesModule';
@@ -34,7 +34,8 @@ const SpicesList = () => {
     const [editingImage, setEditingImage] = useState(false);  // 이미지 수정
 
     // 검색창
-    const filteredSpices = spices.filter((spice) => {
+    // spices가 배열인지 확인하고 필터링
+    const filteredSpices = Array.isArray(spices) ? spices.filter((spice) => {
         // 안전하게 spice.name을 처리
         const name = spice?.name || '';
         const nameKr = spice?.nameKr || '';
@@ -51,10 +52,20 @@ const SpicesList = () => {
         // 필터 조건 (activeFilters)
         const matchesFilter =
             activeFilters.length === 0 || // 필터가 없으면 true
-            activeFilters.some((filter) => name.includes(filter) || nameKr.includes(filter) || lineName.includes(filter) || description.includes(filter)); // 이름 또는 브랜드와 일치
+            activeFilters.some((filter) =>
+                name.includes(filter) ||
+                nameKr.includes(filter) ||
+                lineName.includes(filter) ||
+                description.includes(filter)
+            );
 
         return matchesSearch && matchesFilter;
-    });
+    }) : [];
+
+    // 컴포넌트에서 spices 상태 확인을 위한 디버깅
+    useEffect(() => {
+        console.log('현재 spices:', spices);
+    }, [spices]);
 
 
     // 페이지 관련 설정
@@ -306,17 +317,17 @@ const SpicesList = () => {
             };
 
             try {
-    console.log("향료 추가 요청 데이터:", newSpiceData);
-    const response = await dispatch(createSpices(newSpiceData));
-    console.log("향료 추가 응답:", response);
-    setSuccessMessage('향료가 성공적으로 추가되었습니다!');
-    setShowAddModal(false); // 추가 모달 닫기
-    setIsAdding(false);     // 추가 모드 비활성화
-    handleReset();          // 입력 값 초기화
-} catch (error) {
-    console.error("향료 추가 실패:", error);
-    alert("향료 추가에 실패했습니다. 다시 시도해주세요.");
-}
+                console.log("향료 추가 요청 데이터:", newSpiceData);
+                const response = await dispatch(createSpices(newSpiceData));
+                console.log("향료 추가 응답:", response);
+                setSuccessMessage('향료가 성공적으로 추가되었습니다!');
+                setShowAddModal(false); // 추가 모달 닫기
+                setIsAdding(false);     // 추가 모드 비활성화
+                handleReset();          // 입력 값 초기화
+            } catch (error) {
+                console.error("향료 추가 실패:", error);
+                alert("향료 추가에 실패했습니다. 다시 시도해주세요.");
+            }
         }
 
         // 수정 모드 처리
@@ -324,7 +335,7 @@ const SpicesList = () => {
             const updatedSpiceData = {
                 ...selectedSpice,
             };
-            // console.log("수정하려는 향료 ID:", selectedSpice.id);
+            console.log("수정하려는 향료 ID:", updatedSpiceData.id);
             try {
                 await dispatch(modifySpices(updatedSpiceData));
                 setSuccessMessage('향료가 성공적으로 수정되었습니다!');
@@ -691,34 +702,34 @@ const SpicesList = () => {
                             </div>
                             <div className="admin-spices-modal-row">
                                 <label className="spices-form-label">계열</label>
-                                    <select
-                                        className="admin-spices-modal-row-spices"
-                                        value={selectedSpice?.lineName || ""} // 상태에서 line 값을 가져옴
-                                        onChange={(e) =>
-                                            setSelectedSpice((prev) => ({
-                                                ...prev,
-                                                lineName: e.target.value, // 선택한 값을 상태에 업데이트
-                                            }))
-                                        }
-                                        required
-                                    >
-                                        <option value="Spicy">Spicy</option>
-                                        <option value="Fruity">Fruity</option>
-                                        <option value="Citrus">Citrus</option>
-                                        <option value="Green">Green</option>
-                                        <option value="Aldehyde">Aldehyde</option>
-                                        <option value="Aquatic">Aquatic</option>
-                                        <option value="Fougere">Fougere</option>
-                                        <option value="Gourmand">Gourmand</option>
-                                        <option value="Woody">Woody</option>
-                                        <option value="Oriental">Oriental</option>
-                                        <option value="Floral">Floral</option>
-                                        <option value="Musk">Musk</option>
-                                        <option value="Powdery">Powdery</option>
-                                        <option value="Amber">Amber</option>
-                                        <option value="Tobacco Leather">Tobacco Leather</option>
-                                    </select>
-                                </div>
+                                <select
+                                    className="admin-spices-modal-row-spices"
+                                    value={selectedSpice?.lineName || ""} // 상태에서 line 값을 가져옴
+                                    onChange={(e) =>
+                                        setSelectedSpice((prev) => ({
+                                            ...prev,
+                                            lineName: e.target.value, // 선택한 값을 상태에 업데이트
+                                        }))
+                                    }
+                                    required
+                                >
+                                    <option value="Spicy">Spicy</option>
+                                    <option value="Fruity">Fruity</option>
+                                    <option value="Citrus">Citrus</option>
+                                    <option value="Green">Green</option>
+                                    <option value="Aldehyde">Aldehyde</option>
+                                    <option value="Aquatic">Aquatic</option>
+                                    <option value="Fougere">Fougere</option>
+                                    <option value="Gourmand">Gourmand</option>
+                                    <option value="Woody">Woody</option>
+                                    <option value="Oriental">Oriental</option>
+                                    <option value="Floral">Floral</option>
+                                    <option value="Musk">Musk</option>
+                                    <option value="Powdery">Powdery</option>
+                                    <option value="Amber">Amber</option>
+                                    <option value="Tobacco Leather">Tobacco Leather</option>
+                                </select>
+                            </div>
                             <div className="admin-spices-modal-row">
                                 <label className="spices-form-label">향료 설명</label>
                                 <textarea
