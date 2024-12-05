@@ -65,6 +65,7 @@ function Chat() {
         RecommendationCard,
         navigate,
         filteredMessages,
+        handleCreateScentCard,
     } = useChatLogic();
 
     return (
@@ -158,13 +159,7 @@ function Chat() {
                                                 {/* "향기 카드 만들기" 버튼 */}
                                                 <button
                                                     className="chat-create-scent-card-button"
-                                                    onClick={() =>
-                                                        navigate('/history', {
-                                                            state: {
-                                                                recommendations: msg.recommendations, // 추천 데이터를 전달
-                                                            },
-                                                        })
-                                                    }
+                                                    onClick={() => handleCreateScentCard(msg.id)}
                                                 >
                                                     향기 카드 만들기
                                                 </button>

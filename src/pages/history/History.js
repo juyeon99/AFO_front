@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation  } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../../css/History.css';
 
 function History() {
@@ -7,8 +7,6 @@ function History() {
     const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
     const cardsPerPage = 3; // 한 번에 표시할 카드 수
-    const location = useLocation();
-    const recommendations = location.state?.recommendations || [];
 
     // 히스토리 날짜와 카드 데이터 배열
     const historyData = [
@@ -150,9 +148,9 @@ function History() {
             <div className="history-container">
                 <h2 className="history-title">{`"${title}"`}</h2>
                 <div className="card-container">
-                    {recommendations.map((card, index) => (
+                    {visibleCards.map((card, index) => (
                         <div className="history-card" key={index}>
-                            <img src={card.imageUrl || '/default-image.png'} alt={card.title} className="card-image" />
+                            <img src={card.imageUrl} alt={card.title} className="card-image" />
                             <div className="card-content">
                                 <h3 className="card-title">{card.title}</h3>
                                 <hr className="divider" />

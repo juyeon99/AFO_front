@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchChatResponse, selectResponse, selectLoading, selectError, fetchChatHistory, selectChatHistory } from "../../module/ChatModule";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid'; // UUID 라이브러리 임포트
+import { createScentCard } from "../../module/HistoryModule";
 
 export const useChatLogic = () => {
     const dispatch = useDispatch();
@@ -311,12 +312,12 @@ export const useChatLogic = () => {
 
         // 비회원이고 이미 추천을 받은 경우 로그인 모달 표시
         if (
-            (!isLoggedIn && hasReceivedRecommendation && isRecommendationRequest) || 
+            (!isLoggedIn && hasReceivedRecommendation && isRecommendationRequest) ||
             (!isLoggedIn && nonMemberChatCount >= MAX_CHAT_COUNT)
         ) {
             setShowLoginModal(true); // 로그인 모달 표시
             return; // 함수 종료
-        }        
+        }
 
         setRetryAvailable(false);
         setIsLoading(true);
@@ -578,6 +579,21 @@ export const useChatLogic = () => {
         );
     };
 
+    const handleCreateScentCard = async (chatId) => {
+        try {
+            const cardData = await dispatch(createScentCard(chatId)); // 향기 카드 생성 요청
+            console.log("향기 카드 생성 성공:", cardData);
+
+            navigate('/history', {
+                state: {
+                    recommendations: cardData.recommendations, // 추천 데이터 전달
+                },
+            });
+        } catch (error) {
+            console.error("향기 카드 생성 실패:", error);
+        }
+    };
+
     return {
         chatMode,                       // 현재 채팅 모드
         response,                       // 응답 데이터
@@ -638,6 +654,7 @@ export const useChatLogic = () => {
         RecommendationCard,             // 추천 카드 렌더링
         navigate,
         filteredMessages,
+        handleCreateScentCard,          // 향기 카드 만들기
     };
 
 };
