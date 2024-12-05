@@ -67,7 +67,8 @@
 /* 필터링 */
 .spices-filters {
     display: grid;
-    grid-template-columns: repeat(8, auto); 
+    grid-template-columns: repeat(8, auto);
+    justify-content: space-between;
     gap: 10px;
     width: 60%;
     transform: translateY(-40px);
@@ -75,8 +76,8 @@
 }
 
 .spices-filter-item {
-    width: 40px;
-    height: 10px;
+    width: 80px;
+    height: 35px;
     padding: 10px 20px;
     border: 1px solid #000000;
     border-radius: 35px;
@@ -103,12 +104,43 @@
     margin-top: 20px;
     margin-bottom: 40px;
 }
-
 .spices-item-card {
+    position: relative;
     width: 200px;
     height: 300px;
-    background: #FFFFFF;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    perspective: 1000px;
+    border-radius: 20px;
+    padding: 15px;
+    justify-content: center;
+}
+
+.spices-item-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s ease;
+    transform-style: preserve-3d; /* 3D 효과 유지 */
+}
+
+.spices-item-card:hover .spices-item-card-inner {
+    transform: rotateY(180deg);
+}
+
+
+.spices-item-card img {
+    object-fit: cover;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+}
+
+.spices-item-front,
+.spices-item-back {
+    background-color: #ffffff; /* 기본 배경색 */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden; /* 뒷면 숨기기 */
     border-radius: 20px;
     padding: 15px;
     text-align: center;
@@ -116,15 +148,35 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
-    perspective: 1000px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.spices-item-card img {
-    object-fit: cover;
-    width: 60px;
-    height: 60px;
-    margin-bottom: 10px;
+/* 카드 뒷면 */
+.spices-item-back {
+    background-color: #f8f8f8;
+    transform: rotateY(180deg) translateX(25px);
+    z-index: 1;
+}
+
+/* Edit 버튼이 회전하지 않도록 별도 스타일 지정 */
+.admin-spices-edit-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3; /* 카드 앞면에 고정된 상태로 유지 */
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* 호버 시 카드 회전 */
+.spices-item-card.hover .spices-item-front {
+    transform: rotateY(-180deg); /* 앞면 회전 */
+    
+}
+
+.spices-item-card.hover .spices-item-back {
+    transform: rotateY(0); /* 뒷면 보이기 */
 }
 
 .spices-name {
@@ -157,61 +209,12 @@
 }
 
 .spices-description {
-    font-family: 'Inter', sans-serif;
     text-align: center;
     justify-content: center;
     transform: translateY(10px);
 }
 
-/* 카드 뒤집기 및 체크박스 */
-.spices-item-card .spices-item-front,
-.spices-item-card .spices-item-back {
-    position: absolute;
-    backface-visibility: hidden; /* 뒷면 숨기기 */
-    transition: transform 0.6s ease; /* 회전 애니메이션 */
-    width: 200px;
-    height: 300px;
-    background: #FFFFFF;
-    border-radius: 20px;
-    padding: 15px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    opacity: 1;
-}
-
-/* 카드 앞면 */
-.spices-item-front {
-    background-color: #ffffff; /* 기본 배경색 */
-    transform: rotateY(0deg);
-    z-index: 2;
-}
-
-/* 카드 뒷면 */
-.spices-item-back {
-    transform: rotateY(180deg);
-    z-index: 1;
-    
-}
-
-.spices-item-card:hover {
-    /* 모든 카드에 hover 효과 적용을 방지 */
-    transform: none; 
-}
-
-/* 호버 시 카드 회전 */
-.spices-item-card.hover .spices-item-front {
-    transform: rotateY(-180deg); /* 앞면 회전 */
-}
-
-.spices-item-card.hover .spices-item-back {
-    transform: rotateY(0); /* 뒷면 보이기 */
-}
-
-
-/* 체크박스 */
+/* ADMIN */
 .admin-spices-item-select-checkbox {
     z-index: 10;
     width: 15px;
@@ -230,16 +233,6 @@
     transition: background-color 0.3s ease;
     translate: -80px -137px !important;;
     z-index: 11;
-}
-
-.admin-spices-item-select-checkbox:checked + label {
-    background-color: #b6e6ec !important; /* 선택 시 배경색 */
-    border-color: #000; /* 선택 시 테두리 색상 */
-}
-
-.spices-item-card.hover .admin-spices-item-select-checkbox,
-.spices-item-card.hover .admin-spices-item-select-checkbox + label {
-    z-index: 150; /* hover 상태에서도 체크박스가 항상 위에 표시 */
 }
 
 /* 페이지네이션 */
@@ -279,28 +272,37 @@
 
 /* 모달 */
 .admin-spices-modal-backdrop {
-    position: fixed;
+    position: fixed; /* 화면 전체를 덮도록 설정 */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* 배경 반투명 */
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    z-index: 1000; /* 높은 z-index 값으로 푸터와 다른 요소 위에 렌더링 */
     display: flex;
-    justify-content: center; /* 가로 중앙 정렬 */
-    align-items: center; /* 세로 중앙 정렬 */
-    z-index: 100; /* 화면 위에 표시 */
+    justify-content: center;
+    align-items: center;
 }
 
 .admin-spices-modal-container {
     background: #fff;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
-    width: 400px; /* 모달 창의 고정된 너비 */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
-    font-family: Arial, sans-serif;
+    min-height: 550px;
+    max-height: 80vh;   
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     position: relative;
     text-align: left;
-    height: 500px;
+    overflow-y: auto; /* 내용이 넘치면 스크롤 */
+}
+
+.admin-spices-modal-row{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    align-items: center;
+    margin-left: 40px;
+    margin-right: 40px;
 }
 
 .admin-spices-modal-container-delete {
@@ -309,7 +311,6 @@
     border-radius: 10px;
     width: 400px; /* 모달 창의 고정된 너비 */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
-    font-family: Arial, sans-serif;
     position: relative;
     text-align: center;
     height: 200px;
@@ -320,7 +321,6 @@
     padding: 20px;
     border-radius: 10px;
     width: 400px; /* 모달 창의 고정된 너비 */
-    font-family: Arial, sans-serif;
     position: relative;
     text-align: center;
 }
@@ -352,6 +352,7 @@
     background-color: #fff;
     color: black;
     border: 2px solid #CDC6CE;
+    margin-left: 20px;
 }
 
 .admin-spices-confirm-button {
@@ -362,50 +363,106 @@
     color: black;
 }
 
-.admin-spices-url-input {
-    translate: 155px;
+.admin-spices-modal-row input,
+.admin-spices-modal-row textarea,
+.admin-spices-modal-row-description {
+    width: 270px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-left: 10px;
+    flex-basis: 65%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #EFEDED;
+}
+
+.admin-spices-modal-row-description {
+    resize: none;
+    height: 80px;
+    font-family: 'Inter', sans-serif;
+}
+
+.spice-in-description{
+    font-size: 15px;
+}
+
+.admin-spices-modal-row-spices {
+    width: 275px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    background-color: #EFEDED;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.admin-spices-image-upload{
+    width: 60px;
+    height: 50px;
+    border: 1px solid #ddd; /* 테두리 스타일 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #EFEDED; /* 배경색 */
+    transform: translateX(-210px);
+}
+
+.admin-spices-image-url-input {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ddd; /* 테두리 스타일 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #EFEDED; /* 배경색 */
+    transform: translateX(140px);
+}
+
+.admin-spices-modal-row-description textarea {
+    height: 100px;
+    resize: vertical;
 }
 
 /* 관리자 버튼 */
 .admin-spices-controls {
     gap: 5px;
-    margin-left: 20px;
+    margin-left: 130px;
     translate: 1000px -20px;
     display: flex;
     position: absolute;
 }
 
 .admin-spices-add-button,
-.admin-spices-select-button {
-    padding: 5px 10px;
-    border: none;
+.admin-spices-select-button,
+.admin-spices-delete-button {
+    margin-right: 8px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #333;
+    border-radius: 10%;
     cursor: pointer;
-    font-size: 16px;
     background-color: #EFEDED;
-    border: 1px solid black;
+    transition: background-color 0.3s ease, transform 0.2s;
 }
 
 .admin-spices-add-button:hover,
-.admin-spices-select-button:hover {
-    background-color: #ccc;
-}
-
-.admin-spices-delete-button {
-    background: none;
-    border: 1px solid black;
-    cursor: pointer;
-    padding: 5px;
-    transition: transform 0.2s;
-}
-
+.admin-spices-select-button:hover,
 .admin-spices-delete-button:hover {
+    background-color: #ccc;
     transform: scale(1.1);
 }
 
-.admin-spices-delete-button svg {
-    color: black;
-}
-
+/* 수정 */
 .admin-spices-edit-button {
     position: absolute;
     top: 15px;
@@ -414,9 +471,12 @@
     border: none;
     cursor: pointer;
     padding: 5px;
-    z-index: 3;
+    z-index: 100;
 }
 
-.admin-spices-edit-button:hover {
-    color: #007bff; /* 호버 시 색상 변경 */
+.admin-spices-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 50px;
 }

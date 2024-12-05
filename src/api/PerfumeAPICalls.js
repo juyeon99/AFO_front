@@ -4,7 +4,6 @@ import apis from "./Apis";
 export const getAllPerfumes = async () => {
     try {
         const response = await apis.get("/perfumes");
-        console.log(response.data);
         return response.data;
     } catch (error) {
         console.error("Error fetching perfumes:", error);
@@ -16,6 +15,7 @@ export const getAllPerfumes = async () => {
 export const modifyPerfumes = async (perfumeData) => {
     try {
         const response = await apis.put(`/perfumes`, perfumeData);
+        console.log("히하이ㅏ링라ㅣ아링", response)
         return response.data;
     } catch (error) {
         console.error("Error modifying perfume:", error);
