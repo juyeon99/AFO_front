@@ -1,6 +1,6 @@
 import '../../css/SpicesList.css';
 import React, { useState, useEffect } from 'react';
-import { Search, Edit, Trash2, Construction } from 'lucide-react';
+import { Search, Edit, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { fetchSpices, selectSpices, modifySpices, deleteSpices, createSpices } from '../../module/SpicesModule';
@@ -62,12 +62,6 @@ const SpicesList = () => {
         return matchesSearch && matchesFilter;
     }) : [];
 
-    // 컴포넌트에서 spices 상태 확인을 위한 디버깅
-    useEffect(() => {
-        console.log('현재 spices:', spices);
-    }, [spices]);
-
-
     // 페이지 관련 설정
     const itemsPerPage = 12;
 
@@ -104,22 +98,22 @@ const SpicesList = () => {
     };
 
     const filterButtons = [
-        { name: 'ALL', color: '#FFFFFF' },
+        { name: 'ALL', color: '#EFEDED' },
         { name: 'Spicy', color: '#FF5757' },
         { name: 'Fruity', color: '#FFBD43' },
         { name: 'Citrus', color: '#FFE043' },
-        { name: 'Green', color: '#62D66A' },
-        { name: 'Floral', color: '#FF80C1' },
-        { name: 'Oriental', color: '#C061FF' },
-        { name: 'Musk', color: '#F8E4FF' },
-        { name: 'Powdery', color: '#FFFFFF' },
-        { name: 'Tobacco Leather', color: '#000000' },
         { name: 'Fougere', color: '#7ED3BB' },
-        { name: 'Gourmand', color: '#A1522C' },
-        { name: 'Woody', color: '#86390F' },
+        { name: 'Green', color: '#62D66A' },
         { name: 'Aldehyde', color: '#98D1FF' },
         { name: 'Aquatic', color: '#56D2FF' },
         { name: 'Amber', color: '#FFE8D3' },
+        { name: 'Gourmand', color: '#A1522C' },
+        { name: 'Woody', color: '#86390F' },
+        { name: 'Musk', color: '#F8E4FF' },
+        { name: 'Floral', color: '#FF80C1' },
+        { name: 'Oriental', color: '#C061FF' },
+        { name: 'Powdery', color: '#FFFFFF' },
+        { name: 'Tobacco Leather', color: '#000000' },
     ];
 
     // 라인 별 색깔
@@ -311,15 +305,14 @@ const SpicesList = () => {
             const newSpiceData = {
                 name: selectedSpice?.name || "",
                 nameKr: selectedSpice?.nameKr || "",
-                lineName: selectedSpice?.lineName || "Spicy",
+                lineName: selectedSpice?.lineName || "향료의 계열을 선택해주세요",
                 description: selectedSpice?.description || "",
-                imageUrl: selectedSpice?.imageUrl || "https://cdn-icons-png.flaticon.com/512/8081/8081401.png", // 이미지 기본 설정
+                imageUrl: selectedSpice?.imageUrl || "http://www.myflavor.com/img/sub/natural_img01.jpg", // 이미지 기본 설정
             };
 
             try {
                 console.log("향료 추가 요청 데이터:", newSpiceData);
-                const response = await dispatch(createSpices(newSpiceData));
-                console.log("향료 추가 응답:", response);
+                await dispatch(createSpices(newSpiceData));
                 setSuccessMessage('향료가 성공적으로 추가되었습니다!');
                 setShowAddModal(false); // 추가 모달 닫기
                 setIsAdding(false);     // 추가 모드 비활성화
@@ -350,6 +343,7 @@ const SpicesList = () => {
         setIsEditing(false);
         setIsAdding(false);
         setSelectedSpice(null);
+        window.location.reload();
     };
 
     // 모달 상태들
@@ -401,7 +395,7 @@ const SpicesList = () => {
                             key={index}
                             className={`spices-filter-item ${activeFilters.includes(filter.name) ? 'active' : ''}`}
                             style={{
-                                backgroundColor: activeFilters.includes(filter.name) ? filter.color : '#FFFFFF', // 필터 색상 설정
+                                backgroundColor: activeFilters.includes(filter.name) ? filter.color : '#EFEDED', // 필터 색상 설정
                                 color: getTextColor(activeFilters.includes(filter.name) ? filter.color : '#FFFFFF'), // 텍스트 색상 계산
                                 borderColor: 'black', // 테두리 색상 지정
                             }}
@@ -428,45 +422,69 @@ const SpicesList = () => {
                         .map((spice) => (
                             <div key={spice.id} className="spice-item-card">
                                 <div className="spices-item-card">
-                                    {/* 카드 앞면 */}
-                                    <div className="spices-item-front">
-                                        {showCheckboxes && (
-                                            <input
-                                                type="checkbox"
-                                                className="admin-spices-card-select-circle"
-                                                name={`spice-select-${spice.id}`}
-                                                checked={selectedCard === spice.id}
-                                                onChange={() => handleCardCheckboxChange(spice.id)}
-                                            />
-                                        )}
+                                    <div className="spices-item-card-inner">
+                                        {/* 카드 앞면 */}
+                                        <div className="spices-item-front">
+                                            {showCheckboxes && (
+                                                <input
+                                                    type="checkbox"
+                                                    id={`checkbox-${spice.id}`}
+                                                    className="admin-perfume-card-select-circle"
+                                                    name={`spice-select-${spice.id}`}
+                                                    checked={selectedCard === spice.id}
+                                                    onChange={() => handleCardCheckboxChange(spice.id)}
+                                                />
+                                            )}
 
-                                        {/* Edit 아이콘 버튼 */}
-                                        {role === 'ADMIN' && (
-                                            <>
+                                            {/* Edit 아이콘 버튼 */}
+                                            {role === 'ADMIN' && (
+                                                    <button
+                                                        className="admin-spices-edit-button"
+                                                        onClick={() => handleEditButtonClick(spice)} 
+                                                    >
+                                                        <Edit size={16} color="#333" /> 
+                                                    </button>
+                                            )}
+                                            <img
+                                                src={spice.imageUrl}
+                                                alt={spice.name}
+                                                className="spice-item-image"
+                                            />
+                                            <div className="spices-name"><strong>{spice.name}</strong></div>
+                                            <div className="spices-nameKr">{spice.nameKr}</div>
+                                            <div className="spices-divider-small"></div>
+                                            <div className="spices-category">{spice.lineName} 계열</div>
+                                        </div>
+                                        {/* 카드 뒷면 */}
+                                        <div className="spices-item-back"
+                                            style={{
+                                                backgroundColor: getFilterColor(spice.lineName),
+                                                color: getTextColor(getFilterColor(spice.lineName)),
+                                            }}
+                                        >
+                                            {showCheckboxes && (
+                                                <input
+                                                    type="checkbox"
+                                                    id={`checkbox-back-${spice.id}`}
+                                                    className="admin-perfume-card-select-circle"
+                                                    name={`spice-select-${spice.id}`}
+                                                    checked={selectedCard === spice.id}
+                                                    onChange={() => handleCardCheckboxChange(spice.id)}
+                                                />
+                                            )}
+                                            
+                                            {role === 'ADMIN' && (
                                                 <button
                                                     className="admin-spices-edit-button"
-                                                    onClick={() => handleEditButtonClick(spice)} // 수정 버튼 클릭 시 실행
+                                                    onClick={() => handleEditButtonClick(spice)}
                                                 >
-                                                    <Edit size={16} color="#333" /> {/* Edit 아이콘 사용 */}
+                                                    <Edit size={16} color="#333" />
                                                 </button>
-                                            </>
-                                        )}
-
-                                        <img
-                                            src={spice.imageUrl}
-                                            alt={spice.name}
-                                            className="spice-item-image"
-                                        />
-                                        <div className="spices-name"><strong>{spice.name}</strong></div>
-                                        <div className="spices-nameKr">{spice.nameKr}</div>
-                                        <div className="spices-divider-small"></div>
-                                        <div className="spices-category">{spice.lineName}</div>
-                                    </div>
-
-                                    {/* 카드 뒷면 */}
-                                    <div className="spices-item-back">
-                                        <div className="spice-description">
-                                            <p>{spice.description}</p>
+                                            )}
+                                            <div className="spices-name"><strong>{spice.nameKr}</strong></div>
+                                            <div className="spice-description">
+                                                <p className="spice-in-description">{spice.description}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -561,6 +579,7 @@ const SpicesList = () => {
                                     }
                                     required
                                 >
+                                    <option value="">향료의 계열을 선택하세요</option>
                                     <option value="Spicy">Spicy</option>
                                     <option value="Fruity">Fruity</option>
                                     <option value="Citrus">Citrus</option>
@@ -578,10 +597,10 @@ const SpicesList = () => {
                                     <option value="Tobacco Leather">Tobacco Leather</option>
                                 </select>
                             </div>
-                            <div className="admin-spices-modal-row-description">
+                            <div className="admin-spices-modal-row">
                                 <label className="spices-form-label">향료 설명</label>
                                 <textarea
-                                    className="admin-spices-modal-row-description-input"
+                                    className="admin-spices-modal-row-description"
                                     value={selectedSpice?.description || ""}
                                     onChange={(e) =>
                                         setSelectedSpice((prev) => ({ ...prev, description: e.target.value }))
@@ -603,7 +622,7 @@ const SpicesList = () => {
                                             type="text"
                                             className="admin-spices-image-url-input"
                                             placeholder="이미지 URL을 입력하세요"
-                                            value={selectedSpice?.imageUrl || "https://example.com/default-image.jpg"}
+                                            value={selectedSpice?.imageUrl || "http://www.myflavor.com/img/sub/natural_img01.jpg"}
                                             onChange={(e) => {
                                                 const newUrl = e.target.value;
                                                 setSelectedSpice((prev) => ({
@@ -677,7 +696,7 @@ const SpicesList = () => {
                         <div className="admin-spices-modal-container">
                             <h2 className="admin-spices-modal-title">향료 카드 수정하기</h2>
                             <div className="admin-spices-modal-row">
-                                <label className="spices-form-label">향료명</label>
+                                <label className="spices-form-label">향료명(영어)</label>
                                 <input
                                     type="text"
                                     className="admin-spices-modal-row-name"
@@ -689,7 +708,7 @@ const SpicesList = () => {
                                 />
                             </div>
                             <div className="admin-spices-modal-row">
-                                <label className="spices-form-label">향료 이름(한글)</label>
+                                <label className="spices-form-label">향료명(한글)</label>
                                 <input
                                     type="text"
                                     className="admin-spices-modal-row-brand"
@@ -713,6 +732,7 @@ const SpicesList = () => {
                                     }
                                     required
                                 >
+                                    <option value="">향료의 계열을 선택하세요</option>
                                     <option value="Spicy">Spicy</option>
                                     <option value="Fruity">Fruity</option>
                                     <option value="Citrus">Citrus</option>
@@ -744,8 +764,8 @@ const SpicesList = () => {
                                     placeholder="향료 설명 수정"
                                 />
                             </div>
-                            <div className="admin-spices-modal-row2">
-                                <label className="admin-spices-modal-row-image-label">이미지</label>
+                            <div className="admin-spices-modal-row">
+                                <label className="spices-form-label">이미지</label>
                                 <div
                                     className="admin-spices-image-upload"
                                     onClick={() => {
@@ -764,6 +784,7 @@ const SpicesList = () => {
                                                     ...prev,
                                                     imageUrl: newUrl, // URL 입력값으로 imageUrl 수정
                                                 }));
+                                                setImagePreview(newUrl); 
                                             }}
                                             onBlur={() => setEditingImage(false)} // 입력 필드 외 클릭 시 수정 모드 해제
                                             onKeyDown={(e) => {
@@ -784,9 +805,8 @@ const SpicesList = () => {
                                             )}
                                         </>
                                     )}
-                                    {/* 파일 업로드 input */}
                                     <input
-                                        id="admin-spices-file-input-edit"
+                                        id="admin-spices-file-input"
                                         type="file"
                                         className="admin-spices-file-input"
                                         accept="image/*"

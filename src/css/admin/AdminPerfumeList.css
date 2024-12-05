@@ -64,13 +64,6 @@
     translate: -40px -50px;
 }
 
-.admin-perfume-controls{
-    display: flex;
-    gap: 2px;
-    margin-left: -130px;
-    translate: 280px -20px;
-}
-
 .admin-perfume-list-filter-btn {
     padding: 8px 16px;
     border: 1px solid #333;
