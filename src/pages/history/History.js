@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { fetchChatHistory } from '../../module/ChatModule';
+import { fetchHistory } from '../../module/HistoryModule';
 import { useNavigate } from 'react-router-dom';
 import '../../css/History.css';
 
@@ -21,7 +21,10 @@ function History() {
         const memberId = localAuth?.id;
 
         if (memberId) {
-            dispatch(fetchChatHistory(memberId)); // API 호출
+            console.log("향기 카드 데이터 요청 시작");
+            dispatch(fetchHistory(memberId))
+                .then(() => console.log("향기 카드 데이터 불러오기 성공"))
+                .catch((err) => console.error("향기 카드 데이터 불러오기 실패:", err));
         }
     }, [dispatch]);
 
