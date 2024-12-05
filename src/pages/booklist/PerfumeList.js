@@ -10,29 +10,30 @@ const PerfumeList = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
     const perfumes = useSelector(selectPerfumes) || [];
-    const [searchTerm, setSearchTerm] = useState('');
-    const [activeFilters, setActiveFilters] = useState('');
+
+    const [searchTerm, setSearchTerm] = useState(''); // 검색창
+    const [activeFilters, setActiveFilters] = useState(''); // 버튼 필터
     const [showCheckboxes, setShowCheckboxes] = useState(false); // 체크박스 표시 여부
-    const [role, setRole] = useState(null);
+    const [role, setRole] = useState(null); // 사용자 역할
     const [selectedCard, setSelectedCard] = useState(null); // 선택된 단일 카드
-    console.log("현재 선택된 카드 ID:", selectedCard);
+    // console.log("현재 선택된 카드 ID:", selectedCard);
 
     const [showAddModal, setShowAddModal] = useState(false); // 추가 모달 표시
-    const [showEditModal, setShowEditModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false); // 수정 모달
 
-    const [selectedPerfume, setSelectedPerfume] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
+    const [selectedPerfume, setSelectedPerfume] = useState(null); // 향수 데이터 값 설정
+    const [imagePreview, setImagePreview] = useState(null); // 이미지 미리보기
 
-    const [successMessage, setSuccessMessage] = useState('');
-    const [isAdding, setIsAdding] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [successMessage, setSuccessMessage] = useState(''); // 성공 메시지
+    const [isAdding, setIsAdding] = useState(false); // 추가할 값
+    const [isEditing, setIsEditing] = useState(false); // 수정할 값
+    const [isDeleting, setIsDeleting] = useState(false); // 삭제할 값
     const [paginationGroup, setPaginationGroup] = useState(0); // 페이지네이션 그룹 관리
-    const [currentPage, setCurrentPage] = useState(1);
-    const [editingImage, setEditingImage] = useState(false); 
+    const [currentPage, setCurrentPage] = useState(1); // 페이지
+    const [editingImage, setEditingImage] = useState(false);  // 이미지 수정
 
+    // 검색창
     const filteredPerfumes = perfumes.filter((perfume) => {
         // 안전하게 perfume.name을 처리
         const name = perfume?.name || '';
@@ -53,208 +54,16 @@ const PerfumeList = () => {
         return matchesSearch && matchesFilter;
     });
 
-    const itemsPerPage = 12;
 
+    // 페이지 관련 설정
+    const itemsPerPage = 12;
+    
     const totalPages = filteredPerfumes.length
         ? Math.ceil(filteredPerfumes.length / itemsPerPage)
         : 1;
 
     const pageStart = paginationGroup * 10 + 1;
     const pageEnd = Math.min((paginationGroup + 1) * 10, totalPages);
-
-    useEffect(() => {
-        // 향수 목록 가져오기
-        dispatch(fetchPerfumes());
-    }, [dispatch]);
-
-    useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem('auth'));
-        if (storedUser && storedUser.role) {
-            setRole(storedUser.role); // 사용자 역할 저장
-        }
-    }, []);
-
-    const handleSearch = (e) => {
-        setSearchTerm(e.target.value);
-        setCurrentPage(1);
-    };
-
-    const handleEditButtonClick = (perfume) => {
-
-        setSelectedPerfume(perfume);
-        setShowEditModal(true);
-        setIsEditing(true); // 수정 모드 활성화
-        setIsAdding(false); // 추가 모드 비활성화
-    };
-
-    const handleSuccessClose = () => {
-        setSuccessMessage(''); // 메시지 초기화
-        dispatch(fetchPerfumes()); // 최신 데이터 가져오기
-    };
-
-    const handleFilterClick = (filterId) => {
-        setActiveFilters(prev => {
-            if (prev.includes(filterId)) {
-                return prev.filter(id => id !== filterId);
-            } else {
-                return [...prev, filterId];
-            }
-        });
-        setCurrentPage(1);
-    };
-
-    const handleReset = () => {
-        setImagePreview(null); // 파일 선택 영역 초기화
-    };
-
-    const filterButtons = [
-        { id: '오 드 퍼퓸', label: 'Eau de Perfume' },
-        { id: '오 드 뚜왈렛', label: 'Eau de Toilette' },
-        { id: '오 드 코롱', label: 'Eau de Cologne' },
-        { id: '퍼퓸', label: 'Perfume' },
-        { id: '솔리드 퍼퓸', label: 'Solid Perfume'}
-
-    ];
-
-    const handleCheckboxToggle = () => setShowCheckboxes(!showCheckboxes);
-
-    const handleCardCheckboxChange = (id) => {
-        if (selectedCard === id) {
-            setSelectedCard(null); // 같은 항목 클릭 시 선택 해제
-        } else {
-            setSelectedCard(id); // 새로운 항목 선택
-        }
-        console.log("현재 선택된 카드 ID:", id); // 디버깅 메시지
-    };
-
-    const handleAddButtonClick = () => {
-        setSelectedPerfume({
-            name: null,
-            description: null,
-            brand: null,
-            grade: "오 드 퍼퓸",
-            singleNote: null,
-            topNote: null,
-            middleNote: null,
-            baseNote: null,
-            imageUrl: null,
-        }); 
-    
-        setShowAddModal(true); // 모달 열기
-        setIsAdding(true); // 추가 모드 활성화
-        setIsEditing(false);   // 수정 모드 비활성화
-    };
-
-    const handleDeleteButtonClick = () => {
-        if (!selectedCard) {
-            alert("삭제할 카드를 선택하세요.");
-            return;
-        }
-
-        const perfumeToDelete = perfumes.find((perfume) => perfume.id === selectedCard);
-        setSelectedPerfume(perfumeToDelete); // 삭제할 카드 설정
-        setIsDeleting(true); // 삭제 모달 활성화
-    };
-
-    const handleDeleteConfirm = async () => {
-        if (!selectedPerfume) {
-            console.error("선택된 향수 카드가 없습니다.");
-            alert("삭제할 카드를 선택하세요.");
-            return;
-        }
-        console.log("삭제 요청 ID:", selectedCard);
-
-        try {
-            // Redux를 통해 삭제 API 호출
-            await dispatch(deletePerfume(selectedCard));
-            setSuccessMessage(`${selectedPerfume.name} 향수 카드가 삭제되었습니다!`);
-    
-            // 삭제 모달 닫기
-            setIsDeleting(false);
-            setSelectedPerfume(null);
-        } catch (error) {
-            console.error("향수 삭제 실패:", error);
-            alert("향수 삭제에 실패했습니다. 다시 시도해주세요.");
-        }
-    };
-
-    const handleDeleteClose = () => {
-        setIsDeleting(false); // 삭제 모달 닫기
-        setSelectedPerfume(null); 
-        setSelectedCard(null); // 선택 초기화
-    };
-
-    const handleSubmit = async () => {
-        // console.log("추가할 향수 데이터:", selectedPerfume);
-        if (!selectedPerfume.grade) {
-            alert("부향률을 선택하세요."); // 부향률 값 확인
-            return;
-        }
-
-        if (isAdding && selectedPerfume) {
-            
-            // 싱글 노트 또는 탑/미들/베이스 노트 중 하나만 포함
-            const newPerfumeData = {
-                name: selectedPerfume?.name || "",
-                description: selectedPerfume?.description || "",
-                brand: selectedPerfume?.brand || "",
-                grade: selectedPerfume?.grade || "오 드 퍼퓸", 
-                singleNote: selectedPerfume?.singleNote || null, 
-                topNote: selectedPerfume?.topNote || "" || null,
-                middleNote: selectedPerfume?.middleNote || "" || null, 
-                baseNote: selectedPerfume?.baseNote || "" || null, 
-                imageUrl: selectedPerfume?.imageUrl || "", // 이미지 URL
-            };
-            // console.log("grade 값:", selectedPerfume?.grade);
-    
-            // 유효성 검사: 싱글 노트 또는 탑/미들/베이스 노트 중 하나는 반드시 있어야 함
-            if (
-                (!newPerfumeData.singleNote && !newPerfumeData.topNote && !newPerfumeData.middleNote && !newPerfumeData.baseNote) ||
-                (newPerfumeData.singleNote && (newPerfumeData.topNote || newPerfumeData.middleNote || newPerfumeData.baseNote))
-            ) {
-                alert("잘못 입력했습니다.");
-                return;
-            }
-    
-            try {
-                await dispatch(createPerfume(newPerfumeData)); // Redux 액션 호출
-                setSuccessMessage('향수가 성공적으로 추가되었습니다!');
-                setShowAddModal(false); // 추가 모달 닫기
-                setIsAdding(false);     // 추가 모드 비활성화
-                handleReset();          // 입력 값 초기화
-            } catch (error) {
-                console.error("향수 추가 실패:", error);
-                alert("향수 추가에 실패했습니다. 다시 시도해주세요.");
-            }
-        }
-    
-        // 수정 모드 처리
-        if (isEditing && selectedPerfume) {
-            // console.log("수정하려는 향수 ID:", selectedPerfume.id);
-            try {
-                await dispatch(modifyPerfume(selectedPerfume));
-                setSuccessMessage('향수가 성공적으로 수정되었습니다!');
-                setShowEditModal(false); // 수정 모달 닫기
-            } catch (error) {
-                console.error("향수 수정 실패:", error);
-                alert("향수 수정에 실패했습니다. 다시 시도해주세요.");
-            }
-        }
-    
-        // 공통 처리
-        setIsEditing(false);
-        setIsAdding(false);
-        setSelectedPerfume(null);
-    };
-
-    const closeModal = () => {
-        setShowAddModal(false); // 추가 모달 닫기
-        setShowEditModal(false); // 수정 모달 닫기
-        setIsAdding(false);      // 추가 모드 비활성화
-        setIsEditing(false);     // 수정 모드 비활성화
-        setSelectedPerfume(null); // 선택된 데이터 초기화
-        setImagePreview(null);   // 이미지 미리보기 초기화
-    };
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -281,7 +90,239 @@ const PerfumeList = () => {
         }
     };
 
-    // 데이터가 비어 있는 경우 처리
+    // 필터 버튼
+    const filterButtons = [
+        { id: '오 드 퍼퓸', label: 'Eau de Perfume' },
+        { id: '오 드 뚜왈렛', label: 'Eau de Toilette' },
+        { id: '오 드 코롱', label: 'Eau de Cologne' },
+        { id: '퍼퓸', label: 'Perfume' },
+        { id: '솔리드 퍼퓸', label: 'Solid Perfume'}
+
+    ];
+
+    // 필터 버튼 핸들러
+    const handleFilterClick = (filterId) => {
+        setActiveFilters(prev => {
+            if (prev.includes(filterId)) {
+                return prev.filter(id => id !== filterId);
+            } else {
+                return [...prev, filterId];
+            }
+        });
+        setCurrentPage(1);
+    };
+
+    // 조회 API 요청
+    useEffect(() => {
+        // 향수 목록 가져오기
+        dispatch(fetchPerfumes());
+    }, [dispatch]);
+
+    // 로그인한 사용자의 role 상태
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem('auth'));
+        if (storedUser && storedUser.role) {
+            setRole(storedUser.role); // 사용자 역할 저장
+        }
+    }, []);
+
+
+    // **핸들러들**
+
+    // 검색
+    const handleSearch = (e) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+
+
+    // 수정
+    const handleEditButtonClick = (perfume) => {
+
+        setSelectedPerfume(perfume);
+        setShowEditModal(true);
+        setIsEditing(true); // 수정 모드 활성화
+        setIsAdding(false); // 추가 모드 비활성화
+    };
+
+    // 성공 메시지
+    const handleSuccessClose = () => {
+        setSuccessMessage(''); // 메시지 초기화
+        dispatch(fetchPerfumes()); // 최신 데이터 가져오기
+    };
+
+    // 이미지 선택
+    const handleReset = () => {
+        setImagePreview(null); // 파일 선택 영역 초기화
+    };
+
+    // 체크박스 선택
+    const handleCheckboxToggle = () => setShowCheckboxes(!showCheckboxes);
+
+    const handleCardCheckboxChange = (id) => {
+        if (selectedCard === id) {
+            setSelectedCard(null); // 같은 항목 클릭 시 선택 해제
+        } else {
+            setSelectedCard(id); // 새로운 항목 선택
+        }
+        console.log("현재 선택된 카드 ID:", id); // 디버깅 메시지
+    };
+
+    // 추가 버튼
+    const handleAddButtonClick = () => {
+        setSelectedPerfume({
+            name: null,
+            description: null,
+            brand: null,
+            grade: "오 드 퍼퓸",
+            singleNote: null,
+            topNote: null,
+            middleNote: null,
+            baseNote: null,
+            imageUrl: null,
+        }); 
+    
+        setShowAddModal(true); // 모달 열기
+        setIsAdding(true); // 추가 모드 활성화
+        setIsEditing(false);   // 수정 모드 비활성화
+    };
+
+    // 삭제 버튼
+    const handleDeleteButtonClick = () => {
+        if (!selectedCard) {
+            alert("삭제할 카드를 선택하세요.");
+            return;
+        }
+
+        const perfumeToDelete = perfumes.find((perfume) => perfume.id === selectedCard);
+        setSelectedPerfume(perfumeToDelete); // 삭제할 카드 설정
+        setIsDeleting(true); // 삭제 모달 활성화
+    };
+
+    // 삭제 버튼
+    const handleDeleteConfirm = async () => {
+        if (!selectedPerfume) {
+            console.error("선택된 향수 카드가 없습니다.");
+            alert("삭제할 카드를 선택하세요.");
+            return;
+        }
+        console.log("삭제 요청 ID:", selectedCard);
+
+        try {
+            // Redux를 통해 삭제 API 호출
+            await dispatch(deletePerfume(selectedCard));
+            setSuccessMessage(`${selectedPerfume.name} 향수 카드가 삭제되었습니다!`);
+    
+            // 삭제 모달 닫기
+            setIsDeleting(false);
+            setSelectedPerfume(null);
+        } catch (error) {
+            console.error("향수 삭제 실패:", error);
+            alert("향수 삭제에 실패했습니다. 다시 시도해주세요.");
+        }
+    };
+
+    // 삭제 모달창 닫기
+    const handleDeleteClose = () => {
+        setIsDeleting(false); // 삭제 모달 닫기
+        setSelectedPerfume(null); 
+        setSelectedCard(null); // 선택 초기화
+    };
+
+
+    // 추가 버튼, 수정 버튼
+    const handleSubmit = async () => {
+        // console.log("추가할 향수 데이터:", selectedPerfume);
+        if (!selectedPerfume.name) {
+            alert("이름을 입력하세요."); // 부향률 값 확인
+            return;
+        }
+        if (!selectedPerfume.brand) {
+            alert("브랜드를 입력하세요."); // 부향률 값 확인
+            return;
+        }
+        if (!selectedPerfume.grade) {
+            alert("부향률을 선택하세요."); // 부향률 값 확인
+            return;
+        }
+        if (!selectedPerfume.description) {
+            alert("향수의 설명을 선택하세요."); // 부향률 값 확인
+            return;
+        }
+        if (
+            !selectedPerfume.singleNote &&
+            !selectedPerfume.topNote &&
+            !selectedPerfume.middleNote &&
+            !selectedPerfume.baseNote
+        ) {
+            alert("하나의 노트는 반드시 입력해야 합니다.");
+            return;
+        }
+        
+        if (isAdding && selectedPerfume) {
+            
+            // 싱글 노트 또는 탑/미들/베이스 노트 중 하나만 포함
+            const newPerfumeData = {
+                name: selectedPerfume?.name || "",
+                description: selectedPerfume?.description || "",
+                brand: selectedPerfume?.brand || "",
+                grade: selectedPerfume?.grade || "오 드 퍼퓸", 
+                singleNote: selectedPerfume?.singleNote || null, 
+                topNote: selectedPerfume?.topNote || null,
+                middleNote: selectedPerfume?.middleNote || null, 
+                baseNote: selectedPerfume?.baseNote || null, 
+                imageUrl: selectedPerfume?.imageUrl || "https://sensient-beauty.com/wp-content/uploads/2023/11/Fragrance-Trends-Alcohol-Free.jpg", // 이미지 기본 설정
+            };
+    
+            try {
+                await dispatch(createPerfume(newPerfumeData)); 
+                setSuccessMessage('향수가 성공적으로 추가되었습니다!');
+                setShowAddModal(false); // 추가 모달 닫기
+                setIsAdding(false);     // 추가 모드 비활성화
+                handleReset();          // 입력 값 초기화
+            } catch (error) {
+                console.error("향수 추가 실패:", error);
+                alert("향수 추가에 실패했습니다. 다시 시도해주세요.");
+            }
+        }
+    
+        // 수정 모드 처리
+        if (isEditing && selectedPerfume) {
+            const updatedPerfumeData = {
+                ...selectedPerfume,
+                singleNote: selectedPerfume?.singleNote || null,
+                topNote: selectedPerfume?.topNote || null,
+                middleNote: selectedPerfume?.middleNote || null,
+                baseNote: selectedPerfume?.baseNote || null,
+            };
+            // console.log("수정하려는 향수 ID:", selectedPerfume.id);
+            try {
+                await dispatch(modifyPerfume(updatedPerfumeData));
+                setSuccessMessage('향수가 성공적으로 수정되었습니다!');
+                setShowEditModal(false); // 수정 모달 닫기
+            } catch (error) {
+                console.error("향수 수정 실패:", error);
+                alert("향수 수정에 실패했습니다. 다시 시도해주세요.");
+            }
+        }
+    
+        // 공통 처리
+        setIsEditing(false);
+        setIsAdding(false);
+        setSelectedPerfume(null);
+    };
+
+    // 모달 상태들
+    const closeModal = () => {
+        setShowAddModal(false); // 추가 모달 닫기
+        setShowEditModal(false); // 수정 모달 닫기
+        setIsAdding(false);      // 추가 모드 비활성화
+        setIsEditing(false);     // 수정 모드 비활성화
+        setSelectedPerfume(null); // 선택된 데이터 초기화
+        setImagePreview(null);   // 이미지 미리보기 초기화
+    };
+
+    // 로딩창 - 데이터가 비어 있는 경우 처리
     if (!perfumes || perfumes.length === 0) {
         return <LoadingScreen message="항수를 불러오는 중..." />;
     }
@@ -299,7 +340,7 @@ const PerfumeList = () => {
                         <input
                             type="text"
                             className="perfume-list-search"
-                            placeholder="브랜드명, 향수 이름 검색"
+                            placeholder="브랜드명, 향수 이름 검색 가능"
                             value={searchTerm}
                             onChange={handleSearch}
                         />
@@ -555,7 +596,7 @@ const PerfumeList = () => {
                                             type="text"
                                             className="admin-perfume-image-url-input"
                                             placeholder="이미지 URL을 입력하세요"
-                                            value={selectedPerfume?.imageUrl || ""}
+                                            value={selectedPerfume?.imageUrl || "https://sensient-beauty.com/wp-content/uploads/2023/11/Fragrance-Trends-Alcohol-Free.jpg"}
                                             onChange={(e) => {
                                                 const newUrl = e.target.value;
                                                 setSelectedPerfume((prev) => ({
