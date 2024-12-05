@@ -98,6 +98,9 @@ export const useChatLogic = () => {
             }));
 
             setInitialMessages(formattedMessages); // 초기 메시지 설정
+        } else {
+            console.error("chatHistory가 배열이 아닙니다:", chatHistory);
+            setInitialMessages([]); // 기본값으로 설정
         }
     }, [chatHistory]);
 
@@ -235,24 +238,31 @@ export const useChatLogic = () => {
 
     const filteredMessages = useMemo(() => {
         const seenIds = new Set();
-        // 모든 메시지 (initialMessages + chatMessages)에서 중복 제거
-        return [...initialMessages, ...chatMessages].filter((message) => {
+        const combinedMessages = [...initialMessages, ...chatMessages];
+        const uniqueMessages = combinedMessages.filter((message) => {
             if (seenIds.has(message.id)) {
-                return false; // 중복 메시지 제외
+                return false; // 중복 제거
             }
             seenIds.add(message.id);
             return true;
         });
+        console.log("filteredMessages 확인:", uniqueMessages); // 확인 로그
+        return uniqueMessages;
     }, [initialMessages, chatMessages]);
+    
     
     const addMessage = (message) => {
         if (!message?.text?.trim() && (!message.recommendations || message.recommendations.length === 0)) {
             return; // 빈 메시지나 추천 없는 메시지 무시
         }
-
+    
         const newMessage = { ...message, id: message.id || uuidv4() };
-
+    
         setChatMessages((prevMessages) => {
+            if (!Array.isArray(prevMessages)) {
+                console.error("chatMessages가 배열이 아님:", prevMessages);
+                return []; // 안전하게 빈 배열로 초기화
+            }
             if (prevMessages.some((msg) => msg.id === newMessage.id)) {
                 console.log("중복 메시지:", newMessage);
                 return prevMessages; // 중복 메시지 무시
@@ -260,6 +270,7 @@ export const useChatLogic = () => {
             return [...prevMessages, newMessage];
         });
     };
+    
 
     const handleSendMessage = async (isRetry = false) => {
         if (isLoading) return; // 중복 요청 방지
@@ -292,7 +303,7 @@ export const useChatLogic = () => {
             };
 
         if (!isRetry) {
-            setChatMessages(userMessage);
+            setChatMessages((prevMessages) => [...prevMessages, userMessage]);
             setInput('');
             setSelectedImages([]);
         } else {
