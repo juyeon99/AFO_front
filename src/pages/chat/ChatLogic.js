@@ -89,6 +89,12 @@ export const useChatLogic = () => {
     // 채팅 기록 업데이트 (initialMessages 설정)
     useEffect(() => {
         if (chatHistory && chatHistory.length > 0) {
+            const initialBotMessage = {
+                id: 'initial-bot-message',
+                sender: 'bot',
+                text: '안녕하세요. 센티크입니다. 당신에게 어울리는 향을 찾아드리겠습니다.', // 초기 메시지
+            };
+
             const formattedMessages = chatHistory.map((message) => ({
                 sender: message.type === "USER" ? "user" : "bot",
                 text: message.messageText || "",
@@ -97,10 +103,16 @@ export const useChatLogic = () => {
                 generatedImage: message.chatImage || null,
             }));
 
-            setInitialMessages(formattedMessages); // 초기 메시지 설정
+            setInitialMessages([initialBotMessage, ...formattedMessages]);
         } else {
             console.error("chatHistory가 배열이 아닙니다:", chatHistory);
-            setInitialMessages([]); // 기본값으로 설정
+            setInitialMessages([
+                {
+                    id: 'initial-bot-message',
+                    sender: 'bot',
+                    text: '안녕하세요. 센티크입니다. 당신에게 어울리는 향을 찾아드리겠습니다.', // 초기 메시지
+                },
+            ]);
         }
     }, [chatHistory]);
 
@@ -192,12 +204,6 @@ export const useChatLogic = () => {
     }, [chatMode]);
 
     useEffect(() => {
-        if (messageEndRef.current) {
-            messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [messages]);
-
-    useEffect(() => {
         if (chatMode === "recommendation" && response) {
             // 추천 데이터 처리
             const recommendations = response.recommendations || [];
@@ -238,26 +244,43 @@ export const useChatLogic = () => {
 
     const filteredMessages = useMemo(() => {
         const seenIds = new Set();
-        const combinedMessages = [...initialMessages, ...chatMessages];
-        const uniqueMessages = combinedMessages.filter((message) => {
-            if (seenIds.has(message.id)) {
-                return false; // 중복 제거
+        const combinedMessages = [
+            ...(initialMessages || []),  // 초기 메시지 포함
+            ...(chatMessages || [])      // 채팅 메시지 포함
+        ].filter(message => {
+            // 기본적인 메시지 유효성 검사
+            const isValidMessage = message && (
+                (message.text && message.text.trim()) ||
+                (message.recommendations && message.recommendations.length > 0)
+            );
+
+            // 중복 체크 및 유효성 검사를 동시에 수행
+            if (!isValidMessage || seenIds.has(message.id)) {
+                return false;
             }
+
             seenIds.add(message.id);
             return true;
         });
-        console.log("filteredMessages 확인:", uniqueMessages); // 확인 로그
-        return uniqueMessages;
+
+        console.log("필터링된 메시지:", combinedMessages);
+        return combinedMessages;
     }, [initialMessages, chatMessages]);
-    
-    
+
+    useEffect(() => {
+        if (filteredMessages.length > 0 && messageEndRef.current) {
+            console.log("Scrolling to the latest message...");
+            messageEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+    }, [filteredMessages]);
+
     const addMessage = (message) => {
         if (!message?.text?.trim() && (!message.recommendations || message.recommendations.length === 0)) {
             return; // 빈 메시지나 추천 없는 메시지 무시
         }
-    
+
         const newMessage = { ...message, id: message.id || uuidv4() };
-    
+
         setChatMessages((prevMessages) => {
             if (!Array.isArray(prevMessages)) {
                 console.error("chatMessages가 배열이 아님:", prevMessages);
@@ -270,7 +293,6 @@ export const useChatLogic = () => {
             return [...prevMessages, newMessage];
         });
     };
-    
 
     const handleSendMessage = async (isRetry = false) => {
         if (isLoading) return; // 중복 요청 방지
@@ -282,11 +304,19 @@ export const useChatLogic = () => {
         // 추천 요청을 구분
         const isRecommendationRequest = chatMode === "recommendation";
 
+        if (!isLoggedIn && hasReceivedRecommendation) {
+            setShowLoginModal(true); // 추천 받은 비회원은 즉시 로그인 모달 표시
+            return;
+        }
+
         // 비회원이고 이미 추천을 받은 경우 로그인 모달 표시
-        if (!isLoggedIn && hasReceivedRecommendation && isRecommendationRequest || nonMemberChatCount >= MAX_CHAT_COUNT) {
+        if (
+            (!isLoggedIn && hasReceivedRecommendation && isRecommendationRequest) || 
+            (!isLoggedIn && nonMemberChatCount >= MAX_CHAT_COUNT)
+        ) {
             setShowLoginModal(true); // 로그인 모달 표시
             return; // 함수 종료
-        }
+        }        
 
         setRetryAvailable(false);
         setIsLoading(true);
@@ -386,18 +416,16 @@ export const useChatLogic = () => {
         } catch (error) {
             console.error("Error handling chat response:", error);
             setRetryAvailable(true); // 실패 시 재시도 버튼 표시
-            setMessages((prevMessages) => [
-                ...prevMessages,
-                { sender: 'bot', text: '문제가 발생했습니다. 네트워크 연결을 확인하거나 다시 시도해주세요.' },
-            ]);
+
+            const errorMessage = {
+                id: uuidv4(), // 고유 ID 생성
+                sender: 'bot',
+                text: '네트워크 문제로 요청이 실패했습니다. 다시 시도해주세요.', // 에러 메시지
+            };
+
+            setChatMessages((prevMessages) => [...prevMessages, errorMessage]);
         } finally {
             setIsLoading(false);
-            // 메시지가 추가된 후 스크롤 이동
-            setTimeout(() => {
-                if (messageEndRef.current) {
-                    messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                }
-            }, 100);
         }
     };
 
