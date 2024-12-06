@@ -48,17 +48,18 @@ export const fetchChatResponse = (userInput, imageFile = null) => async (dispatc
         const response = await requestRecommendations(userInput, imageFile, userId);
         console.log("API 응답 데이터:", response);
 
-        const { mode, recommendations, common_feeling, imageProcessed, generatedImage } = response;
+        // 4. 응답 데이터에서 필요한 필드 추출
+        const chatData = {
+            id: response.id || null,
+            mode: response.mode || "chat",
+            content: response.content || "",
+            imageUrl: response.imageUrl || null,
+            recommendations: response.recommendations || [],
+            lineId: response.lineId || null,
+            timeStamp: new Date().toISOString(), // 백엔드가 timestamp 제공하지 않는 경우
+        };
 
-        dispatch(fetchChatSuccess({
-            response,
-            userInput,
-            mode,
-            recommendations,
-            commonFeeling: common_feeling,
-            imageProcessed,
-            generatedImage,
-        }));
+        dispatch(fetchChatSuccess(chatData));
 
         return response; // 응답 데이터 반환
 
@@ -74,14 +75,14 @@ export const fetchChatHistory = () => async (dispatch) => {
 
         // 로컬 스토리지에서 사용자 정보 확인
         const localAuth = JSON.parse(localStorage.getItem("auth"));
-        const userId = localAuth?.id;
+        const memberId = localAuth?.id;
 
-        if (!userId) {
+        if (!memberId) {
             throw new Error("로그인한 사용자 정보가 없습니다.");
         }
 
         // 서버에서 채팅 내역 가져오기
-        const chatHistory = await getChatHistory(userId);
+        const chatHistory = await getChatHistory(memberId);
         console.log("채팅 내역 API 응답:", chatHistory);
 
         dispatch(fetchChatHistorySuccess(chatHistory));
@@ -103,7 +104,7 @@ const chatReducer = handleActions(
             };
         },
         [fetchChatSuccess]: (state, { payload }) => {
-            console.log("fetchChatSuccess 상태 변경:", payload);
+            console.log("fetchChatSuccess 상태 변경:", payload);  // 응답 데이터 확인
             return {
                 ...state,
                 chatMode: payload.mode || payload.response?.mode || "chat",
