@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from "react-redux";
+import { fetchHistory } from '../../module/HistoryModule';
 import { useNavigate } from 'react-router-dom';
 import '../../css/History.css';
 
@@ -6,98 +8,37 @@ function History() {
     const [currentDateIndex, setCurrentDateIndex] = useState(0);
     const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { historyData, loading, error } = useSelector((state) => state.history || {});
+
     const cardsPerPage = 3; // 한 번에 표시할 카드 수
 
-    // 히스토리 날짜와 카드 데이터 배열
-    const historyData = [
-        {
-            date: '2024.11.11',
-            title: "햇살 속에 담긴 포근함과 나른함을 표현한 향기",
-            cards: [
-                {
-                    title: "조 말론 우드 세이지 & 씨 솔트",
-                    description: "자연스러운 우디 향과 소금기 섞인 바다 내음이 어우러져 따뜻하고 편안한 느낌",
-                    imageUrl: "/images/per1.png"
-                },
-                {
-                    title: "메종 마르지엘라 레플리카 레이지 선데이 모닝",
-                    description: "머스크와 플로럴 향이 부드럽게 어우러져, 포근하고 여유로운 감성을 담은 향",
-                    imageUrl: "/images/per2.png"
-                },
-                {
-                    title: "딥티크 탐다오",
-                    description: "샌달우드의 깊고 편안한 우디 향의 풍요로움, 따뜻한 숲속과 잘 어울리는 차분한 향",
-                    imageUrl: "/images/per3.png"
-                },
-                {
-                    title: "혜연바보",
-                    description: "설명4",
-                    imageUrl: "/images/per1.png"
-                },
-                {
-                    title: "성민바보",
-                    description: "설명5",
-                    imageUrl: "/images/per2.png"
-                },
-                {
-                    title: "강현바보",
-                    description: "설명6",
-                    imageUrl: "/images/per3.png"
-                },
-                {
-                    title: "성은구리 바보",
-                    description: "설명4",
-                    imageUrl: "/images/per1.png"
-                },
-                {
-                    title: "동동구리 바보",
-                    description: "설명5",
-                    imageUrl: "/images/per2.png"
-                },
-                {
-                    title: "효찬구리 바보",
-                    description: "설명6",
-                    imageUrl: "/images/per3.png"
-                },
-            ]
-        },
-        {
-            date: '2024.10.15',
-            title: "가을의 차분함과 따스함을 담은 향기",
-            cards: [
-                {
-                    title: "향수7",
-                    description: "설명7",
-                    imageUrl: "/images/per4.png"
-                },
-                {
-                    title: "향수8",
-                    description: "설명8",
-                    imageUrl: "/images/per5.png"
-                },
-                {
-                    title: "향수9",
-                    description: "설명9",
-                    imageUrl: "/images/per6.png"
-                },
-                {
-                    title: "향수10",
-                    description: "설명10",
-                    imageUrl: "/images/per7.png"
-                },
-                {
-                    title: "향수11",
-                    description: "설명11",
-                    imageUrl: "/images/per8.png"
-                },
-                {
-                    title: "향수12",
-                    description: "설명12",
-                    imageUrl: "/images/per9.png"
-                },
-            ]
-        },
-    ];
+
+    useEffect(() => {
+        const localAuth = JSON.parse(localStorage.getItem("auth")); // 로그인 정보 가져오기
+        const memberId = localAuth?.id;
+
+        if (memberId) {
+            console.log("향기 카드 데이터 요청 시작");
+            dispatch(fetchHistory(memberId))
+                .then(() => console.log("향기 카드 데이터 불러오기 성공"))
+                .catch((err) => console.error("향기 카드 데이터 불러오기 실패:", err));
+        }
+    }, [dispatch]);
+
+    if (loading) {
+        return <div>로딩 중...</div>;
+    }
+
+    if (error) {
+        return <div>오류 발생: {error}</div>;
+    }
+
+    if (!historyData || historyData.length === 0) {
+        return <div>히스토리 데이터가 없습니다.</div>;
+    }
 
     const handleDateClick = (index) => {
         setCurrentDateIndex(index);
@@ -117,22 +58,20 @@ function History() {
     const handleDotClick = (index) => {
         setCurrentCardIndex(index * cardsPerPage);
     };
-    
 
-    const { date, title, cards } = historyData[currentDateIndex];
-    const visibleCards = cards.slice(currentCardIndex, currentCardIndex + cardsPerPage);
+
+    const { content, recommendations } = historyData[currentDateIndex] || { content: "", recommendations: [] };
+    const visibleCards = recommendations.slice(currentCardIndex, currentCardIndex + cardsPerPage);
 
     // 점 개수 계산
-    const dotCount = Math.ceil(cards.length / cardsPerPage);
-
-    const navigate = useNavigate();
+    const dotCount = Math.ceil(recommendations.length / cardsPerPage);
 
     return (
         <div className="history-main-container">
-        <img src="/images/logo.png" alt="Logo" className="history-logo"
-        onClick={() => navigate('/')}
-        style={{ cursor: 'pointer' }}
-        />
+            <img src="/images/logo.png" alt="Logo" className="history-logo"
+                onClick={() => navigate('/')}
+                style={{ cursor: 'pointer' }}
+            />
             <div className="history-header">
                 {historyData.map((item, index) => (
                     <button
@@ -146,15 +85,16 @@ function History() {
             </div>
 
             <div className="history-container">
-                <h2 className="history-title">{`"${title}"`}</h2>
+                <h2 className="history-title">{`"${content || "내용이 없습니다."}"`}</h2>
                 <div className="card-container">
                     {visibleCards.map((card, index) => (
                         <div className="history-card" key={index}>
-                            <img src={card.imageUrl} alt={card.title} className="card-image" />
+                            <img src={card.perfumeImageUrl || "https://cafe24.poxo.com/ec01/mataba/Xeym8gXyw/uNs04t9Tz1DqGEhx/RFwxojjA1nGGahjRqV6u/3bljc3eRqaK7vJ2SKd4ixXX36YNhP777nnJTfA==/_/web/product/big/202007/ffc65a83cb4b7d9b0d37bdf93581a71c.jpg"} alt={card.perfume} className="card-image" />
                             <div className="card-content">
-                                <h3 className="card-title">{card.title}</h3>
+                                <h3 className="card-title">{card.perfumeName || "알 수 없는 향수"}</h3>
                                 <hr className="divider" />
-                                <p className="card-description">{card.description}</p>
+                                <p className="card-description"><strong>추천 이유:</strong> {card.reason || "이유가 없습니다."}</p>
+                                <p className="card-description"><strong>추천 상황:</strong> {card.situation || "상황이 없습니다."}</p>
                             </div>
                         </div>
                     ))}
