@@ -4,14 +4,21 @@ import { requestRecommendations, getChatHistory } from "../api/ChatAPICalls";
 // 초기 상태
 const initialState = {
     chatMode: "chat", // 현재 모드 ("chat" 또는 "recommendation")
-    response: null,   // 서버에서 반환된 응답
-    recommendedPerfumes: [], // 추천된 향수 목록
-    commonFeeling: null, // 공통 감정
-    imageProcessed: null, // 처리된 이미지 결과
-    generatedImage: null,  // 생성된 이미지 경로
+    response: {
+        id: null,
+        mode: "chat",
+        content: null,
+        imageUrl: null,
+        lineId: null,
+        recommendations: null,
+    }, // 서버에서 반환된 응답 객체로 초기화
+    recommendedPerfumes: [], // 추천된 향수 목록 (빈 배열로 초기화)
+    commonFeeling: null, // 공통 감정 (초기값 null)
+    imageProcessed: null, // 처리된 이미지 결과 (초기값 null)
+    generatedImage: null,  // 생성된 이미지 경로 (초기값 null)
     loading: false, // 로딩 상태
     error: null,    // 에러 메시지
-    chatHistory: [],
+    chatHistory: [], // 채팅 기록 (빈 배열로 초기화)
 };
 
 // 액션 생성
@@ -107,20 +114,18 @@ const chatReducer = handleActions(
             console.log("fetchChatSuccess 상태 변경:", payload);  // 응답 데이터 확인
             return {
                 ...state,
-                chatMode: payload.mode || payload.response?.mode || "chat",
-                response: payload.response || null,
-                recommendedPerfumes: Array.isArray(payload.response?.recommendations)
-                    ? payload.response.recommendations
-                    : [],
-                commonFeeling: payload.response?.common_feeling || null,
-                imageProcessed: payload.imageProcessed || null,
-                generatedImage: payload.generatedImage || null,
+                chatMode: payload.mode || "chat", // 응답에서 mode 가져오기
+                response: payload, // 응답 데이터를 상태에 저장
+                recommendedPerfumes: Array.isArray(payload.recommendations) ? payload.recommendations : [], // 추천 향수 배열
+                commonFeeling: null, // 필요 시 공통 감정 처리
+                imageProcessed: null, // 필요 시 처리된 이미지
+                generatedImage: null, // 필요 시 생성된 이미지
                 loading: false,
                 error: null,
                 chatHistory: [
                     ...(state.chatHistory || []),
-                    { type: "user", message: payload.userInput },
-                    { type: "bot", message: payload.response },
+                    { type: "user", message: payload.content },  // 사용자 메시지
+                    { type: "bot", message: payload.content },    // 봇 응답 (원래는 다른 응답 처리해야 할 수 있음)
                 ],
             };
         },

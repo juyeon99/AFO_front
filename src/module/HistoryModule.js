@@ -9,7 +9,6 @@ const initialState = {
     error: null,     // 에러 메시지
 };
 
-
 // 액션 생성
 export const {
     history: {

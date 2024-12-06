@@ -40,23 +40,24 @@ export const useChatLogic = () => {
     const chatHistoryLoaded = useRef(false); // 기록 불러오기 여부
     const [initialMessages, setInitialMessages] = useState([]); // 초기 메시지 상태
     const [chatMessages, setChatMessages] = useState([]); // 실시간 추가 메시지 상태
+    const [generatedImage, setGeneratedImage] = useState(null);
 
     const filters = [
-        { name: 'Spicy', color: '#FF5757' },
-        { name: 'Fruity', color: '#FFBD43' },
-        { name: 'Citrus', color: '#FFE043' },
-        { name: 'Green', color: '#62D66A' },
-        { name: 'Floral', color: '#FF80C1' },
-        { name: 'Oriental', color: '#C061FF' },
-        { name: 'Musk', color: '#F8E4FF' },
-        { name: 'Powdery', color: '#FFFFFF' },
-        { name: 'Tobacco Leather', color: '#000000' },
-        { name: 'Fougere', color: '#7ED3BB' },
-        { name: 'Gourmand', color: '#A1522C' },
-        { name: 'Woody', color: '#86390F' },
-        { name: 'Aldehyde', color: '#98D1FF' },
-        { name: 'Aquatic', color: '#56D2FF' },
-        { name: 'Amber', color: '#FFE8D3' },
+        { id: 1, name: 'Spicy', color: '#FF5757' },
+        { id: 2, name: 'Fruity', color: '#FFBD43' },
+        { id: 3, name: 'Citrus', color: '#FFE043' },
+        { id: 4, name: 'Green', color: '#62D66A' },
+        { id: 5, name: 'Floral', color: '#FF80C1' },
+        { id: 6, name: 'Oriental', color: '#C061FF' },
+        { id: 7, name: 'Musk', color: '#F8E4FF' },
+        { id: 8, name: 'Powdery', color: '#FFFFFF' },
+        { id: 9, name: 'Tobacco Leather', color: '#000000' },
+        { id: 10, name: 'Fougere', color: '#7ED3BB' },
+        { id: 11, name: 'Gourmand', color: '#A1522C' },
+        { id: 12, name: 'Woody', color: '#86390F' },
+        { id: 13, name: 'Aldehyde', color: '#98D1FF' },
+        { id: 14, name: 'Aquatic', color: '#56D2FF' },
+        { id: 15, name: 'Amber', color: '#FFE8D3' },
     ];
 
     // 특정 계열에 대한 색상 반환
@@ -134,12 +135,6 @@ export const useChatLogic = () => {
                 return;
             }
 
-            if (response?.commonFeeling) {
-                const newColor = getColorForCategory(response.commonFeeling);
-                console.log("새로운 색상 설정:", newColor);
-                setColor(newColor);
-            }
-
             // recommendedPerfumes를 조건부로 업데이트
             if (Array.isArray(response?.recommendedPerfumes?.recommendations)) {
                 setRecommendedPerfumes((prevPerfumes) => {
@@ -205,21 +200,37 @@ export const useChatLogic = () => {
     }, [chatMode]);
 
     useEffect(() => {
-        if (chatMode === "recommendation" && response) {
-            // 추천 데이터 처리
-            const recommendations = response.recommendations || [];
-            const recommendationMessage = {
-                sender: "bot",
-                text: "향수 추천 결과를 확인하세요.",
-                recommendations,
-                generatedImage: response.generatedImage?.s3_url || null, // 이미지 URL 추가
-            };
+        const { content, imageUrl, lineId, mode, recommendations } = response || {};
 
-            if (recommendationMessage.text && recommendations.length > 0) {
-                addMessage(recommendationMessage);
-            }
+        // chatMode 업데이트
+        if (mode) {
+            setChatMode(mode); // 백엔드에서 받은 mode 값으로 업데이트
         }
-    }, [chatMode, response]);
+
+        // 응답이 있고 content가 있으면 해당 값을 업데이트
+        if (content) {
+            addMessage({ sender: "bot", text: content });
+        }
+
+        // imageUrl이 있으면 상태에 반영
+        if (imageUrl) {
+            setGeneratedImage(imageUrl);
+        }
+
+        // recommendations이 null이 아니고 배열로 있으면 추천 향수 목록 업데이트
+        if (Array.isArray(recommendations) && recommendations.length > 0) {
+            setRecommendedPerfumes(recommendations);
+        } else {
+            setRecommendedPerfumes([]); // 추천이 없으면 빈 배열로 설정
+        }
+
+        // lineId가 있으면 상태에 반영 (현재는 null이지만 필요 시 활용)
+        if (lineId) {
+            console.log("Line ID:", lineId);
+        }
+
+    }, [response]); // response 값이 변경될 때마다 실행
+
 
     useEffect(() => {
         const savedCount = parseInt(localStorage.getItem('nonMemberChatCount'), 10);
@@ -377,8 +388,8 @@ export const useChatLogic = () => {
                     id: uuidv4(),
                     sender: 'bot',
                     text: '향수 추천 결과를 확인하세요.',
-                    recommendations,
-                    generatedImage: response.generatedImage.s3_url,
+                    recommendations: recommendations,
+                    imageUrl: response.imageUrl,
                 };
 
                 // 빈 메시지 방지 조건 추가
@@ -397,7 +408,7 @@ export const useChatLogic = () => {
                     setHasReceivedRecommendation(true);
                     localStorage.setItem('hasReceivedRecommendation', 'true');
                 }
-                setChatMode("chat");
+                setChatMode(response.mode || "chat");
 
             } else if (response?.mode === "chat") {
                 // 일반 메시지 처리
@@ -561,20 +572,44 @@ export const useChatLogic = () => {
         navigate(-1); // 이전 페이지로 이동
     };
 
-    const RecommendationCard = ({ perfume }) => {
-        if (!perfume || Object.keys(perfume).length === 0) {
+    const RecommendationCard = ({ recommendations, lineId, imageUrl }) => {
+        // recommendations가 배열이 아니거나 빈 배열인 경우 처리
+        if (!recommendations || recommendations.length === 0) {
             return <div className="chat-recommendation-card">추천된 향수 정보를 불러올 수 없습니다.</div>;
         }
 
+        // lineId로 filters에서 해당하는 name 찾기
+        const filter = filters.find(f => f.id === lineId);
+        const lineName = filter ? filter.name : 'N/A'; // lineId에 해당하는 name, 없으면 'N/A'
+
         return (
             <div className="chat-recommendation-card">
-                <div className="chat-recommendation-content">
-                    <p className="chat-recommendation-name"><strong className="recommendation-card-context">이름 :</strong> {perfume.name || 'N/A'}</p>
-                    <p className="chat-recommendation-line"><strong className="recommendation-card-context">계열 :</strong> {perfume.line || 'N/A'}</p>
-                    <p className="chat-recommendation-brand"><strong className="recommendation-card-context">브랜드 :</strong> {perfume.brand || 'N/A'}</p>
-                    <p className="chat-recommendation-reason"><strong className="recommendation-card-context">추천 이유 :</strong> {perfume.reason || 'N/A'}</p>
-                    <p className="chat-recommendation-situation"><strong className="recommendation-card-context">추천 상황 :</strong> {perfume.situation || 'N/A'}</p>
+                <div className="chat-recommendation-header">
+                    {imageUrl && <img src={imageUrl} alt="Recommendation" />}
                 </div>
+
+                {recommendations.map((recommendation, index) => {
+                    return (
+                        <div key={index} className="chat-recommendation-content">
+                            <p className="chat-recommendation-name">{recommendation.perfumeImageUrl || 'N/A'}</p>
+                            <p className="chat-recommendation-name">
+                                <strong className="recommendation-card-context">이름 :</strong> {recommendation.perfumeName || 'N/A'}
+                            </p>
+                            <p className="chat-recommendation-line">
+                                <strong className="recommendation-card-context">계열 :</strong> {lineName}
+                            </p>
+                            <p className="chat-recommendation-brand">
+                                <strong className="recommendation-card-context">브랜드 :</strong> {recommendation.perfumeBrand || 'N/A'}
+                            </p>
+                            <p className="chat-recommendation-reason">
+                                <strong className="recommendation-card-context">추천 이유 :</strong> {recommendation.reason || 'N/A'}
+                            </p>
+                            <p className="chat-recommendation-situation">
+                                <strong className="recommendation-card-context">추천 상황 :</strong> {recommendation.situation || 'N/A'}
+                            </p>
+                        </div>
+                    );
+                })}
             </div>
         );
     };
@@ -593,7 +628,6 @@ export const useChatLogic = () => {
             console.error("향기 카드 생성 실패:", error);
         }
     };
-
     return {
         chatMode,                       // 현재 채팅 모드
         response,                       // 응답 데이터
