@@ -43,6 +43,13 @@ body {
     font-family: 'Nanum Myeongjo';
 }
 
+.empty-history-message{
+    margin-top: 240px;
+    margin-bottom: 240px;
+    font-size: 25px;
+    font-weight: bold;
+}
+
 .history-date-button {
     font-family: 'Nanum Myeongjo', serif;
     background: none;
@@ -185,4 +192,15 @@ body {
 
 .dot.active {
     background-color: #FF8C00; /* 활성화된 점 */
+}
+
+.imageSave{
+    all: unset;
+    cursor: pointer;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    gap: 10px;
+    margin-left: 880px;
+    font-size: 18px;
 }

@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { fetchHistory } from '../../module/HistoryModule';
 import { useNavigate } from 'react-router-dom';
+import { Download } from 'lucide-react';
+import html2canvas from "html2canvas";
+import saveAs from "file-saver";
+import { useRef } from "react";
 import '../../css/History.css';
 
 function History() {
@@ -10,11 +14,11 @@ function History() {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const divRef = useRef(null); // 이미지 저장 관련
 
     const { historyData, loading, error } = useSelector((state) => state.history || {});
 
     const cardsPerPage = 3; // 한 번에 표시할 카드 수
-
 
     useEffect(() => {
         const localAuth = JSON.parse(localStorage.getItem("auth")); // 로그인 정보 가져오기
@@ -34,10 +38,6 @@ function History() {
 
     if (error) {
         return <div>오류 발생: {error}</div>;
-    }
-
-    if (!historyData || historyData.length === 0) {
-        return <div>히스토리 데이터가 없습니다.</div>;
     }
 
     const handleDateClick = (index) => {
@@ -66,6 +66,22 @@ function History() {
     // 점 개수 계산
     const dotCount = Math.ceil(recommendations.length / cardsPerPage);
 
+    const handleDownload = async () => {
+        if (!divRef.current) return;
+
+        try {
+            const div = divRef.current;
+            const canvas = await html2canvas(div, { scale: 2 });
+            canvas.toBlob((blob) => {
+                if (blob !== null) {
+                    saveAs(blob, "result.png");
+                }
+            });
+        } catch (error) {
+            console.error("Error converting div to image:", error);
+        }
+    };
+
     return (
         <div className="history-main-container">
             <img src="/images/logo.png" alt="Logo" className="history-logo"
@@ -84,27 +100,38 @@ function History() {
                 ))}
             </div>
 
-            <div className="history-container">
-                <h2 className="history-title">{`"${content || "내용이 없습니다."}"`}</h2>
-                <div className="card-container">
-                    {visibleCards.map((card, index) => (
-                        <div className="history-card" key={index}>
-                            <img src={card.perfumeImageUrl || "https://cafe24.poxo.com/ec01/mataba/Xeym8gXyw/uNs04t9Tz1DqGEhx/RFwxojjA1nGGahjRqV6u/3bljc3eRqaK7vJ2SKd4ixXX36YNhP777nnJTfA==/_/web/product/big/202007/ffc65a83cb4b7d9b0d37bdf93581a71c.jpg"} alt={card.perfume} className="card-image" />
-                            <div className="card-content">
-                                <h3 className="card-title">{card.perfumeName || "알 수 없는 향수"}</h3>
-                                <hr className="divider" />
-                                <p className="card-description"><strong>추천 이유:</strong> {card.reason || "이유가 없습니다."}</p>
-                                <p className="card-description"><strong>추천 상황:</strong> {card.situation || "상황이 없습니다."}</p>
-                            </div>
+            <div className="history-container"
+                ref={divRef}>
+                {historyData.length === 0 || recommendations.length === 0 ? ( // 데이터 유무 확인
+                    <div className="empty-history-message">
+                        저장된 향기 히스토리가 없습니다.
+                    </div>
+                ) : (
+                    <>
+                        <h2 className="history-title">{`"${content}"`}</h2>
+                        <div className="card-container">
+                            {visibleCards.map((card, index) => (
+                                <div className="history-card" key={index}>
+                                    <img src={card.perfumeImageUrl ||
+                                        "https://cafe24.poxo.com/ec01/mataba/Xeym8gXyw/uNs04t9Tz1DqGEhx/RFwxojjA1nGGahjRqV6u/3bljc3eRqaK7vJ2SKd4ixXX36YNhP777nnJTfA==/_/web/product/big/202007/ffc65a83cb4b7d9b0d37bdf93581a71c.jpg"}
+                                        alt={card.perfume}
+                                        className="card-image" />
+                                    <div className="card-content">
+                                        <h3 className="card-title">{card.perfumeName}</h3>
+                                        <hr className="divider" />
+                                        <p className="card-description"><strong>추천 이유:</strong> {card.reason}</p>
+                                        <p className="card-description"><strong>추천 상황:</strong> {card.situation}</p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
 
-                {/* 좌우 화살표 버튼 */}
-                <button className="prev-arrow" onClick={() => handleCardChange('prev')}>&#5130;</button>
-                <button className="next-arrow" onClick={() => handleCardChange('next')}>&#5125;</button>
+                        {/* 좌우 화살표 버튼 */}
+                        <button className="prev-arrow" onClick={() => handleCardChange('prev')}>&#5130;</button>
+                        <button className="next-arrow" onClick={() => handleCardChange('next')}>&#5125;</button>
+                    </>
+                )}
             </div>
-
             {/* 페이지네이션 점 표시 (카드 컨테이너 외부) */}
             <div className="dot-container">
                 {Array.from({ length: dotCount }, (_, index) => (
@@ -115,8 +142,8 @@ function History() {
                     ></span>
                 ))}
             </div>
+            <button className='imageSave' onClick={handleDownload}>이미지 저장하기 <Download strokeWidth={2} size={28} /></button>
         </div>
-
     );
 }
 
