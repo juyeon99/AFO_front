@@ -2,6 +2,7 @@ import '../../css/Chat.css';
 import { NavLink } from "react-router-dom";
 import NonMemberLoginModal from '../../components/login/LoginModal';
 import { useChatLogic } from './ChatLogic';
+import { v4 as uuidv4 } from 'uuid';
 
 function Chat() {
 
@@ -66,6 +67,7 @@ function Chat() {
         navigate,
         filteredMessages,
         handleCreateScentCard,
+        filters
     } = useChatLogic();
 
     return (
@@ -117,7 +119,7 @@ function Chat() {
                                     <p
                                         className="chat-search-result-text"
                                         dangerouslySetInnerHTML={{
-                                            __html: highlightSearch(filteredMessages[index].text, searchInput),
+                                            __html: highlightSearch(filteredMessages[index].content, searchInput),
                                         }}
                                     ></p>
                                 </div>
@@ -139,10 +141,10 @@ function Chat() {
                                         {/* 추천 모드 렌더링 */}
                                         {msg.mode === 'recommendation' && msg.type === 'AI' && (
                                             <>
-                                                {msg.generatedImage && (
+                                                {msg.imageUrl && (
                                                     <div className="chat-recommendation-image">
                                                         <img
-                                                            src={msg.generatedImage}
+                                                            src={msg.imageUrl}
                                                             alt="추천 이미지"
                                                             className="generated-image"
                                                         />
@@ -159,8 +161,9 @@ function Chat() {
                                                             <div className="chat-recommendations-wrapper">
                                                                 {msg.recommendations.map((perfume, idx) => (
                                                                     <RecommendationCard
-                                                                        key={idx}
+                                                                        key={`${msg.id}-${idx}`}
                                                                         perfume={perfume}
+                                                                        filters={filters}
                                                                     />
                                                                 ))}
                                                             </div>
@@ -196,7 +199,7 @@ function Chat() {
                                                             <p
                                                                 className="chat-message-text"
                                                                 dangerouslySetInnerHTML={{
-                                                                    __html: highlightSearch(msg.text, searchInput),
+                                                                    __html: highlightSearch(msg.content, searchInput),
                                                                 }}
                                                             ></p>
                                                             <div
@@ -230,12 +233,12 @@ function Chat() {
                                                                     className="chat-uploaded-image"
                                                                     onClick={() => openModal(image)}
                                                                 />
-                                                            ))}
-                                                        {msg.text && (
+                                                            ))} 
+                                                        {msg.content && (
                                                             <p
                                                                 className="chat-message-text"
                                                                 dangerouslySetInnerHTML={{
-                                                                    __html: highlightSearch(msg.text, searchInput),
+                                                                    __html: highlightSearch(msg.content, searchInput),
                                                                 }}
                                                             ></p>
                                                         )}
