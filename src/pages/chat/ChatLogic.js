@@ -65,53 +65,49 @@ export const useChatLogic = () => {
         { id: 15, name: 'Tobacco Leather', color: '#000000' },
     ];
 
-    // 특정 계열에 대한 색상 반환
-    const getColorForCategory = (lineId, filters) => {
-        // 유효성 검사를 통해 기본값 반환
-        if (!lineId) {
-            console.warn('Invalid lineId provided. Returning default color.');
-            return '#D9D9D9'; // 기본 색상
-        }
+// 특정 계열에 대한 색상 반환
+const getColorForCategory = (lineId, filters) => {
+    if (!lineId) {
+        console.warn('Invalid lineId provided. Returning default color.');
+        return '#D9D9D9'; // 기본 색상
+    }
 
-        // filters 배열에서 lineId와 일치하는 필터 검색
-        const filter = filters.find((f) => Number(f.id) === Number(lineId));
+    const filter = filters.find((f) => Number(f.id) === Number(lineId));
 
-        // 필터가 없으면 기본 색상 반환
-        if (!filter) {
-            console.warn(`No matching filter found for lineId: ${lineId}`);
-            return '#D9D9D9'; // 기본 색상
-        }
+    if (!filter) {
+        console.warn(`No matching filter found for lineId: ${lineId}`);
+        return '#D9D9D9'; // 기본 색상
+    }
 
-        return filter.color; // 필터의 색상 반환
-    };
+    return filter.color; // 필터의 색상 반환
+};
 
-    // 색상 변경 로직
-    useEffect(() => {
-        if (color) {
-            localStorage.setItem('chatColor', color); // 색상을 로컬 스토리지에 저장
-        }
-    }, [color]);
+// 색상 변경 로직: 색상이 변경될 때마다 로컬 스토리지에 저장
+useEffect(() => {
+    if (color) {
+        localStorage.setItem('chatColor', color); // 색상을 로컬 스토리지에 저장
+    }
+}, [color]);
 
-    // 새로고침 시 초기 색상 불러오기
-    useEffect(() => {
-        const storedColor = localStorage.getItem('chatColor'); // 저장된 색상 불러오기
-        if (storedColor) {
-            setColor(storedColor); // 상태를 저장된 색상으로 설정
-        } else if (response?.lineId) {
-            // 로컬 스토리지에 저장된 색상이 없을 경우 response.lineId 기반으로 설정
-            const newColor = getColorForCategory(response.lineId, filters);
-            setColor(newColor);
-        }
-    }, [response, filters]);
+// 새로고침 시 초기 색상 불러오기
+useEffect(() => {
+    const storedColor = localStorage.getItem('chatColor'); // 저장된 색상 불러오기
+    if (storedColor) {
+        setColor(storedColor); // 저장된 색상을 상태로 설정
+    } else if (response?.lineId) {
+        // 로컬 스토리지에 저장된 색상이 없을 경우 response.lineId 기반으로 설정
+        const newColor = getColorForCategory(response.lineId, filters);
+        setColor(newColor);
+    }
+}, [filters]); // filters가 초기화된 이후에 실행
 
-    // response.lineId 기반 색상 설정
-    useEffect(() => {
-        if (response?.lineId) {
-            const newColor = getColorForCategory(response.lineId, filters);
-            setColor(newColor);
-        }
-    }, [response, filters]);
-
+// response.lineId가 변경될 때마다 색상 설정
+useEffect(() => {
+    if (response?.lineId) {
+        const newColor = getColorForCategory(response.lineId, filters);
+        setColor(newColor);
+    }
+}, [response?.lineId, filters]);
 
     // 로그인 상태 변경 시 작동
     useEffect(() => {
@@ -298,6 +294,12 @@ export const useChatLogic = () => {
             console.log("새 메시지 추가:", newMessage);
             return [...prevMessages, newMessage];
         });
+    };
+
+    const handleRetry = () => {
+        if (retryAvailable && messages[messages.length - 1]?.type === 'USER') {
+            handleSendMessage(true); // 재시도 시 isRetry를 true로 전달
+        }
     };
 
     const handleSendMessage = async (isRetry = false) => {
@@ -688,6 +690,7 @@ export const useChatLogic = () => {
         navigate,
         handleCreateScentCard,          // 향기 카드 만들기
         filters,
+        handleRetry,
     };
 
 };

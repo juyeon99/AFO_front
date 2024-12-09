@@ -68,6 +68,7 @@ function Chat() {
         filteredMessages,
         handleCreateScentCard,
         filters,
+        handleRetry,
     } = useChatLogic();
 
     return (
@@ -267,6 +268,7 @@ function Chat() {
                                                                     onClick={() => {
                                                                         setRetryAvailable(false);
                                                                         handleSendMessage(true);
+                                                                        handleRetry(true);
                                                                     }}
                                                                 >
                                                                     재시도하기
