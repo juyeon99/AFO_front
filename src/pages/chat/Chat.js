@@ -67,7 +67,7 @@ function Chat() {
         navigate,
         filteredMessages,
         handleCreateScentCard,
-        filters
+        filters,
     } = useChatLogic();
 
     return (
@@ -165,13 +165,24 @@ function Chat() {
                                                                 className="chat-avatar"
                                                             />
                                                             <div className="chat-recommendations-wrapper">
-                                                                {msg.recommendations.map((perfume, idx) => (
-                                                                    <RecommendationCard
-                                                                        key={`${msg.id}-${idx}`}
-                                                                        perfume={perfume}
-                                                                        filters={filters}
-                                                                    />
-                                                                ))}
+                                                                {msg.recommendations.map((perfume, idx) => {
+                                                                    const lineId = msg.lineId || null;
+
+                                                                    if (!lineId) {
+                                                                        console.warn("lineId가 없습니다. msg:", msg);
+                                                                    }
+
+                                                                    // perfume 객체에 lineId를 추가하여 전달
+                                                                    const perfumeWithLineId = { ...perfume, lineId };
+
+                                                                    return (
+                                                                        <RecommendationCard
+                                                                            key={`${msg.id}-${idx}`}
+                                                                            perfume={perfumeWithLineId}
+                                                                            filters={filters}
+                                                                        />
+                                                                    );
+                                                                })}
                                                             </div>
                                                             <div
                                                                 className={`chat-color-bar ${color === '#FFFFFF'
@@ -276,7 +287,7 @@ function Chat() {
                                 ))}
 
                                 {/* 로딩 상태 표시 */}
-                                {loading && (
+                                {isLoading && (
                                     <div className="chat-message chat-bot-message">
                                         <img
                                             src="/images/logo-bot.png"

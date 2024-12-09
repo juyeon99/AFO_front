@@ -89,7 +89,7 @@ export const fetchChatHistory = () => async (dispatch) => {
 
         dispatch(fetchChatHistorySuccess(chatHistory));
         return chatHistory
-        
+
     } catch (error) {
         console.error("채팅 내역 불러오기 실패:", error);
         dispatch(fetchChatHistoryFail(error.message || "채팅 내역을 불러오는 중 오류 발생"));
@@ -123,5 +123,6 @@ const chatReducer = handleActions(
 export const selectChatMode = (state) => state.chat.chatMode;
 export const selectResponse = (state) => state.chat.response;
 export const selectChatHistory = (state) => state.chat.chatHistory;
+export const selectLoading = (state) => state.chat.loading;
 
 export default chatReducer;
