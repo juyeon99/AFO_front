@@ -78,34 +78,38 @@ export const useChatLogic = () => {
         return '#D9D9D9'; // 기본 색상
     };
 
-    // 로그인 상태 변경 시 작동
+    // 로그인 상태 변경 감지 useEffect 수정
     useEffect(() => {
         console.log("로그인 상태 변경 감지:", isLoggedIn);
 
-        if (isLoggedIn) {
+        if (isLoggedIn && !chatHistoryLoaded.current) {
             console.log("로그인 상태 - 히스토리 로딩 시도");
+            chatHistoryLoaded.current = true; // 히스토리 로드 상태 표시
+
             dispatch(fetchChatHistory())
                 .then((history) => {
-                    console.log("받아온 히스토리:", history);
                     if (Array.isArray(history)) {
                         const formattedHistory = history
-                            .filter(message => message.id && message.content) // 필수 데이터가 있는지 확인
+                            .filter(message => message.id && message.content)
                             .map((message) => ({
                                 id: message.id || uuidv4(),
-                                type: message.type || "unknown", // 기본값 제공
-                                content: message.content || "(내용 없음)", // 기본값 제공
+                                type: message.type || "unknown",
+                                content: message.content || "(내용 없음)",
                                 recommendations: message.recommendations || [],
                                 imageUrl: message.imageUrl || null,
-                                mode: message.mode || "chat", // 기본값 제공
+                                mode: message.mode || "chat",
                             }));
 
-                        setMessages(prevMessages => [...prevMessages, ...formattedHistory]);
-                    } else {
-                        console.error("받아온 히스토리가 배열이 아님:", history);
+                        // 초기 메시지와 히스토리를 결합하여 새로 설정
+                        setMessages(prevMessages => {
+                            const initialMessage = prevMessages[0]; // 초기 인사 메시지 보존
+                            return [initialMessage, ...formattedHistory];
+                        });
                     }
                 })
                 .catch((error) => {
                     console.error("채팅 기록 로드 실패:", error);
+                    chatHistoryLoaded.current = false; // 실패시 재시도 가능하도록 설정
                 });
         }
     }, [isLoggedIn, dispatch]);
@@ -235,24 +239,46 @@ export const useChatLogic = () => {
     };
 
     const addMessage = (message) => {
-        if (!message?.text?.trim() && (!message.recommendations || message.recommendations.length === 0)) {
-            return; // 빈 메시지나 추천 없는 메시지 무시
+        if (!message) {
+            console.log("메시지 객체가 없음");
+            return;
         }
 
-        const newMessage = { ...message, id: message.id || uuidv4() };
+        // 단순히 content만 사용
+        const messageContent = message.content?.trim();
 
-        setMessages((prevMessages) => {
-            const isDuplicate = prevMessages.some((msg) => msg.id === newMessage.id);
+        if (!messageContent && !message.recommendations?.length) {
+            console.log("메시지 내용이 없음");
+            return;
+        }
+
+        const newMessage = {
+            ...message,
+            id: uuidv4(),
+            content: messageContent,
+            timestamp: new Date().toISOString(),
+            mode: message.mode || 'chat'
+        };
+
+        setMessages(prevMessages => {
+            const isDuplicate = prevMessages.some(msg =>
+                msg.timestamp === newMessage.timestamp &&
+                msg.type === message.type &&
+                msg.content === messageContent
+            );
+
             if (isDuplicate) {
-                console.log("중복 메시지 무시:", newMessage);
+                console.log("중복 메시지 발견:", messageContent);
                 return prevMessages;
             }
+
+            console.log("새 메시지 추가:", newMessage);
             return [...prevMessages, newMessage];
         });
-
     };
 
     const handleSendMessage = async (isRetry = false) => {
+        // 입력값이 없거나 로딩 중인 경우 처리하지 않음
         if (isLoading || (!input.trim() && selectedImages.length === 0)) return;
 
         // 비회원 채팅 횟수 제한
@@ -261,44 +287,48 @@ export const useChatLogic = () => {
         // 추천 요청을 구분
         const isRecommendationRequest = chatMode === "recommendation";
 
-        if (!isLoggedIn && hasReceivedRecommendation) {
-            setShowLoginModal(true); // 추천 받은 비회원은 즉시 로그인 모달 표시
-            return;
-        }
-
-        // 비회원이고 이미 추천을 받은 경우 로그인 모달 표시
-        if (
-            (!isLoggedIn && hasReceivedRecommendation && isRecommendationRequest) ||
-            (!isLoggedIn && nonMemberChatCount >= MAX_CHAT_COUNT)
-        ) {
-            setShowLoginModal(true); // 로그인 모달 표시
-            return; // 함수 종료
-        }
-
-        setRetryAvailable(false);
-        setIsLoading(true);
-
         // 재시도 시 이전 메시지 사용
         const userMessage = isRetry && messages[messages.length - 1]?.type === 'USER'
             ? messages[messages.length - 1]
             : {
                 id: uuidv4(),
                 type: 'USER',
-                text: input.trim() || '', // text 대신 content 사용
+                content: input.trim() || '',
                 images: selectedImages.map(img => img.url),
+                mode: 'chat',
                 retryAvailable: false,
             };
 
+        // 추천 받은 비회원은 즉시 로그인 모달 표시
+        if (!isLoggedIn && hasReceivedRecommendation) {
+            setShowLoginModal(true);
+            return;
+        }
+
+        // 비회원이고 이미 추천을 받은 경우 또는 채팅 횟수 초과시 로그인 모달 표시
+        if (
+            (!isLoggedIn && hasReceivedRecommendation && isRecommendationRequest) ||
+            (!isLoggedIn && nonMemberChatCount >= MAX_CHAT_COUNT)
+        ) {
+            setShowLoginModal(true);
+            return;
+        }
+
+        setRetryAvailable(false);
+        setIsLoading(true);
+
         // 메시지 추가
         if (!isRetry) {
-            setMessages((prevMessages) => [...prevMessages, userMessage]); // 메시지 상태 업데이트
+            console.log("새 메시지 추가:", userMessage);
+            setMessages((prevMessages) => [...prevMessages, userMessage]);
             setInput('');
             setSelectedImages([]);
         } else {
-            // 재시도 시에도 `messages`가 업데이트되도록 보장
+            console.log("메시지 재시도:", userMessage);
+            // 재시도 시에도 messages가 업데이트되도록 보장
             setMessages((prevMessages) => {
                 const updatedMessages = prevMessages.map((msg) =>
-                    msg.id === userMessage.id ? userMessage : msg // ID 매칭 시 업데이트
+                    msg.id === userMessage.id ? userMessage : msg
                 );
                 return updatedMessages;
             });
@@ -321,7 +351,11 @@ export const useChatLogic = () => {
                 // 에러 처리
                 console.error('서버 에러 발생:', response.error);
                 setRetryAvailable(true); // 실패 시 재시도 버튼 표시
-                addMessage({ type: 'bot', content: '추천 데이터를 처리하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.' });
+                addMessage({
+                    type: 'AI',
+                    content: '추천 데이터를 처리하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
+                    mode: 'chat'
+                });
                 return;
             }
 
@@ -331,7 +365,7 @@ export const useChatLogic = () => {
                 // 추천 메시지 처리
                 const recommendationMessage = {
                     id: response.id,
-                    type: "AI", // ChatType.AI 사용
+                    type: "AI",
                     recommendations: response.recommendations || [],
                     imageUrl: response.imageUrl,
                     mode: response.mode,
@@ -359,6 +393,7 @@ export const useChatLogic = () => {
                     id: uuidv4(),
                     type: 'AI',
                     content: response.content,
+                    mode: 'chat'
                 };
 
                 addMessage(chatMessage);
@@ -369,12 +404,13 @@ export const useChatLogic = () => {
             setRetryAvailable(true); // 실패 시 재시도 버튼 표시
 
             const errorMessage = {
-                id: uuidv4(), // 고유 ID 생성
+                id: uuidv4(),
                 type: 'AI',
-                content: '네트워크 문제로 요청이 실패했습니다. 다시 시도해주세요.', // 에러 메시지
+                content: '네트워크 문제로 요청이 실패했습니다. 다시 시도해주세요.',
+                mode: 'chat'
             };
 
-            setMessages((prevMessages) => [...prevMessages, errorMessage]);
+            addMessage(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -449,62 +485,95 @@ export const useChatLogic = () => {
         return text.replace(regex, '<span class="highlight">$1</span>');
     };
 
-    const handleSearch = () => {
-        if (!searchInput.trim()) return;
+    const [originalMessages, setOriginalMessages] = useState([]); // 원본 메시지 저장
+    const [filteredMessages, setFilteredMessages] = useState([]); // 검색 결과 메시지
 
-        const regex = new RegExp(searchInput, 'i');
-        const indexes = messages
-            .map((msg, idx) => (msg.text && regex.test(msg.text) ? idx : null))
-            .filter(idx => idx !== null);
-
-        if (indexes.length > 0) {
-            setHighlightedMessageIndexes(indexes);
-            const latestIndex = indexes.length - 1;
-            setCurrentHighlightedIndex(latestIndex);
-            scrollToMessage(indexes[latestIndex]);
-        } else {
-            setHighlightedMessageIndexes([]);
-            setCurrentHighlightedIndex(null);
-        }
-    };
-
-    const clearSearch = () => {
-        setSearchInput('');
-        setHighlightedMessageIndexes([]);
-        setCurrentHighlightedIndex(null);
-        setIsSearchMode(false);
-        setTimeout(() => {
-            if (messageEndRef.current) {
-                messageEndRef.current.scrollIntoView({ behavior: "smooth" });
-            }
-        }, 100);
-    };
-
+    /**
+     * 특정 메시지 인덱스로 스크롤하는 함수
+     * @param {number} index - 스크롤할 메시지의 인덱스
+     */
     const scrollToMessage = (index) => {
+        // 인덱스가 숫자가 아닌 경우 early return
+        if (typeof index !== 'number') return;
+
+        // 해당 인덱스의 메시지 요소를 찾음
         const messageElement = document.getElementById(`message-${index}`);
         if (messageElement) {
+            // 부드러운 스크롤로 해당 메시지를 화면 중앙에 위치시킴
             messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     };
 
+    /**
+     * 검색 실행 함수
+     * 입력된 검색어로 메시지 배열을 검색하고 결과를 하이라이트 처리
+     */
+    const handleSearch = () => {
+        if (!searchInput?.trim()) {
+            setFilteredMessages(originalMessages);
+            return;
+        }
+    
+        const filtered = originalMessages.filter(msg => 
+            msg.content && msg.content.toLowerCase().includes(searchInput.toLowerCase())
+        );
+    
+        setFilteredMessages(filtered);
+    };
+
+    /**
+     * 이전 검색 결과로 이동하는 함수
+     */
     const goToPreviousHighlight = () => {
-        if (highlightedMessageIndexes.length > 0 && currentHighlightedIndex > 0) {
-            const prevIndex = currentHighlightedIndex - 1;
-            setCurrentHighlightedIndex(prevIndex);
-            scrollToMessage(highlightedMessageIndexes[prevIndex]);
+        if (highlightedMessageIndexes.length === 0 || currentHighlightedIndex === null) {
+            return;
         }
+
+        // 현재 인덱스가 0보다 크면 이전 인덱스로, 아니면 마지막 인덱스로 이동
+        const newIndex = currentHighlightedIndex > 0
+            ? currentHighlightedIndex - 1
+            : highlightedMessageIndexes.length - 1;
+
+        setCurrentHighlightedIndex(newIndex);
+        scrollToMessage(highlightedMessageIndexes[newIndex]);
     };
 
+    /**
+     * 다음 검색 결과로 이동하는 함수
+     */
     const goToNextHighlight = () => {
-        if (highlightedMessageIndexes.length > 0 && currentHighlightedIndex < highlightedMessageIndexes.length - 1) {
-            const nextIndex = currentHighlightedIndex + 1;
-            setCurrentHighlightedIndex(nextIndex);
-            scrollToMessage(highlightedMessageIndexes[nextIndex]);
+        if (highlightedMessageIndexes.length === 0 || currentHighlightedIndex === null) {
+            return;
+        }
+
+        // 현재 인덱스가 마지막이 아니면 다음 인덱스로, 마지막이면 처음으로 이동
+        const newIndex = currentHighlightedIndex < highlightedMessageIndexes.length - 1
+            ? currentHighlightedIndex + 1
+            : 0;
+
+        setCurrentHighlightedIndex(newIndex);
+        scrollToMessage(highlightedMessageIndexes[newIndex]);
+    };
+
+    // 검색 모드 토글 함수 수정
+    const toggleSearchMode = () => {
+        const newMode = !isSearchMode;
+        setIsSearchMode(newMode);
+    
+        if (!newMode) {
+            clearSearch();
         }
     };
 
-    const toggleSearchMode = () => {
-        setIsSearchMode((prevMode) => !prevMode);
+    /**
+     * 검색 상태를 초기화하는 함수
+     * 검색어, 하이라이트 인덱스, 검색 모드를 모두 초기화하고
+     * DOM에서 하이라이트 클래스를 제거
+     */
+    const clearSearch = () => {
+        setSearchInput('');
+        setFilteredMessages(originalMessages);
+        setIsSearchMode(false);
     };
 
     const handleGoBack = () => {
