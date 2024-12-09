@@ -3,6 +3,7 @@ import '../../css/components/Sidebar.css'
 import { Menu } from 'lucide-react';
 import { useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { setMemberLeave } from '../../api/MemberAPICalls';
 import { logout } from '../../module/AuthModule';
 
 const Sidebar = () => {
@@ -37,6 +38,37 @@ const Sidebar = () => {
         navigate('/'); // 로그아웃 후 메인 페이지로 이동
         window.location.reload(); // 페이지 새로고침
     };
+
+    const handleMemberLeave = async () => {
+        try {
+            const storedUser = localStorage.getItem('auth');
+            if (!storedUser) {
+                alert('사용자 정보를 찾을 수 없습니다.');
+                return;
+            }
+    
+            const parsedUser = JSON.parse(storedUser);
+            if (!parsedUser?.id) {
+                alert('회원 ID가 유효하지 않습니다.');
+                return;
+            }
+    
+            // setMemberLeave 함수 호출 후 성공 여부 확인
+            const success = await setMemberLeave(parsedUser.id);
+            if (success) {
+                localStorage.removeItem('auth'); // 로컬 스토리지 초기화
+                dispatch(logout()); // Redux 상태 초기화
+                navigate('/'); // 메인 페이지로 이동
+            } else {
+                alert('회원 탈퇴 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+            }
+        } catch (error) {
+            console.error('회원 탈퇴 처리 중 오류:', error);
+            alert('회원 탈퇴 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        }
+    };
+    
+
 
     const handleScrollToIntro = (e) => {
         e.preventDefault(); // 기본 링크 동작 방지
@@ -121,6 +153,7 @@ const Sidebar = () => {
                                     <div className="sidebar-menu">
                                         <button
                                             className="sidebar-auth-button"
+                                            onClick={handleMemberLeave}
                                         >
                                             회원탈퇴
                                         </button>
