@@ -1,38 +1,35 @@
 import apis from "./Apis";
 
+// 채팅 추천 요청
 export const requestRecommendations = async (userInput, imageFile = null, userId = null) => {
     try {
-        const formData = new FormData();
-        formData.append("user_input", userInput);
-        
-        // userId가 존재할 경우에만 추가
-        if (userId) {
-            formData.append("userId", userId);
-        }
-        
-        if (imageFile) {
-            formData.append("image", imageFile);
-        }
-        
-        // 디버깅용: FormData의 내용을 출력
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value instanceof File ? value.name : value}`);
+        if (!userInput?.trim()) {
+            throw new Error("사용자 입력이 비어 있습니다.");
         }
 
-        const response = await apis.post("/recommends/", formData, {
+        const formData = new FormData();
+        formData.append("content", userInput);
+        if (imageFile) formData.append("image", imageFile);
+        if (userId) formData.append("memberId", userId);
+
+        const response = await apis.post("/chats", formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
-
-        console.log("API 응답:", response.data);
         return response.data;
     } catch (error) {
-        console.error("Error fetching recommendations:", error);
-        throw error;
-    } 
+        console.error("추천 요청 중 오류 발생:", error);
+        throw new Error(error.response?.data?.message || "추천 요청 중 오류가 발생했습니다.");
+    }
 };
 
 // 로그인한 회원의 채팅 내역 가져오기
 export const getChatHistory = async (memberId) => {
-    const response = await apis.get(`/recommends/${memberId}`);
-    return response.data; // 응답 데이터 반환
+    try {
+        const response = await apis.get(`/chats/${memberId}`);
+        return response.data; // 응답 데이터 반환
+    } catch (error) {
+        // 채팅 내역 가져오기 오류 처리
+        console.error("채팅 내역 가져오기 오류:", error);
+        throw new Error(error.response?.data?.message || "채팅 내역을 가져오는 중 오류가 발생했습니다.");
+    }
 };
