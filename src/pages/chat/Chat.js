@@ -123,55 +123,75 @@ function Chat() {
                                 </div>
                             ))
                         ) : (
-                            // 추천 모드 또는 일반 채팅 모드 렌더링
                             <>
-                                {filteredMessages.map((msg, index) => (
+                                {/* 추천 모드 또는 일반 채팅 모드 렌더링 */}
+                                {messages.map((msg, index) => (
                                     <div
                                         key={msg.id}
                                         id={`message-${index}`}
-                                        className={`chat-message ${msg.sender === 'bot' ? 'chat-bot-message' : 'chat-user-message'} ${highlightedMessageIndexes.includes(index) && index === currentHighlightedIndex
-                                            ? 'highlighted'
-                                            : ''
+                                        className={`chat-message ${msg.type === 'AI' ? 'chat-bot-message' : 'chat-user-message'
+                                            } ${highlightedMessageIndexes.includes(index) &&
+                                                index === currentHighlightedIndex
+                                                ? 'highlighted'
+                                                : ''
                                             }`}
                                     >
-                                        {/* 봇 메시지: 추천 이미지 렌더링 */}
-                                        {msg.sender === 'bot' && msg.generatedImage && (
-                                            <div className="chat-recommendation-image">
-                                                <img src={msg.generatedImage} alt="추천 이미지" className="generated-image" />
-                                            </div>
+                                        {/* 추천 모드 렌더링 */}
+                                        {msg.mode === 'recommendation' && msg.type === 'AI' && (
+                                            <>
+                                                {msg.generatedImage && (
+                                                    <div className="chat-recommendation-image">
+                                                        <img
+                                                            src={msg.generatedImage}
+                                                            alt="추천 이미지"
+                                                            className="generated-image"
+                                                        />
+                                                    </div>
+                                                )}
+                                                {Array.isArray(msg.recommendations) &&
+                                                    msg.recommendations.length > 0 && (
+                                                        <div className="chat-recommendations-container">
+                                                            <img
+                                                                src="/images/logo-bot.png"
+                                                                alt="Bot Avatar"
+                                                                className="chat-avatar"
+                                                            />
+                                                            <div className="chat-recommendations-wrapper">
+                                                                {msg.recommendations.map((perfume, idx) => (
+                                                                    <RecommendationCard
+                                                                        key={idx}
+                                                                        perfume={perfume}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                            <div
+                                                                className={`chat-color-bar ${color === '#FFFFFF'
+                                                                        ? 'highlighted-border'
+                                                                        : ''
+                                                                    }`}
+                                                                style={{ backgroundColor: color }}
+                                                            ></div>
+                                                            <button
+                                                                className="chat-create-scent-card-button"
+                                                                onClick={() => handleCreateScentCard(msg.id)}
+                                                            >
+                                                                향기 카드 만들기
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                            </>
                                         )}
 
-                                        {/* 봇 메시지: 추천 리스트 렌더링 */}
-                                        {msg.sender === 'bot' && Array.isArray(msg.recommendations) && msg.recommendations.length > 0 ? (
-                                            <div className="chat-recommendations-container">
-                                                <img src="/images/logo-bot.png" alt="Bot Avatar" className="chat-avatar" />
-                                                <div className="chat-recommendations-wrapper">
-                                                    {msg.recommendations.map((perfume, idx) => (
-                                                        <RecommendationCard key={idx} perfume={perfume} />
-                                                    ))}
-                                                </div>
-                                                <div
-                                                    className={`chat-color-bar ${color === '#FFFFFF' ? 'highlighted-border' : ''
-                                                        }`}
-                                                    style={{ backgroundColor: color }}
-                                                ></div>
-
-                                                {/* "향기 카드 만들기" 버튼 */}
-                                                <button
-                                                    className="chat-create-scent-card-button"
-                                                    onClick={() => handleCreateScentCard(msg.id)}
-                                                >
-                                                    향기 카드 만들기
-                                                </button>
-                                            </div>
-
-                                        ) : (
+                                        {/* 일반 텍스트 메시지 렌더링 */}
+                                        {msg.mode === 'chat' && (
                                             <>
-
-                                                {/* 봇 일반 메시지 렌더링 */}
-                                                {msg.sender === 'bot' && (
+                                                {msg.type === 'AI' && (
                                                     <>
-                                                        <img src="/images/logo-bot.png" alt="Bot Avatar" className="chat-avatar" />
+                                                        <img
+                                                            src="/images/logo-bot.png"
+                                                            alt="Bot Avatar"
+                                                            className="chat-avatar"
+                                                        />
                                                         <div className="chat-message-text-wrapper">
                                                             <p
                                                                 className="chat-message-text"
@@ -180,83 +200,95 @@ function Chat() {
                                                                 }}
                                                             ></p>
                                                             <div
-                                                                className={`chat-color-bar ${color === '#FFFFFF' ? 'highlighted-border' : ''
+                                                                className={`chat-color-bar ${color === '#FFFFFF'
+                                                                        ? 'highlighted-border'
+                                                                        : ''
                                                                     }`}
                                                                 style={{ backgroundColor: color }}
                                                             ></div>
                                                         </div>
                                                     </>
                                                 )}
-                                            </>
-                                        )}
-
-                                        {/* 사용자 메시지 렌더링 */}
-                                        {msg.sender === 'user' && (
-                                            <div
-                                                className={`chat-message-text-wrapper chat-user-message-wrapper ${msg.images && msg.images.length > 0 && msg.text ? 'with-image-and-text' : msg.images && msg.images.length > 0 ? 'with-image' : 'without-image'
-                                                    }`}
-                                            >
-                                                {msg.images &&
-                                                    msg.images.map((image, idx) => (
-                                                        <img
-                                                            key={idx}
-                                                            src={image}
-                                                            alt="Uploaded"
-                                                            className="chat-uploaded-image"
-                                                            onClick={() => openModal(image)}
-                                                        />
-                                                    ))}
-                                                {msg.text && (
-                                                    <p
-                                                        className="chat-message-text"
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: highlightSearch(msg.text, searchInput),
-                                                        }}
-                                                    ></p>
-                                                )}
-                                                <div
-                                                    className={`chat-color-circle ${color === '#FFFFFF' ? 'highlighted-border' : ''
-                                                        }`}
-                                                    style={{ backgroundColor: color }}
-                                                ></div>
-                                                {/* 재시도 버튼 */}
-                                                {retryAvailable && (
-                                                    <div className="chat-input-area-wrapper-retry">
-                                                        <button
-                                                            className="chat-retry-button"
-                                                            onClick={() => {
-                                                                setRetryAvailable(false); // 재시도 버튼 숨기기
-                                                                handleSendMessage(true); // 메시지 재전송
-                                                            }}
-                                                        >
-                                                            재시도하기
-                                                        </button>
+                                                {msg.type === 'USER' && (
+                                                    <div
+                                                        className={`chat-message-text-wrapper chat-user-message-wrapper ${msg.images &&
+                                                                msg.images.length > 0 &&
+                                                                msg.text
+                                                                ? 'with-image-and-text'
+                                                                : msg.images &&
+                                                                    msg.images.length > 0
+                                                                    ? 'with-image'
+                                                                    : 'without-image'
+                                                            }`}
+                                                    >
+                                                        {msg.images &&
+                                                            msg.images.map((image, idx) => (
+                                                                <img
+                                                                    key={idx}
+                                                                    src={image}
+                                                                    alt="Uploaded"
+                                                                    className="chat-uploaded-image"
+                                                                    onClick={() => openModal(image)}
+                                                                />
+                                                            ))}
+                                                        {msg.text && (
+                                                            <p
+                                                                className="chat-message-text"
+                                                                dangerouslySetInnerHTML={{
+                                                                    __html: highlightSearch(msg.text, searchInput),
+                                                                }}
+                                                            ></p>
+                                                        )}
+                                                        <div
+                                                            className={`chat-color-circle ${color === '#FFFFFF'
+                                                                    ? 'highlighted-border'
+                                                                    : ''
+                                                                }`}
+                                                            style={{ backgroundColor: color }}
+                                                        ></div>
+                                                        {retryAvailable && (
+                                                            <div className="chat-input-area-wrapper-retry">
+                                                                <button
+                                                                    className="chat-retry-button"
+                                                                    onClick={() => {
+                                                                        setRetryAvailable(false);
+                                                                        handleSendMessage(true);
+                                                                    }}
+                                                                >
+                                                                    재시도하기
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
-                                            </div>
+                                            </>
                                         )}
                                     </div>
                                 ))}
+
+                                {/* 로딩 상태 표시 */}
+                                {loading && (
+                                    <div className="chat-message chat-bot-message">
+                                        <img
+                                            src="/images/logo-bot.png"
+                                            alt="Bot Avatar"
+                                            className="chat-avatar"
+                                        />
+                                        <div className="chat-message-text-wrapper">
+                                            <div className="chat-loading-enhanced-loader">
+                                                <div className="chat-loading-floating-smoke chat-loading-smoke-1"></div>
+                                                <div className="chat-loading-floating-smoke chat-loading-smoke-2"></div>
+                                                <div className="chat-loading-floating-smoke chat-loading-smoke-3"></div>
+                                                <div className="chat-loading-floating-smoke chat-loading-smoke-4"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* 메세지 끝 스크롤 */}
+                                <div ref={messageEndRef}></div>
                             </>
                         )}
-
-                        {/* 로딩 중일 때 로딩 메시지 표시 */}
-                        {loading && (
-                            <div className="chat-message chat-bot-message">
-                                <img src="/images/logo-bot.png" alt="Bot Avatar" className="chat-avatar" />
-                                <div className="chat-message-text-wrapper">
-                                    <div className="chat-loading-enhanced-loader">
-                                        <div className="chat-loading-floating-smoke chat-loading-smoke-1"></div>
-                                        <div className="chat-loading-floating-smoke chat-loading-smoke-2"></div>
-                                        <div className="chat-loading-floating-smoke chat-loading-smoke-3"></div>
-                                        <div className="chat-loading-floating-smoke chat-loading-smoke-4"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* 메세지 끝 스크롤 */}
-                        <div ref={messageEndRef}></div>
                     </div>
                 </div>
 
