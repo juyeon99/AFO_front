@@ -260,7 +260,7 @@
     align-self: flex-start;
     translate: 40px;
     word-wrap: break-word;
-    max-width: 50%;
+    max-width: 40%;
 }
 
 .chat-avatar {
@@ -539,10 +539,12 @@
 }
 
 .chat-recommendations-wrapper {
-    display: flex;
+    display: wrap !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     flex-direction: column;
     gap: 10px;
     margin-left: 50px; /* 아바타와 카드 사이 간격 */
+    align-items: start;
 }
 
 .chat-recommendation-card {
@@ -552,8 +554,9 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #f9f9f9;
-    max-width: 80%;
+    max-width: 60%;
     margin-bottom: 20px;
+    flex: 1 1 calc(33.333% - 16px) !important; /* 한 줄에 3개 배치 */
 }
 
 .chat-recommendation-image {
@@ -562,6 +565,11 @@
     object-fit: cover;
     border-radius: 50%;
     margin-right: 10px;
+}
+
+.chat-recommendation-perfume-image {
+    width: 70%;
+    margin: 0 auto;
 }
 
 .chat-recommendation-content {
