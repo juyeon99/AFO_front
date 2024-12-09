@@ -114,17 +114,23 @@ function Chat() {
                 <div className="chat-message-box" style={{ '--scroll-color': color }}>
                     <div className="chat-messages-container">
                         {/* 검색 모드일 경우 */}
-                        {isSearchMode && highlightedMessageIndexes.length > 0 ? (
-                            highlightedMessageIndexes.map((index) => (
-                                <div key={index} className="chat-search-result">
-                                    <p
-                                        className="chat-search-result-text"
-                                        dangerouslySetInnerHTML={{
-                                            __html: highlightSearch(filteredMessages[index].content, searchInput),
-                                        }}
-                                    ></p>
-                                </div>
-                            ))
+                        {isSearchMode && highlightedMessageIndexes?.length > 0 ? (
+                            highlightedMessageIndexes.map((index) => {
+                                // filteredMessages가 존재하고 유효한 인덱스인지 확인
+                                if (!filteredMessages || !filteredMessages[index]) {
+                                    return null;
+                                }
+                                return (
+                                    <div key={index} className="chat-search-result">
+                                        <p
+                                            className="chat-search-result-text"
+                                            dangerouslySetInnerHTML={{
+                                                __html: highlightSearch(filteredMessages[index].content || '', searchInput),
+                                            }}
+                                        ></p>
+                                    </div>
+                                );
+                            }).filter(Boolean) // null 값 제거
                         ) : (
                             <>
                                 {/* 추천 모드 또는 일반 채팅 모드 렌더링 */}
