@@ -85,6 +85,34 @@ export const useChatLogic = () => {
         return filter.color; // 필터의 색상 반환
     };
 
+    // 색상 변경 로직
+    useEffect(() => {
+        if (color) {
+            localStorage.setItem('chatColor', color); // 색상을 로컬 스토리지에 저장
+        }
+    }, [color]);
+
+    // 새로고침 시 초기 색상 불러오기
+    useEffect(() => {
+        const storedColor = localStorage.getItem('chatColor'); // 저장된 색상 불러오기
+        if (storedColor) {
+            setColor(storedColor); // 상태를 저장된 색상으로 설정
+        } else if (response?.lineId) {
+            // 로컬 스토리지에 저장된 색상이 없을 경우 response.lineId 기반으로 설정
+            const newColor = getColorForCategory(response.lineId, filters);
+            setColor(newColor);
+        }
+    }, [response, filters]);
+
+    // response.lineId 기반 색상 설정
+    useEffect(() => {
+        if (response?.lineId) {
+            const newColor = getColorForCategory(response.lineId, filters);
+            setColor(newColor);
+        }
+    }, [response, filters]);
+
+
     // 로그인 상태 변경 시 작동
     useEffect(() => {
         console.log("로그인 상태 변경 감지:", isLoggedIn);
@@ -408,6 +436,7 @@ export const useChatLogic = () => {
                 id: uuidv4(), // 고유 ID 생성
                 type: 'AI',
                 content: '네트워크 문제로 요청이 실패했습니다. 다시 시도해주세요.', // 에러 메시지
+                mode: 'chat'
             };
 
             addMessage(errorMessage);
