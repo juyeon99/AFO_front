@@ -200,19 +200,11 @@ export const useChatLogic = () => {
     }, []);
 
     useEffect(() => {
-        const handleArrowKeyPress = (e) => {
-            if (e.key === 'ArrowUp') {
-                goToPreviousHighlight();
-            } else if (e.key === 'ArrowDown') {
-                goToNextHighlight();
-            }
-        };
-
-        document.addEventListener('keydown', handleArrowKeyPress);
-        return () => {
-            document.removeEventListener('keydown', handleArrowKeyPress);
-        };
-    }, [currentHighlightedIndex, highlightedMessageIndexes]);
+        // 새 메시지가 추가될 때마다 맨 아래로 스크롤
+        if (messageEndRef.current) {
+            messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages]); // messages가 변경될 때마다 실행
 
     useEffect(() => {
         console.log("Chat Mode has changed:", chatMode);
@@ -460,6 +452,11 @@ export const useChatLogic = () => {
             addMessage();
         } finally {
             setIsLoading(false);
+
+            // 여기에 스크롤 코드 추가
+            if (messageEndRef.current) {
+                messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+            }
         }
     };
 
@@ -536,6 +533,45 @@ export const useChatLogic = () => {
     const [filteredMessages, setFilteredMessages] = useState([]); // 검색 결과 메시지
 
     /**
+         * 검색 실행 함수
+         * 입력된 검색어로 메시지 배열을 검색하고 결과를 하이라이트 처리
+         */
+    const handleSearch = () => {
+        if (!searchInput?.trim()) {
+            setFilteredMessages(originalMessages);
+            return;
+        }
+    
+        // 검색어에 해당하는 메시지들 찾기
+        const matchingIndexes = messages.reduce((acc, msg, index) => {
+            if (msg.content && msg.content.toLowerCase().includes(searchInput.toLowerCase())) {
+                acc.push(index);
+            }
+            return acc;
+        }, []);
+    
+        setHighlightedMessageIndexes(matchingIndexes);
+    
+        // 검색된 메시지들이 있다면 가장 마지막(최근) 메시지부터 시작
+        if (matchingIndexes.length > 0) {
+            const lastIndex = matchingIndexes.length - 1;
+            setCurrentHighlightedIndex(lastIndex);
+            scrollToMessage(matchingIndexes[lastIndex]);
+        }
+    };
+
+    /**
+ * 검색 상태를 초기화하는 함수
+ * 검색어, 하이라이트 인덱스, 검색 모드를 모두 초기화하고
+ * DOM에서 하이라이트 클래스를 제거
+ */
+    const clearSearch = () => {
+        setSearchInput('');
+        setFilteredMessages(originalMessages);
+        setIsSearchMode(false);
+    };
+
+    /**
      * 특정 메시지 인덱스로 스크롤하는 함수
      * @param {number} index - 스크롤할 메시지의 인덱스
      */
@@ -551,56 +587,44 @@ export const useChatLogic = () => {
         }
     };
 
-    /**
-     * 검색 실행 함수
-     * 입력된 검색어로 메시지 배열을 검색하고 결과를 하이라이트 처리
-     */
-    const handleSearch = () => {
-        if (!searchInput?.trim()) {
-            setFilteredMessages(originalMessages);
-            return;
-        }
-
-        const filtered = originalMessages.filter(msg =>
-            msg.content && msg.content.toLowerCase().includes(searchInput.toLowerCase())
-        );
-
-        setFilteredMessages(filtered);
-    };
-
-    /**
-     * 이전 검색 결과로 이동하는 함수
-     */
     const goToPreviousHighlight = () => {
-        if (highlightedMessageIndexes.length === 0 || currentHighlightedIndex === null) {
+        if (highlightedMessageIndexes.length === 0 || 
+            currentHighlightedIndex === null || 
+            currentHighlightedIndex === 0) { // 첫 번째 인덱스면 이전으로 못 감
             return;
         }
-
-        // 현재 인덱스가 0보다 크면 이전 인덱스로, 아니면 마지막 인덱스로 이동
-        const newIndex = currentHighlightedIndex > 0
-            ? currentHighlightedIndex - 1
-            : highlightedMessageIndexes.length - 1;
-
+    
+        const newIndex = currentHighlightedIndex - 1; // 이전(더 오래된) 메시지로 이동
         setCurrentHighlightedIndex(newIndex);
         scrollToMessage(highlightedMessageIndexes[newIndex]);
     };
-
-    /**
-     * 다음 검색 결과로 이동하는 함수
-     */
+    
     const goToNextHighlight = () => {
-        if (highlightedMessageIndexes.length === 0 || currentHighlightedIndex === null) {
+        if (highlightedMessageIndexes.length === 0 || 
+            currentHighlightedIndex === null || 
+            currentHighlightedIndex === highlightedMessageIndexes.length - 1) { // 마지막 인덱스면 다음으로 못 감
             return;
         }
-
-        // 현재 인덱스가 마지막이 아니면 다음 인덱스로, 마지막이면 처음으로 이동
-        const newIndex = currentHighlightedIndex < highlightedMessageIndexes.length - 1
-            ? currentHighlightedIndex + 1
-            : 0;
-
+    
+        const newIndex = currentHighlightedIndex + 1; // 다음(더 최근) 메시지로 이동
         setCurrentHighlightedIndex(newIndex);
         scrollToMessage(highlightedMessageIndexes[newIndex]);
     };
+
+    useEffect(() => {
+        const handleArrowKeyPress = (e) => {
+            if (e.key === 'ArrowUp') {
+                goToPreviousHighlight();
+            } else if (e.key === 'ArrowDown') {
+                goToNextHighlight();
+            }
+        };
+
+        document.addEventListener('keydown', handleArrowKeyPress);
+        return () => {
+            document.removeEventListener('keydown', handleArrowKeyPress);
+        };
+    }, [currentHighlightedIndex, highlightedMessageIndexes]);
 
     // 검색 모드 토글 함수 수정
     const toggleSearchMode = () => {
@@ -612,16 +636,7 @@ export const useChatLogic = () => {
         }
     };
 
-    /**
-     * 검색 상태를 초기화하는 함수
-     * 검색어, 하이라이트 인덱스, 검색 모드를 모두 초기화하고
-     * DOM에서 하이라이트 클래스를 제거
-     */
-    const clearSearch = () => {
-        setSearchInput('');
-        setFilteredMessages(originalMessages);
-        setIsSearchMode(false);
-    };
+
 
     const handleGoBack = () => {
         navigate(-1); // 이전 페이지로 이동
