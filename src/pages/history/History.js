@@ -22,7 +22,10 @@ function History() {
 
     useEffect(() => {
         const localAuth = JSON.parse(localStorage.getItem("auth")); // 로그인 정보 가져오기
+        console.log("로그인한 사용자의 정보 : ", localAuth)
         const memberId = localAuth?.id;
+        console.log("로그인한 사용자의 아이디 : ", memberId)
+
 
         if (memberId) {
             console.log("향기 카드 데이터 요청 시작");
