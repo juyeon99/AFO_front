@@ -65,49 +65,44 @@ export const useChatLogic = () => {
         { id: 15, name: 'Tobacco Leather', color: '#000000' },
     ];
 
-// 특정 계열에 대한 색상 반환
-const getColorForCategory = (lineId, filters) => {
-    if (!lineId) {
-        console.warn('Invalid lineId provided. Returning default color.');
-        return '#D9D9D9'; // 기본 색상
-    }
+    // 특정 계열에 대한 색상 반환
+    const getColorForCategory = (lineId, filters) => {
+        if (!lineId) {
+            console.warn('Invalid lineId provided. Returning default color.');
+            return '#D9D9D9'; // 기본 색상
+        }
 
-    const filter = filters.find((f) => Number(f.id) === Number(lineId));
+        const filter = filters.find((f) => Number(f.id) === Number(lineId));
 
-    if (!filter) {
-        console.warn(`No matching filter found for lineId: ${lineId}`);
-        return '#D9D9D9'; // 기본 색상
-    }
+        return filter?.color || '#D9D9D9'; // 필터의 색상 반환
+    };
 
-    return filter.color; // 필터의 색상 반환
-};
+    // 색상 변경 로직: 색상이 변경될 때마다 로컬 스토리지에 저장
+    useEffect(() => {
+        if (color) {
+            localStorage.setItem('chatColor', color); // 색상을 로컬 스토리지에 저장
+        }
+    }, [color]);
 
-// 색상 변경 로직: 색상이 변경될 때마다 로컬 스토리지에 저장
-useEffect(() => {
-    if (color) {
-        localStorage.setItem('chatColor', color); // 색상을 로컬 스토리지에 저장
-    }
-}, [color]);
+    // 새로고침 시 초기 색상 불러오기
+    useEffect(() => {
+        const storedColor = localStorage.getItem('chatColor'); // 저장된 색상 불러오기
+        if (storedColor) {
+            setColor(storedColor); // 저장된 색상을 상태로 설정
+        } else if (response?.lineId) {
+            // 로컬 스토리지에 저장된 색상이 없을 경우 response.lineId 기반으로 설정
+            const newColor = getColorForCategory(response.lineId, filters);
+            setColor(newColor);
+        }
+    }, [filters]); // filters가 초기화된 이후에 실행
 
-// 새로고침 시 초기 색상 불러오기
-useEffect(() => {
-    const storedColor = localStorage.getItem('chatColor'); // 저장된 색상 불러오기
-    if (storedColor) {
-        setColor(storedColor); // 저장된 색상을 상태로 설정
-    } else if (response?.lineId) {
-        // 로컬 스토리지에 저장된 색상이 없을 경우 response.lineId 기반으로 설정
-        const newColor = getColorForCategory(response.lineId, filters);
-        setColor(newColor);
-    }
-}, [filters]); // filters가 초기화된 이후에 실행
-
-// response.lineId가 변경될 때마다 색상 설정
-useEffect(() => {
-    if (response?.lineId) {
-        const newColor = getColorForCategory(response.lineId, filters);
-        setColor(newColor);
-    }
-}, [response?.lineId, filters]);
+    // response.lineId가 변경될 때마다 색상 설정
+    useEffect(() => {
+        if (response?.lineId) {
+            const newColor = getColorForCategory(response.lineId, filters);
+            setColor(newColor);
+        }
+    }, [response?.lineId, filters]);
 
     // 로그인 상태 변경 감지 useEffect 수정
     useEffect(() => {
@@ -268,9 +263,10 @@ useEffect(() => {
 
         // 단순히 content만 사용
         const messageContent = message.content?.trim();
+        const hasValidRecommendations = Array.isArray(message.recommendations) && message.recommendations.length > 0;
 
-        if (!messageContent && !message.recommendations?.length) {
-            console.log("메시지 내용이 없음");
+        if (!messageContent && !hasValidRecommendations && !message.imageUrl) {
+            console.log("메시지 내용이나 추천 데이터가 없습니다. 추가되지 않습니다.");
             return;
         }
 
@@ -377,369 +373,373 @@ useEffect(() => {
             const response = await dispatch(fetchChatResponse(input.trim(), imageFile));
             console.log("서버 응답:", response);
 
+            if (!response?.recommendations?.length && response?.mode === "recommendation") {
+                throw new Error('추천 데이터가 없습니다.');
+            }
+
             // response가 undefined인 경우 처리
-                if (!response) {
-                    throw new Error('응답이 없습니다.');
-                }
+            if (!response) {
+                throw new Error('응답이 없습니다.');
+            }
 
-                if (response?.error) {
-                    // 에러 처리
-                    console.error('서버 에러 발생:', response.error);
-                    setRetryAvailable(true); // 실패 시 재시도 버튼 표시
-                    addMessage({
-                        type: 'AI',
-                        content: '추천 데이터를 처리하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
-                        mode: 'chat'
-                    });
-                    return;
-                }
-
-                // **이미지만 반환된 경우 처리**
-                if (response.imageUrl) {
-                    const imageMessage = {
-                        id: response.id || uuidv4(),
-                        type: 'AI',
-                        imageUrl: response.imageUrl,
-                        content: response.content || '', // 이미지만 있을 경우 content가 없을 수 있음
-                    };
-                    addMessage(imageMessage);
-                }
-
-                setRetryAvailable(false);
-
-                if (response?.mode === "recommendation") {
-                    // 추천 메시지 처리
-                    const recommendationMessage = {
-                        id: response.id,
-                        type: "AI",
-                        content: response.content,
-                        recommendations: response.recommendations || [],
-                        imageUrl: response.imageUrl,
-                        mode: response.mode,
-                        lineId: response.lineId,
-                        timeStamp: response.timeStamp
-                    };
-                    addMessage(recommendationMessage);
-
-                    // 빈 메시지 방지 조건 추가
-                    if (response.recommendations?.length > 0) {
-                        setRecommendedPerfumes(response.recommendations);
-                        setColor(getColorForCategory(response.lineId || ""));
-                    }
-
-                    // 비회원이 추천을 받은 경우 상태 업데이트
-                    if (!isLoggedIn) {
-                        setHasReceivedRecommendation(true);
-                        localStorage.setItem('hasReceivedRecommendation', 'true');
-                    }
-                    setChatMode("chat");
-
-                } else if (response?.mode === "chat") {
-                    // 일반 메시지 처리
-                    const chatMessage = {
-                        id: uuidv4(),
-                        type: 'AI',
-                        content: response.content,
-                        mode: 'chat'
-                    };
-
-                    addMessage(chatMessage);
-                }
-
-            } catch (error) {
-                console.error("Error handling chat response:", error);
+            if (response?.error) {
+                // 에러 처리
+                console.error('서버 에러 발생:', response.error);
                 setRetryAvailable(true); // 실패 시 재시도 버튼 표시
+                addMessage({
+                    type: 'AI',
+                    content: '추천 데이터를 처리하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
+                    mode: 'chat'
+                });
+                return;
+            }
 
-                const errorMessage = {
+            // **이미지만 반환된 경우 처리**
+            if (response.imageUrl) {
+                const imageMessage = {
+                    id: response.id || uuidv4(),
+                    type: 'AI',
+                    imageUrl: response.imageUrl,
+                    content: response.content || '', // 이미지만 있을 경우 content가 없을 수 있음
+                };
+                addMessage(imageMessage);
+            }
+
+            setRetryAvailable(false);
+
+            if (response?.mode === "recommendation") {
+                // 추천 메시지 처리
+                const recommendationMessage = {
+                    id: response.id,
+                    type: "AI",
+                    content: response.content,
+                    recommendations: response.recommendations || [],
+                    imageUrl: response.imageUrl,
+                    mode: response.mode,
+                    lineId: response.lineId,
+                    timeStamp: response.timeStamp
+                };
+                addMessage(recommendationMessage);
+
+                // 빈 메시지 방지 조건 추가
+                if (response.recommendations?.length > 0) {
+                    setRecommendedPerfumes(response.recommendations);
+                    setColor(getColorForCategory(response.lineId || ""));
+                }
+
+                // 비회원이 추천을 받은 경우 상태 업데이트
+                if (!isLoggedIn) {
+                    setHasReceivedRecommendation(true);
+                    localStorage.setItem('hasReceivedRecommendation', 'true');
+                }
+                setChatMode("chat");
+
+            } else if (response?.mode === "chat") {
+                // 일반 메시지 처리
+                const chatMessage = {
                     id: uuidv4(),
                     type: 'AI',
-                    content: '네트워크 문제로 요청이 실패했습니다. 다시 시도해주세요.', // 에러 메시지
+                    content: response.content,
                     mode: 'chat'
                 };
 
-                addMessage(errorMessage);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        const handlePaste = (event) => {
-            const items = event.clipboardData.items;
-            const images = [];
-
-            for (let i = 0; i < items.length; i++) {
-                if (items[i].type.startsWith("image")) {
-                    const file = items[i].getAsFile();
-                    const url = URL.createObjectURL(file);
-                    images.push({ url, file });
-                }
+                addMessage(chatMessage);
             }
 
-            if (images.length > 0) {
-                setSelectedImages(prevImages => [...prevImages, ...images]);
-            }
-        };
+        } catch (error) {
+            console.error("Error handling chat response:", error);
+            setRetryAvailable(true); // 실패 시 재시도 버튼 표시
 
-        const handleInputChange = (e) => setInput(e.target.value);
+            addMessage({
+                id: uuidv4(),
+                type: 'AI',
+                content: '네트워크 문제로 요청이 실패했습니다. 다시 시도해주세요.', // 에러 메시지
+                mode: 'chat'
+            });
 
-        const handleKeyPress = (e) => {
-            if (e.key === 'Enter') {
-                handleSendMessage();
-                handleSearch();
-            }
-        };
-
-        const handleImageUpload = (e) => {
-            const file = e.target.files[0]; // 첫 번째 파일만 가져옴
-            if (file) {
-                const newImage = {
-                    url: URL.createObjectURL(file),
-                    file: file
-                };
-                setSelectedImages([newImage]); // 새 이미지를 기존 이미지 대신 대체
-            }
-            e.target.value = ''; // 파일 입력 초기화
-        };
-
-        const handleRemoveImage = (index) => {
-            setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index));
-        };
-
-        const openModal = (imageSrc) => {
-            setModalImage(imageSrc);
-            setIsModalOpen(true);
-        };
-
-        const closeModal = () => {
-            setIsModalOpen(false);
-            setModalImage(null);
-        };
-
-        const handleSearchChange = (e) => {
-            setSearchInput(e.target.value);
-
-            if (e.target.value === '') {
-                clearSearch();
-            }
-        };
-
-        const highlightSearch = (text, query) => {
-            if (typeof text !== 'string') return '';
-
-            if (!query) return text;
-
-            const regex = new RegExp(`(${query})`, 'gi');
-            return text.replace(regex, '<span class="highlight">$1</span>');
-        };
-
-        const [originalMessages, setOriginalMessages] = useState([]); // 원본 메시지 저장
-        const [filteredMessages, setFilteredMessages] = useState([]); // 검색 결과 메시지
-
-        /**
-         * 특정 메시지 인덱스로 스크롤하는 함수
-         * @param {number} index - 스크롤할 메시지의 인덱스
-         */
-        const scrollToMessage = (index) => {
-            // 인덱스가 숫자가 아닌 경우 early return
-            if (typeof index !== 'number') return;
-
-            // 해당 인덱스의 메시지 요소를 찾음
-            const messageElement = document.getElementById(`message-${index}`);
-            if (messageElement) {
-                // 부드러운 스크롤로 해당 메시지를 화면 중앙에 위치시킴
-                messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        };
-
-        /**
-         * 검색 실행 함수
-         * 입력된 검색어로 메시지 배열을 검색하고 결과를 하이라이트 처리
-         */
-        const handleSearch = () => {
-            if (!searchInput?.trim()) {
-                setFilteredMessages(originalMessages);
-                return;
-            }
-
-            const filtered = originalMessages.filter(msg =>
-                msg.content && msg.content.toLowerCase().includes(searchInput.toLowerCase())
-            );
-
-            setFilteredMessages(filtered);
-        };
-
-        /**
-         * 이전 검색 결과로 이동하는 함수
-         */
-        const goToPreviousHighlight = () => {
-            if (highlightedMessageIndexes.length === 0 || currentHighlightedIndex === null) {
-                return;
-            }
-
-            // 현재 인덱스가 0보다 크면 이전 인덱스로, 아니면 마지막 인덱스로 이동
-            const newIndex = currentHighlightedIndex > 0
-                ? currentHighlightedIndex - 1
-                : highlightedMessageIndexes.length - 1;
-
-            setCurrentHighlightedIndex(newIndex);
-            scrollToMessage(highlightedMessageIndexes[newIndex]);
-        };
-
-        /**
-         * 다음 검색 결과로 이동하는 함수
-         */
-        const goToNextHighlight = () => {
-            if (highlightedMessageIndexes.length === 0 || currentHighlightedIndex === null) {
-                return;
-            }
-
-            // 현재 인덱스가 마지막이 아니면 다음 인덱스로, 마지막이면 처음으로 이동
-            const newIndex = currentHighlightedIndex < highlightedMessageIndexes.length - 1
-                ? currentHighlightedIndex + 1
-                : 0;
-
-            setCurrentHighlightedIndex(newIndex);
-            scrollToMessage(highlightedMessageIndexes[newIndex]);
-        };
-
-        // 검색 모드 토글 함수 수정
-        const toggleSearchMode = () => {
-            const newMode = !isSearchMode;
-            setIsSearchMode(newMode);
-
-            if (!newMode) {
-                clearSearch();
-            }
-        };
-
-        /**
-         * 검색 상태를 초기화하는 함수
-         * 검색어, 하이라이트 인덱스, 검색 모드를 모두 초기화하고
-         * DOM에서 하이라이트 클래스를 제거
-         */
-        const clearSearch = () => {
-            setSearchInput('');
-            setFilteredMessages(originalMessages);
-            setIsSearchMode(false);
-        };
-
-        const handleGoBack = () => {
-            navigate(-1); // 이전 페이지로 이동
-        };
-
-        const RecommendationCard = ({ perfume, filters = [] }) => {
-            if (!perfume || Object.keys(perfume).length === 0) {
-                return <div className="chat-recommendation-card">추천된 향수 정보를 불러올 수 없습니다.</div>;
-            }
-
-            const lineId = perfume.lineId || null;
-
-            if (!Array.isArray(filters) || filters.length === 0) {
-                console.error("filters가 비어 있거나 배열이 아닙니다:", filters);
-                return <div className="chat-recommendation-card">필터 데이터를 불러올 수 없습니다.</div>;
-            }
-
-            if (!lineId) {
-                console.error("lineId를 찾을 수 없습니다. 전달된 perfume:", perfume);
-                return <div className="chat-recommendation-card">lineId가 없습니다.</div>;
-            }
-
-            const filter = filters.find((filter) => Number(filter.id) === Number(lineId));
-            const filterName = filter?.name || "N/A";
-
-            if (!filter) {
-                console.warn(`lineId (${lineId})에 해당하는 필터를 찾을 수 없습니다.`);
-            }
-
-            return (
-                <div className="chat-recommendation-card">
-                    <div className="chat-recommendation-content">
-                        <img className="chat-recommendation-perfume-image" src={perfume.perfumeImageUrl}></img>
-                        <p className="chat-recommendation-name"><strong className="recommendation-card-context">이름 :</strong> {perfume.perfumeName || 'N/A'}</p>
-                        <p className="chat-recommendation-line"><strong className="recommendation-card-context">계열 :</strong> {filterName}</p>
-                        <p className="chat-recommendation-brand"><strong className="recommendation-card-context">브랜드 :</strong> {perfume.perfumeBrand || 'N/A'}</p>
-                        <p className="chat-recommendation-reason"><strong className="recommendation-card-context">추천 이유 :</strong> {perfume.reason || 'N/A'}</p>
-                        <p className="chat-recommendation-situation"><strong className="recommendation-card-context">추천 상황 :</strong> {perfume.situation || 'N/A'}</p>
-                    </div>
-                </div>
-            );
-        };
-
-        const handleCreateScentCard = async (chatId) => {
-            try {
-                const cardData = await dispatch(createScentCard(chatId)); // 향기 카드 생성 요청
-                console.log("향기 카드 생성 성공:", cardData);
-
-                navigate('/history', {
-                    state: {
-                        recommendations: cardData.recommendations, // 추천 데이터 전달
-                    },
-                });
-            } catch (error) {
-                console.error("향기 카드 생성 실패:", error);
-            }
-        };
-
-        return {
-            chatMode,                       // 현재 채팅 모드
-            response,                       // 응답 데이터
-            recommendedPerfumes,            //  추천된 향수 배열
-            messages,                       // 채팅 메세지 배열
-            setMessages,
-            input,                          // 사용자 입력 값
-            setInput,
-            selectedImages,                 // 사용자가 업로드한 이미지 배열
-            setSelectedImages,
-            searchInput,                    // 검색 입력 값
-            setSearchInput,
-            color,                          // 현재 색상
-            setColor,
-            isDarkColor,                    // 현재 색상 어두운지 여부
-            highlightedMessageIndexes,      // 검색된 메세지 인덱스 배열
-            setHighlightedMessageIndexes,
-            currentHighlightedIndex,        // 현재 하이라이트 메세지 인덱스
-            setCurrentHighlightedIndex,
-            isSearchMode,                   // 검색 모드 활성화 여부
-            setIsSearchMode,
-            modalImage,                     // 모달에 표시할 이미지 URL
-            setModalImage,
-            isModalOpen,                    // 모달 열림 상태
-            setIsModalOpen,
-            fileInputRef,                   // 이미지 업로드 파일
-            isLoading,
-            setIsLoading,
-            isLoggedIn,                     // 로그인 여부
-            setIsLoggedIn,
-            hasReceivedRecommendation,      // 추천 결과 받은지 여부
-            setHasReceivedRecommendation,
-            showLoginModal,                 // 비회원 로그인 모달 표시
-            setShowLoginModal,
-            retryAvailable,                 // 재시도 버튼 활성화
-            setRetryAvailable,
-            messageEndRef,                  // 채팅 창 끝 부분 스크롤
-            getColorForCategory,            // 특정 카테고리 색상 변경
-            handleSendMessage,              // 사용자 메세지 전송 처리
-            handlePaste,                    // 붙여넣기
-            handleInputChange,              // 사용자 입력 값 변경
-            handleKeyPress,                 // 키보드 입력
-            handleImageUpload,              // 이미지 업로드 처리
-            handleRemoveImage,              // 업로드 이미지 삭제
-            openModal,                      // 이미지 모달
-            closeModal,
-            handleSearchChange,             // 검색 입력 값 변경
-            highlightSearch,                // 검색 단어 하이라이트
-            handleSearch,                   // 검색 실행
-            clearSearch,                    // 검색 초기화
-            scrollToMessage,                // 특정 메세지 스크롤
-            goToPreviousHighlight,          // 이전 하이라이트 이동
-            goToNextHighlight,              // 다음 하이라이트 이동
-            toggleSearchMode,               // 검색 모드 
-            handleGoBack,                   // 뒤로 가기
-            RecommendationCard,             // 추천 카드 렌더링
-            navigate,
-            handleCreateScentCard,          // 향기 카드 만들기
-            filters,
-            handleRetry,
-        };
-
+            addMessage();
+        } finally {
+            setIsLoading(false);
+        }
     };
+
+    const handlePaste = (event) => {
+        const items = event.clipboardData.items;
+        const images = [];
+
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.startsWith("image")) {
+                const file = items[i].getAsFile();
+                const url = URL.createObjectURL(file);
+                images.push({ url, file });
+            }
+        }
+
+        if (images.length > 0) {
+            setSelectedImages(prevImages => [...prevImages, ...images]);
+        }
+    };
+
+    const handleInputChange = (e) => setInput(e.target.value);
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSendMessage();
+            handleSearch();
+        }
+    };
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0]; // 첫 번째 파일만 가져옴
+        if (file) {
+            const newImage = {
+                url: URL.createObjectURL(file),
+                file: file
+            };
+            setSelectedImages([newImage]); // 새 이미지를 기존 이미지 대신 대체
+        }
+        e.target.value = ''; // 파일 입력 초기화
+    };
+
+    const handleRemoveImage = (index) => {
+        setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index));
+    };
+
+    const openModal = (imageSrc) => {
+        setModalImage(imageSrc);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setModalImage(null);
+    };
+
+    const handleSearchChange = (e) => {
+        setSearchInput(e.target.value);
+
+        if (e.target.value === '') {
+            clearSearch();
+        }
+    };
+
+    const highlightSearch = (text, query) => {
+        if (typeof text !== 'string') return '';
+
+        if (!query) return text;
+
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    };
+
+    const [originalMessages, setOriginalMessages] = useState([]); // 원본 메시지 저장
+    const [filteredMessages, setFilteredMessages] = useState([]); // 검색 결과 메시지
+
+    /**
+     * 특정 메시지 인덱스로 스크롤하는 함수
+     * @param {number} index - 스크롤할 메시지의 인덱스
+     */
+    const scrollToMessage = (index) => {
+        // 인덱스가 숫자가 아닌 경우 early return
+        if (typeof index !== 'number') return;
+
+        // 해당 인덱스의 메시지 요소를 찾음
+        const messageElement = document.getElementById(`message-${index}`);
+        if (messageElement) {
+            // 부드러운 스크롤로 해당 메시지를 화면 중앙에 위치시킴
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    /**
+     * 검색 실행 함수
+     * 입력된 검색어로 메시지 배열을 검색하고 결과를 하이라이트 처리
+     */
+    const handleSearch = () => {
+        if (!searchInput?.trim()) {
+            setFilteredMessages(originalMessages);
+            return;
+        }
+
+        const filtered = originalMessages.filter(msg =>
+            msg.content && msg.content.toLowerCase().includes(searchInput.toLowerCase())
+        );
+
+        setFilteredMessages(filtered);
+    };
+
+    /**
+     * 이전 검색 결과로 이동하는 함수
+     */
+    const goToPreviousHighlight = () => {
+        if (highlightedMessageIndexes.length === 0 || currentHighlightedIndex === null) {
+            return;
+        }
+
+        // 현재 인덱스가 0보다 크면 이전 인덱스로, 아니면 마지막 인덱스로 이동
+        const newIndex = currentHighlightedIndex > 0
+            ? currentHighlightedIndex - 1
+            : highlightedMessageIndexes.length - 1;
+
+        setCurrentHighlightedIndex(newIndex);
+        scrollToMessage(highlightedMessageIndexes[newIndex]);
+    };
+
+    /**
+     * 다음 검색 결과로 이동하는 함수
+     */
+    const goToNextHighlight = () => {
+        if (highlightedMessageIndexes.length === 0 || currentHighlightedIndex === null) {
+            return;
+        }
+
+        // 현재 인덱스가 마지막이 아니면 다음 인덱스로, 마지막이면 처음으로 이동
+        const newIndex = currentHighlightedIndex < highlightedMessageIndexes.length - 1
+            ? currentHighlightedIndex + 1
+            : 0;
+
+        setCurrentHighlightedIndex(newIndex);
+        scrollToMessage(highlightedMessageIndexes[newIndex]);
+    };
+
+    // 검색 모드 토글 함수 수정
+    const toggleSearchMode = () => {
+        const newMode = !isSearchMode;
+        setIsSearchMode(newMode);
+
+        if (!newMode) {
+            clearSearch();
+        }
+    };
+
+    /**
+     * 검색 상태를 초기화하는 함수
+     * 검색어, 하이라이트 인덱스, 검색 모드를 모두 초기화하고
+     * DOM에서 하이라이트 클래스를 제거
+     */
+    const clearSearch = () => {
+        setSearchInput('');
+        setFilteredMessages(originalMessages);
+        setIsSearchMode(false);
+    };
+
+    const handleGoBack = () => {
+        navigate(-1); // 이전 페이지로 이동
+    };
+
+    const RecommendationCard = ({ perfume, filters = [] }) => {
+        if (!perfume || Object.keys(perfume).length === 0) {
+            return <div className="chat-recommendation-card">추천된 향수 정보를 불러올 수 없습니다.</div>;
+        }
+
+        const lineId = perfume.lineId || null;
+
+        if (!Array.isArray(filters) || filters.length === 0) {
+            console.error("filters가 비어 있거나 배열이 아닙니다:", filters);
+            return <div className="chat-recommendation-card">필터 데이터를 불러올 수 없습니다.</div>;
+        }
+
+        if (!lineId) {
+            console.error("lineId를 찾을 수 없습니다. 전달된 perfume:", perfume);
+            return <div className="chat-recommendation-card">lineId가 없습니다.</div>;
+        }
+
+        const filter = filters.find((filter) => Number(filter.id) === Number(lineId));
+        const filterName = filter?.name || "N/A";
+
+        if (!filter) {
+            console.warn(`lineId (${lineId})에 해당하는 필터를 찾을 수 없습니다.`);
+        }
+
+        return (
+            <div className="chat-recommendation-card">
+                <div className="chat-recommendation-content">
+                    <img className="chat-recommendation-perfume-image" src={perfume.perfumeImageUrl}></img>
+                    <p className="chat-recommendation-name"><strong className="recommendation-card-context">이름 :</strong> {perfume.perfumeName || 'N/A'}</p>
+                    <p className="chat-recommendation-line"><strong className="recommendation-card-context">계열 :</strong> {filterName}</p>
+                    <p className="chat-recommendation-brand"><strong className="recommendation-card-context">브랜드 :</strong> {perfume.perfumeBrand || 'N/A'}</p>
+                    <p className="chat-recommendation-reason"><strong className="recommendation-card-context">추천 이유 :</strong> {perfume.reason || 'N/A'}</p>
+                    <p className="chat-recommendation-situation"><strong className="recommendation-card-context">추천 상황 :</strong> {perfume.situation || 'N/A'}</p>
+                </div>
+            </div>
+        );
+    };
+
+    const handleCreateScentCard = async (chatId) => {
+        try {
+            const cardData = await dispatch(createScentCard(chatId)); // 향기 카드 생성 요청
+            console.log("향기 카드 생성 성공:", cardData);
+
+            navigate('/history', {
+                state: {
+                    recommendations: cardData.recommendations, // 추천 데이터 전달
+                },
+            });
+        } catch (error) {
+            console.error("향기 카드 생성 실패:", error);
+        }
+    };
+
+    return {
+        chatMode,                       // 현재 채팅 모드
+        response,                       // 응답 데이터
+        recommendedPerfumes,            //  추천된 향수 배열
+        messages,                       // 채팅 메세지 배열
+        setMessages,
+        input,                          // 사용자 입력 값
+        setInput,
+        selectedImages,                 // 사용자가 업로드한 이미지 배열
+        setSelectedImages,
+        searchInput,                    // 검색 입력 값
+        setSearchInput,
+        color,                          // 현재 색상
+        setColor,
+        isDarkColor,                    // 현재 색상 어두운지 여부
+        highlightedMessageIndexes,      // 검색된 메세지 인덱스 배열
+        setHighlightedMessageIndexes,
+        currentHighlightedIndex,        // 현재 하이라이트 메세지 인덱스
+        setCurrentHighlightedIndex,
+        isSearchMode,                   // 검색 모드 활성화 여부
+        setIsSearchMode,
+        modalImage,                     // 모달에 표시할 이미지 URL
+        setModalImage,
+        isModalOpen,                    // 모달 열림 상태
+        setIsModalOpen,
+        fileInputRef,                   // 이미지 업로드 파일
+        isLoading,
+        setIsLoading,
+        isLoggedIn,                     // 로그인 여부
+        setIsLoggedIn,
+        hasReceivedRecommendation,      // 추천 결과 받은지 여부
+        setHasReceivedRecommendation,
+        showLoginModal,                 // 비회원 로그인 모달 표시
+        setShowLoginModal,
+        retryAvailable,                 // 재시도 버튼 활성화
+        setRetryAvailable,
+        messageEndRef,                  // 채팅 창 끝 부분 스크롤
+        getColorForCategory,            // 특정 카테고리 색상 변경
+        handleSendMessage,              // 사용자 메세지 전송 처리
+        handlePaste,                    // 붙여넣기
+        handleInputChange,              // 사용자 입력 값 변경
+        handleKeyPress,                 // 키보드 입력
+        handleImageUpload,              // 이미지 업로드 처리
+        handleRemoveImage,              // 업로드 이미지 삭제
+        openModal,                      // 이미지 모달
+        closeModal,
+        handleSearchChange,             // 검색 입력 값 변경
+        highlightSearch,                // 검색 단어 하이라이트
+        handleSearch,                   // 검색 실행
+        clearSearch,                    // 검색 초기화
+        scrollToMessage,                // 특정 메세지 스크롤
+        goToPreviousHighlight,          // 이전 하이라이트 이동
+        goToNextHighlight,              // 다음 하이라이트 이동
+        toggleSearchMode,               // 검색 모드 
+        handleGoBack,                   // 뒤로 가기
+        RecommendationCard,             // 추천 카드 렌더링
+        navigate,
+        handleCreateScentCard,          // 향기 카드 만들기
+        filters,
+        handleRetry,
+    };
+
+};
