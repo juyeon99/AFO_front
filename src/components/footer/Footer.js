@@ -57,7 +57,7 @@ const Footer = () => {
                                 <span className="separator">|</span>
                                 <a href="/perfumeList">향수 알아가기</a>
                                 <span className="separator">|</span>
-                                <a href="/recommend">맞춤 향수 추천</a>
+                                <a href="/chat">맞춤 향수 추천</a>
                                 <span className="separator">|</span>
                                 <a href="/history">향기 히스토리</a>
                                 <span className="separator">|</span>
