@@ -30,7 +30,7 @@ function Login() {
         if (code) {
             dispatch(handleOAuthKakao(code))
                 .then(() => {
-                    navigate('/');;
+                    navigate('/');
                 })
                 .catch(() => {
                     navigate('/fail'); // 실패 시 실패 페이지로 이동
