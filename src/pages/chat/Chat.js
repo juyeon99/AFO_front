@@ -186,7 +186,7 @@ function Chat() {
                                                             ></div>
                                                             <button
                                                                 className="chat-create-scent-card-button"
-                                                                onClick={() => handleCreateScentCard(msg.id)}
+                                                                onClick={() => handleCreateScentCard(msg.imageUrl)}
                                                             >
                                                                 향기 카드 만들기
                                                             </button>
