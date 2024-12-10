@@ -176,26 +176,6 @@ export const useChatLogic = () => {
         };
     }, []);
 
-    // useEffect(() => {
-    //     console.log("hasReceivedRecommendation 상태:", hasReceivedRecommendation);
-
-    //     // 비회원 여부 확인
-    //     const userData = localStorage.getItem('auth'); // 로컬스토리지에서 사용자 정보 가져오기
-    //     const isUserLoggedIn = !!userData;
-    //     const hasRecommendation = localStorage.getItem('hasReceivedRecommendation') === 'true';
-
-    //     setIsLoggedIn(isUserLoggedIn); // 로그인 상태 업데이트
-    //     setHasReceivedRecommendation(hasRecommendation); // 추천 상태 복원
-    //     console.log("로그인 상태:", isUserLoggedIn);
-
-    //     // 비회원이고 추천을 받은 경우 로그인 모달 표시
-    //     if (!isUserLoggedIn && hasRecommendation) {
-    //         setShowLoginModal(true);
-    //         setChatMode("recommendation"); // 추천 모드 유지
-    //     } else {
-    //         setChatMode("chat"); // 기본 모드는 chat
-    //     }
-    // }, []);
     useEffect(() => {
         const userData = localStorage.getItem('auth');
         const isUserLoggedIn = !!userData;
@@ -328,13 +308,9 @@ export const useChatLogic = () => {
                 type: 'USER',
                 content: input.trim() || '',  // 빈 문자열로 기본값 설정
                 images: selectedImages.map(img => img.url),
-                mode: chatMode
-                content: input.trim() || '',
-                images: selectedImages.map(img => img.imageUrl),
-                retryAvailable: false,
-                mode: chatMode  // 이 부분이 누락됨
+                mode: chatMode,
+                retryAvailable: false
             };
-
 
         setRetryAvailable(false);
         setIsLoading(true);
@@ -556,8 +532,6 @@ export const useChatLogic = () => {
     const goToPreviousHighlight = () => {
         if (highlightedMessageIndexes.length === 0 ||
             currentHighlightedIndex === null ||
-        if (highlightedMessageIndexes.length === 0 ||
-            currentHighlightedIndex === null ||
             currentHighlightedIndex === 0) { // 첫 번째 인덱스면 이전으로 못 감
             return;
         }
@@ -570,8 +544,6 @@ export const useChatLogic = () => {
 
 
     const goToNextHighlight = () => {
-        if (highlightedMessageIndexes.length === 0 ||
-            currentHighlightedIndex === null ||
         if (highlightedMessageIndexes.length === 0 ||
             currentHighlightedIndex === null ||
             currentHighlightedIndex === highlightedMessageIndexes.length - 1) { // 마지막 인덱스면 다음으로 못 감
