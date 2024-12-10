@@ -268,8 +268,8 @@ export const useChatLogic = () => {
 
         const newMessage = {
             ...message,
-            id: uuidv4(),
-            content: message.Content,
+            id: message.id || uuidv4(),
+            content: message.content || 'null',
             timestamp: new Date().toISOString(),
             mode: message.mode || 'chat'
         };

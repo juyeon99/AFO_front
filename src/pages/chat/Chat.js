@@ -206,12 +206,14 @@ function Chat() {
                                                             className="chat-avatar"
                                                         />
                                                         <div className="chat-message-text-wrapper">
-                                                            <p
-                                                                className="chat-message-text"
-                                                                dangerouslySetInnerHTML={{
-                                                                    __html: highlightSearch(msg.content, searchInput),
-                                                                }}
-                                                            ></p>
+                                                            {msg.content && (
+                                                                <p
+                                                                    className="chat-message-text"
+                                                                    dangerouslySetInnerHTML={{
+                                                                        __html: highlightSearch(msg.content, searchInput),
+                                                                    }}
+                                                                ></p>
+                                                            )}
                                                             <div
                                                                 className={`chat-color-bar ${color === '#FFFFFF'
                                                                     ? 'highlighted-border'
