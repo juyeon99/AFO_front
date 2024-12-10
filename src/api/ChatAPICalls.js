@@ -21,7 +21,6 @@ export const requestRecommendations = async (userInput, imageFile = null, userId
         throw new Error(error.response?.data?.message || "추천 요청 중 오류가 발생했습니다.");
     }
 };
-
 // 로그인한 회원의 채팅 내역 가져오기
 export const getChatHistory = async (memberId) => {
     try {

@@ -66,6 +66,8 @@ function Chat() {
         navigate,
         filteredMessages,
         handleCreateScentCard,
+        filters,
+        handleRetry,
     } = useChatLogic();
 
     return (
@@ -111,13 +113,13 @@ function Chat() {
                 <div className="chat-message-box" style={{ '--scroll-color': color }}>
                     <div className="chat-messages-container">
                         {/* 검색 모드일 경우 */}
-                        {isSearchMode && highlightedMessageIndexes.length > 0 ? (
-                            highlightedMessageIndexes.map((index) => (
+                        {isSearchMode && Array.isArray(filteredMessages) && filteredMessages.length > 0 ? (
+                            filteredMessages.map((msg, index) => (
                                 <div key={index} className="chat-search-result">
                                     <p
                                         className="chat-search-result-text"
                                         dangerouslySetInnerHTML={{
-                                            __html: highlightSearch(filteredMessages[index].text, searchInput),
+                                            __html: highlightSearch(msg.content || '', searchInput),
                                         }}
                                     ></p>
                                 </div>
@@ -139,10 +141,10 @@ function Chat() {
                                         {/* 추천 모드 렌더링 */}
                                         {msg.mode === 'recommendation' && msg.type === 'AI' && (
                                             <>
-                                                {msg.generatedImage && (
+                                                {msg.imageUrl && (
                                                     <div className="chat-recommendation-image">
                                                         <img
-                                                            src={msg.generatedImage}
+                                                            src={msg.imageUrl}
                                                             alt="추천 이미지"
                                                             className="generated-image"
                                                         />
@@ -157,17 +159,29 @@ function Chat() {
                                                                 className="chat-avatar"
                                                             />
                                                             <div className="chat-recommendations-wrapper">
-                                                                {msg.recommendations.map((perfume, idx) => (
-                                                                    <RecommendationCard
-                                                                        key={idx}
-                                                                        perfume={perfume}
-                                                                    />
-                                                                ))}
+                                                                {msg.recommendations.map((perfume, idx) => {
+                                                                    const lineId = msg.lineId || null;
+
+                                                                    if (!lineId) {
+                                                                        console.warn("lineId가 없습니다. msg:", msg);
+                                                                    }
+
+                                                                    // perfume 객체에 lineId를 추가하여 전달
+                                                                    const perfumeWithLineId = { ...perfume, lineId };
+
+                                                                    return (
+                                                                        <RecommendationCard
+                                                                            key={`${msg.id}-${idx}`}
+                                                                            perfume={perfumeWithLineId}
+                                                                            filters={filters}
+                                                                        />
+                                                                    );
+                                                                })}
                                                             </div>
                                                             <div
                                                                 className={`chat-color-bar ${color === '#FFFFFF'
-                                                                        ? 'highlighted-border'
-                                                                        : ''
+                                                                    ? 'highlighted-border'
+                                                                    : ''
                                                                     }`}
                                                                 style={{ backgroundColor: color }}
                                                             ></div>
@@ -196,13 +210,13 @@ function Chat() {
                                                             <p
                                                                 className="chat-message-text"
                                                                 dangerouslySetInnerHTML={{
-                                                                    __html: highlightSearch(msg.text, searchInput),
+                                                                    __html: highlightSearch(msg.content, searchInput),
                                                                 }}
                                                             ></p>
                                                             <div
                                                                 className={`chat-color-bar ${color === '#FFFFFF'
-                                                                        ? 'highlighted-border'
-                                                                        : ''
+                                                                    ? 'highlighted-border'
+                                                                    : ''
                                                                     }`}
                                                                 style={{ backgroundColor: color }}
                                                             ></div>
@@ -212,13 +226,13 @@ function Chat() {
                                                 {msg.type === 'USER' && (
                                                     <div
                                                         className={`chat-message-text-wrapper chat-user-message-wrapper ${msg.images &&
-                                                                msg.images.length > 0 &&
-                                                                msg.text
-                                                                ? 'with-image-and-text'
-                                                                : msg.images &&
-                                                                    msg.images.length > 0
-                                                                    ? 'with-image'
-                                                                    : 'without-image'
+                                                            msg.images.length > 0 &&
+                                                            msg.text
+                                                            ? 'with-image-and-text'
+                                                            : msg.images &&
+                                                                msg.images.length > 0
+                                                                ? 'with-image'
+                                                                : 'without-image'
                                                             }`}
                                                     >
                                                         {msg.images &&
@@ -231,18 +245,18 @@ function Chat() {
                                                                     onClick={() => openModal(image)}
                                                                 />
                                                             ))}
-                                                        {msg.text && (
+                                                        {msg.content && (
                                                             <p
                                                                 className="chat-message-text"
                                                                 dangerouslySetInnerHTML={{
-                                                                    __html: highlightSearch(msg.text, searchInput),
+                                                                    __html: highlightSearch(msg.content, searchInput),
                                                                 }}
                                                             ></p>
                                                         )}
                                                         <div
                                                             className={`chat-color-circle ${color === '#FFFFFF'
-                                                                    ? 'highlighted-border'
-                                                                    : ''
+                                                                ? 'highlighted-border'
+                                                                : ''
                                                                 }`}
                                                             style={{ backgroundColor: color }}
                                                         ></div>
@@ -253,6 +267,7 @@ function Chat() {
                                                                     onClick={() => {
                                                                         setRetryAvailable(false);
                                                                         handleSendMessage(true);
+                                                                        handleRetry(true);
                                                                     }}
                                                                 >
                                                                     재시도하기
@@ -267,7 +282,7 @@ function Chat() {
                                 ))}
 
                                 {/* 로딩 상태 표시 */}
-                                {loading && (
+                                {isLoading && (
                                     <div className="chat-message chat-bot-message">
                                         <img
                                             src="/images/logo-bot.png"
