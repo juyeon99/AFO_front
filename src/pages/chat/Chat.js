@@ -140,6 +140,11 @@ function Chat() {
                                         {/* 추천 모드 렌더링 */}
                                         {msg.mode === 'recommendation' && msg.type === 'AI' && (
                                             <>
+                                                <img
+                                                    src="/images/logo-bot.png"
+                                                    alt="Bot Avatar"
+                                                    className="chat-avatar"
+                                                />
                                                 {msg.imageUrl && (
                                                     <div className="chat-recommendation-image">
                                                         <img
@@ -152,11 +157,6 @@ function Chat() {
                                                 {Array.isArray(msg.recommendations) &&
                                                     msg.recommendations.length > 0 && (
                                                         <div className="chat-recommendations-container">
-                                                            <img
-                                                                src="/images/logo-bot.png"
-                                                                alt="Bot Avatar"
-                                                                className="chat-avatar"
-                                                            />
                                                             <div className="chat-recommendations-wrapper">
                                                                 {msg.recommendations.map((perfume, idx) => {
                                                                     const lineId = msg.lineId || null;
