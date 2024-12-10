@@ -45,7 +45,7 @@ export const useChatLogic = () => {
     const chatHistoryLoaded = useRef(false); // 기록 불러오기 여부
     const loading = useSelector(selectLoading);
     const [color, setColor] = useState('#D9D9D9');
-
+    const [filteredMessages, setFilteredMessages] = useState([]); // 검색 결과 메시지
 
     const filters = [
         { id: 1, name: 'Spicy', color: '#FF5757' },
@@ -115,17 +115,15 @@ export const useChatLogic = () => {
             dispatch(fetchChatHistory())
                 .then((history) => {
                     if (Array.isArray(history)) {
-                        const formattedHistory = history
-                            .filter(message => message.id && message.content)
-                            .map((message) => ({
-                                id: message.id || uuidv4(),
-                                type: message.type || "unknown", // 기본값 제공
-                                content: message.content || "(내용 없음)", // 기본값 제공
-                                lineId: message.lineId,
-                                recommendations: message.recommendations || [],
-                                imageUrl: message.imageUrl || null,
-                                mode: message.mode || "chat",
-                            }));
+                        const formattedHistory = history.map((message) => ({
+                            id: message.id || uuidv4(),
+                            type: message.type || "unknown",
+                            content: message.content || "",
+                            lineId: message.lineId,
+                            recommendations: message.recommendations || [],
+                            images: message.imageUrl ? [message.imageUrl] : [], // imageUrl 배열로 변환
+                            mode: message.mode || "chat",
+                        }));
                         // 초기 메시지와 히스토리를 결합하여 새로 설정
                         setMessages(prevMessages => {
                             const initialMessage = prevMessages[0]; // 초기 인사 메시지 보존
@@ -312,7 +310,7 @@ export const useChatLogic = () => {
                 id: uuidv4(),
                 type: 'USER',
                 content: input.trim() || '',
-                images: selectedImages.map(img => img.url),
+                images: selectedImages.map(img => img.imageUrl),
                 retryAvailable: false,
                 mode: chatMode  // 이 부분이 누락됨
             };
@@ -513,11 +511,20 @@ export const useChatLogic = () => {
     };
 
     const handleSearchChange = (e) => {
-        setSearchInput(e.target.value);
+        const query = e.target.value.trim().toLowerCase();
+        setSearchInput(query);
 
-        if (e.target.value === '') {
-            clearSearch();
+        // 검색어가 비어 있으면 검색 결과 초기화
+        if (!query) {
+            setFilteredMessages([]); // 검색 결과 초기화
+            return;
         }
+
+        const filtered = messages.filter((msg) =>
+            typeof msg.content === 'string' && msg.content.toLowerCase().includes(query)
+        );
+
+        setFilteredMessages(filtered); // 검색된 메시지 저장
     };
 
     const highlightSearch = (text, query) => {
@@ -530,8 +537,6 @@ export const useChatLogic = () => {
     };
 
     const [originalMessages, setOriginalMessages] = useState([]); // 원본 메시지 저장
-    const [filteredMessages, setFilteredMessages] = useState([]); // 검색 결과 메시지
-
     /**
          * 검색 실행 함수
          * 입력된 검색어로 메시지 배열을 검색하고 결과를 하이라이트 처리
@@ -541,7 +546,7 @@ export const useChatLogic = () => {
             setFilteredMessages(originalMessages);
             return;
         }
-    
+
         // 검색어에 해당하는 메시지들 찾기
         const matchingIndexes = messages.reduce((acc, msg, index) => {
             if (msg.content && msg.content.toLowerCase().includes(searchInput.toLowerCase())) {
@@ -549,9 +554,9 @@ export const useChatLogic = () => {
             }
             return acc;
         }, []);
-    
+
         setHighlightedMessageIndexes(matchingIndexes);
-    
+
         // 검색된 메시지들이 있다면 가장 마지막(최근) 메시지부터 시작
         if (matchingIndexes.length > 0) {
             const lastIndex = matchingIndexes.length - 1;
@@ -588,24 +593,24 @@ export const useChatLogic = () => {
     };
 
     const goToPreviousHighlight = () => {
-        if (highlightedMessageIndexes.length === 0 || 
-            currentHighlightedIndex === null || 
+        if (highlightedMessageIndexes.length === 0 ||
+            currentHighlightedIndex === null ||
             currentHighlightedIndex === 0) { // 첫 번째 인덱스면 이전으로 못 감
             return;
         }
-    
+
         const newIndex = currentHighlightedIndex - 1; // 이전(더 오래된) 메시지로 이동
         setCurrentHighlightedIndex(newIndex);
         scrollToMessage(highlightedMessageIndexes[newIndex]);
     };
-    
+
     const goToNextHighlight = () => {
-        if (highlightedMessageIndexes.length === 0 || 
-            currentHighlightedIndex === null || 
+        if (highlightedMessageIndexes.length === 0 ||
+            currentHighlightedIndex === null ||
             currentHighlightedIndex === highlightedMessageIndexes.length - 1) { // 마지막 인덱스면 다음으로 못 감
             return;
         }
-    
+
         const newIndex = currentHighlightedIndex + 1; // 다음(더 최근) 메시지로 이동
         setCurrentHighlightedIndex(newIndex);
         scrollToMessage(highlightedMessageIndexes[newIndex]);
@@ -628,15 +633,18 @@ export const useChatLogic = () => {
 
     // 검색 모드 토글 함수 수정
     const toggleSearchMode = () => {
-        const newMode = !isSearchMode;
-        setIsSearchMode(newMode);
+        setIsSearchMode((prevMode) => {
+            const newMode = !prevMode;
 
-        if (!newMode) {
-            clearSearch();
-        }
+            // 검색 모드가 꺼질 때만 검색 상태 초기화
+            if (!newMode) {
+                setFilteredMessages([]); // 검색 결과 초기화
+                setSearchInput(''); // 검색창 초기화
+            }
+
+            return newMode;
+        });
     };
-
-
 
     const handleGoBack = () => {
         navigate(-1); // 이전 페이지로 이동

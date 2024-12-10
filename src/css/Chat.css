@@ -560,11 +560,10 @@
 }
 
 .chat-recommendation-image {
-    width: 50px;
-    height: 50px;
+    text-align: center; /* 이미지를 중앙에 정렬 */
+    width: 70%; /* 카드 너비에 맞게 */
     object-fit: cover;
-    border-radius: 50%;
-    margin-right: 10px;
+    margin-left: 20px;
 }
 
 .chat-recommendation-perfume-image {
@@ -575,7 +574,7 @@
 .chat-recommendation-content {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 10px;
 }
 
 .chat-recommendation-name,
@@ -749,15 +748,8 @@
     background-color: #CDC6CE;
 }
 
-.chat-recommendation-image {
-    text-align: center; /* 이미지를 중앙에 정렬 */
-    margin-bottom: 90px; /* 카드와의 간격 */
-    width: 100%; /* 카드 너비에 맞게 */
-}
-
 .generated-image {
     width: 90%; /* 카드 너비의 90%로 설정 */
-    max-width: 370px; /* 최대 너비를 제한 */
     height: auto; /* 비율 유지 */
     margin: 0 auto 10px auto; /* 카드 위쪽에 여백 */
     border-radius: 8px; /* 모서리 둥글게 */
@@ -765,7 +757,6 @@
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* 적절한 그림자 */
     display: block; /* 블록 형태로 설정 */
     height: 150px;
-    transform: translateX(-10px);
 }
 
 .recommendation-card-context {
@@ -783,7 +774,7 @@
     border-radius: 5px;
     cursor: pointer;
     width: 200px;
-    margin: 0 auto;
+    margin-left: 70px;
     border: 1px solid #ccc;
 }
 
