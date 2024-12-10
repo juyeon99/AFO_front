@@ -105,7 +105,6 @@ function Chat() {
                             <button className="chat-arrow-button" onClick={goToPreviousHighlight} disabled={currentHighlightedIndex === 0}>▲</button>
                             <button className="chat-arrow-button" onClick={goToNextHighlight} disabled={currentHighlightedIndex === highlightedMessageIndexes.length - 1}>▼</button>
                             <button className="chat-clear-search-button" onClick={clearSearch}>X</button>
-                            <button className="chat-open-search-mode" onClick={toggleSearchMode}>통합검색</button>
                         </>
                     )}
                 </div>
@@ -179,7 +178,7 @@ function Chat() {
                                                                 })}
                                                             </div>
                                                             <div
-                                                                className={`chat-color-bar ${color === '#FFFFFF'
+                                                                className={`chat-color-bar-recommendation ${color === '#FFFFFF'
                                                                     ? 'highlighted-border'
                                                                     : ''
                                                                     }`}

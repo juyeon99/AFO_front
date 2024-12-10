@@ -92,12 +92,8 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    translate: -70px -70px;
-    width: 1300px;
-}
-
-.chat-search-bar.search-active .chat-search-button {
-    translate: -60px;
+    translate: 170px -70px;
+    width: 1000px;
 }
 
 .chat-search-input {
@@ -129,7 +125,7 @@
     border: none;
     font-size: 18px;
     cursor: pointer;
-    transform: translateX(-240px);
+    transform: translateX(-180px);
     /* 검색 버튼에 맞춘 위치 조정 */
 }
 
@@ -140,7 +136,7 @@
     font-size: 16px;
     cursor: pointer;
     color: #999;
-    transform: translateX(-240px);
+    transform: translateX(-180px);
     /* 검색 버튼에 맞춘 위치 조정 */
 }
 
@@ -273,6 +269,14 @@
 
 .chat-color-bar {
     width: 100%;
+    height: 5px;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+
+
+.chat-color-bar-recommendation {
+    width: 87%;
     height: 5px;
     margin-top: 5px;
     border-radius: 5px;
