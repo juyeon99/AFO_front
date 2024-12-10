@@ -3,8 +3,8 @@ import apis from "./Apis";
 // 채팅 추천 요청
 export const requestRecommendations = async (userInput, imageFile = null, userId = null) => {
     try {
-        if (!userInput?.trim()) {
-            throw new Error("사용자 입력이 비어 있습니다.");
+        if (!imageFile && (!userInput || !userInput.trim())) {
+            throw new Error("이미지 또는 사용자 입력 중 하나는 필수입니다.");
         }
 
         const formData = new FormData();

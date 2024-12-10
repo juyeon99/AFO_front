@@ -105,7 +105,6 @@ function Chat() {
                             <button className="chat-arrow-button" onClick={goToPreviousHighlight} disabled={currentHighlightedIndex === 0}>▲</button>
                             <button className="chat-arrow-button" onClick={goToNextHighlight} disabled={currentHighlightedIndex === highlightedMessageIndexes.length - 1}>▼</button>
                             <button className="chat-clear-search-button" onClick={clearSearch}>X</button>
-                            <button className="chat-open-search-mode" onClick={toggleSearchMode}>통합검색</button>
                         </>
                     )}
                 </div>
@@ -141,6 +140,11 @@ function Chat() {
                                         {/* 추천 모드 렌더링 */}
                                         {msg.mode === 'recommendation' && msg.type === 'AI' && (
                                             <>
+                                                <img
+                                                    src="/images/logo-bot.png"
+                                                    alt="Bot Avatar"
+                                                    className="chat-avatar"
+                                                />
                                                 {msg.imageUrl && (
                                                     <div className="chat-recommendation-image">
                                                         <img
@@ -153,11 +157,6 @@ function Chat() {
                                                 {Array.isArray(msg.recommendations) &&
                                                     msg.recommendations.length > 0 && (
                                                         <div className="chat-recommendations-container">
-                                                            <img
-                                                                src="/images/logo-bot.png"
-                                                                alt="Bot Avatar"
-                                                                className="chat-avatar"
-                                                            />
                                                             <div className="chat-recommendations-wrapper">
                                                                 {msg.recommendations.map((perfume, idx) => {
                                                                     const lineId = msg.lineId || null;
@@ -179,7 +178,7 @@ function Chat() {
                                                                 })}
                                                             </div>
                                                             <div
-                                                                className={`chat-color-bar ${color === '#FFFFFF'
+                                                                className={`chat-color-bar-recommendation ${color === '#FFFFFF'
                                                                     ? 'highlighted-border'
                                                                     : ''
                                                                     }`}
@@ -187,7 +186,7 @@ function Chat() {
                                                             ></div>
                                                             <button
                                                                 className="chat-create-scent-card-button"
-                                                                onClick={() => handleCreateScentCard(msg.id)}
+                                                                onClick={() => handleCreateScentCard(msg.imageUrl)}
                                                             >
                                                                 향기 카드 만들기
                                                             </button>

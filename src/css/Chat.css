@@ -42,6 +42,8 @@
     cursor: pointer;
     transition: transform 0.3s ease, color 0.3s ease;
     font-family: 'Nanum Myeongjo';
+    margin-left: 30px;
+    margin-top: 15px;
 }
 
 .chat-back-button:hover .chat-back-image {
@@ -52,8 +54,8 @@
 }
 
 .chat-back-image {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     transition: filter 0.3s ease, transform 0.3s ease;
 }
 
@@ -92,12 +94,8 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    translate: -70px -70px;
-    width: 1300px;
-}
-
-.chat-search-bar.search-active .chat-search-button {
-    translate: -60px;
+    translate: 170px -70px;
+    width: 1000px;
 }
 
 .chat-search-input {
@@ -129,7 +127,7 @@
     border: none;
     font-size: 18px;
     cursor: pointer;
-    transform: translateX(-240px);
+    transform: translateX(-180px);
     /* 검색 버튼에 맞춘 위치 조정 */
 }
 
@@ -140,7 +138,7 @@
     font-size: 16px;
     cursor: pointer;
     color: #999;
-    transform: translateX(-240px);
+    transform: translateX(-180px);
     /* 검색 버튼에 맞춘 위치 조정 */
 }
 
@@ -273,6 +271,14 @@
 
 .chat-color-bar {
     width: 100%;
+    height: 5px;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+
+
+.chat-color-bar-recommendation {
+    width: 87%;
     height: 5px;
     margin-top: 5px;
     border-radius: 5px;
@@ -757,6 +763,7 @@
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* 적절한 그림자 */
     display: block; /* 블록 형태로 설정 */
     height: 150px;
+    margin-bottom: 20px;
 }
 
 .recommendation-card-context {

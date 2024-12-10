@@ -26,6 +26,12 @@ export const handleOAuthKakao = (code) => async (dispatch) => {
     try {
         dispatch(setLoading(true));
         const authData = await handleOAuthKakaoAPI(code);
+
+        // role이 LEAVE인 경우 처리
+        if (authData.role === "LEAVE") {
+            throw new Error("탈퇴한 계정입니다. 로그인이 불가능합니다.");
+        }
+
         localStorage.setItem("auth", JSON.stringify(authData)); // 로컬 저장
         dispatch(loginSuccess(authData));
     } catch (error) {

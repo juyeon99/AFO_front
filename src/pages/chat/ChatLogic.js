@@ -110,31 +110,46 @@ export const useChatLogic = () => {
 
         if (isLoggedIn && !chatHistoryLoaded.current) {
             console.log("로그인 상태 - 히스토리 로딩 시도");
-            chatHistoryLoaded.current = true; // 히스토리 로드 상태 표시
+            chatHistoryLoaded.current = true;
 
             dispatch(fetchChatHistory())
                 .then((history) => {
                     if (Array.isArray(history)) {
-                        const formattedHistory = history.map((message) => ({
-                            id: message.id || uuidv4(),
-                            type: message.type || "unknown",
-                            content: message.content || "",
-                            lineId: message.lineId,
-                            recommendations: message.recommendations || [],
-                            images: message.imageUrl ? [message.imageUrl] : [], // imageUrl 배열로 변환
-                            mode: message.mode || "chat",
-                        }));
-                        // 초기 메시지와 히스토리를 결합하여 새로 설정
-                        setMessages(prevMessages => {
-                            const initialMessage = prevMessages[0]; // 초기 인사 메시지 보존
-                            return [initialMessage, ...formattedHistory];
+                        const formattedHistory = history.map((message) => {
+                            const baseMessage = {
+                                id: message.id || uuidv4(),
+                                type: message.type || "unknown",
+                                content: message.content || "",
+                                lineId: message.lineId,
+                                recommendations: message.recommendations || [],
+                                mode: message.mode || "chat",
+                            };
+
+                            // 메시지 타입에 따라 이미지 처리를 다르게 함
+                            if (message.type === "USER") {
+                                return {
+                                    ...baseMessage,
+                                    images: message.imageUrl ? [message.imageUrl] : [],  // 사용자 메시지는 images 배열 사용
+                                };
+                            } else if (message.type === "AI" && message.mode === "recommendation") {
+                                return {
+                                    ...baseMessage,
+                                    imageUrl: message.imageUrl,  // AI 추천은 imageUrl 사용
+                                };
+                            }
+
+                            return baseMessage;
                         });
 
+                        setMessages(prevMessages => {
+                            const initialMessage = prevMessages[0];
+                            return [initialMessage, ...formattedHistory];
+                        });
                     }
                 })
                 .catch((error) => {
                     console.error("채팅 기록 로드 실패:", error);
-                    chatHistoryLoaded.current = false; // 실패시 재시도 가능하도록 설정
+                    chatHistoryLoaded.current = false;
                 });
         }
     }, [isLoggedIn, dispatch]);
@@ -254,7 +269,7 @@ export const useChatLogic = () => {
         const newMessage = {
             ...message,
             id: uuidv4(),
-            content: messageContent,
+            content: message.Content,
             timestamp: new Date().toISOString(),
             mode: message.mode || 'chat'
         };
@@ -490,9 +505,7 @@ export const useChatLogic = () => {
             return acc;
         }, []);
 
-
         setHighlightedMessageIndexes(matchingIndexes);
-
 
         // 검색된 메시지들이 있다면 가장 마지막(최근) 메시지부터 시작
         if (matchingIndexes.length > 0) {
@@ -503,10 +516,10 @@ export const useChatLogic = () => {
     };
 
     /**
- * 검색 상태를 초기화하는 함수
- * 검색어, 하이라이트 인덱스, 검색 모드를 모두 초기화하고
- * DOM에서 하이라이트 클래스를 제거
- */
+    * 검색 상태를 초기화하는 함수
+    * 검색어, 하이라이트 인덱스, 검색 모드를 모두 초기화하고
+    * DOM에서 하이라이트 클래스를 제거
+    */
     const clearSearch = () => {
         setSearchInput('');
         setFilteredMessages(originalMessages);
