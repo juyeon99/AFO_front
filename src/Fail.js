@@ -1,19 +1,19 @@
 import React from "react";
 import "./css/Login.css";
+import { useNavigate } from 'react-router-dom';
 
 function ErrorScreen({ errorMessage, onRetry, errorType }) {
+
+    const navigate = useNavigate();
+
     const renderErrorContent = () => {
         switch (errorType) {
             case "LEAVE_ACCOUNT":
                 return (
                     <div className="error-content">
                         <p>탈퇴한 계정입니다. 로그인이 불가능합니다.</p>
-                        <p>궁금한 사항이 있으면 고객센터에 문의하세요.</p>
-                        <button
-                            className="retry-button"
-                            onClick={() => (window.location.href = "/contact")}
-                        >
-                            고객센터로 이동
+                        <button className="retry-button" onClick={() => navigate('/')}>
+                            다시 시도하기
                         </button>
                     </div>
                 );
