@@ -195,8 +195,8 @@ function History() {
                                         alt={card.perfume || "Default Image"}
                                         className="card-image" />
                                     <div className="card-content">
-                                        <h3 className="card-perfume-brand">{card.perfumeBrand}</h3>
                                         <h3 className="card-perfume-name">{card.perfumeName}</h3>
+                                        <h3 className="card-perfume-brand">{card.perfumeBrand}</h3>
                                         <hr className="divider" />
                                         <p className="card-description"><strong>추천 이유:</strong> {card.reason}</p>
                                         <p className="card-description"><strong>추천 상황:</strong> {card.situation}</p>
