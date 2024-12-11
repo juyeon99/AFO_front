@@ -184,6 +184,7 @@
     /* 텍스트 줄 바꿈 방지 */
     display: inline-block;
     /* 가로 정렬 유지 */
+    cursor: pointer;
 }
 
 .sidebar-bottom-links {
