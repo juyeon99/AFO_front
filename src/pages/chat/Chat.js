@@ -227,26 +227,24 @@ function Chat() {
                                                 )}
                                                 {msg.type === 'USER' && (
                                                     <div
-                                                        className={`chat-message-text-wrapper chat-user-message-wrapper ${msg.images &&
-                                                            msg.images.length > 0 &&
-                                                            msg.text
-                                                            ? 'with-image-and-text'
-                                                            : msg.images &&
-                                                                msg.images.length > 0
-                                                                ? 'with-image'
-                                                                : 'without-image'
+                                                        className={`chat-message-text-wrapper chat-user-message-wrapper ${msg.images && msg.images.length > 0 && msg.content
+                                                            ? 'with-image-and-text' // 이미지와 텍스트가 둘 다 있을 때 적용되는 클래스
+                                                            : msg.images && msg.images.length > 0
+                                                                ? 'with-image' // 이미지만 있을 때 적용되는 클래스
+                                                                : msg.content
+                                                                    ? 'with-text' // 텍스트만 있을 때 적용되는 클래스
+                                                                    : 'without-image' // 이미지나 텍스트가 없을 때
                                                             }`}
                                                     >
-                                                        {msg.images &&
-                                                            msg.images.map((image, idx) => (
-                                                                <img
-                                                                    key={idx}
-                                                                    src={image}
-                                                                    alt="Uploaded"
-                                                                    className="chat-uploaded-image"
-                                                                    onClick={() => openModal(image)}
-                                                                />
-                                                            ))}
+                                                        {msg.images && msg.images.map((image, idx) => (
+                                                            <img
+                                                                key={idx}
+                                                                src={image}
+                                                                alt="Uploaded"
+                                                                className="chat-uploaded-image"
+                                                                onClick={() => openModal(image)}
+                                                            />
+                                                        ))}
                                                         {msg.content && (
                                                             <p
                                                                 className="chat-message-text"
@@ -278,6 +276,7 @@ function Chat() {
                                                         )}
                                                     </div>
                                                 )}
+
                                             </>
                                         )}
                                     </div>
