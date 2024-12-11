@@ -185,12 +185,14 @@ function Chat() {
                                                                     }`}
                                                                 style={{ backgroundColor: color }}
                                                             ></div>
-                                                            <button
-                                                                className="chat-create-scent-card-button"
-                                                                onClick={() => handleCreateScentCard(msg.imageUrl)}
-                                                            >
-                                                                향기 카드 만들기
-                                                            </button>
+                                                            {localStorage.getItem('auth') && (
+                                                                <button
+                                                                    className="chat-create-scent-card-button"
+                                                                    onClick={() => handleCreateScentCard(msg.imageUrl)}
+                                                                >
+                                                                    향기 카드 만들기
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     )}
                                             </>
