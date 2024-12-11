@@ -69,14 +69,15 @@
     display: grid;
     grid-template-columns: repeat(8, auto);
     justify-content: space-between;
-    gap: 10px;
+    row-gap: 20px;
+    column-gap: 30px;
     width: 60%;
     transform: translateY(-40px);
     position: relative;
 }
 
 .spices-filter-item {
-    width: 80px;
+    width: 100px;
     height: 35px;
     padding: 10px 20px;
     border: 1px solid #000000;

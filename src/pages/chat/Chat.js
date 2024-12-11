@@ -151,6 +151,7 @@ function Chat() {
                                                             src={msg.imageUrl}
                                                             alt="추천 이미지"
                                                             className="generated-image"
+                                                            onClick={() => openModal(msg.imageUrl)}
                                                         />
                                                     </div>
                                                 )}
