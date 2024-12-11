@@ -69,9 +69,10 @@ function History() {
                     imageUrl: item.imageUrl,
                     lineId: item.lineId,
                 })),
-            }));
+            })).sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp)); // 최신순 정렬
 
             const dates = [...new Set(mapped.map((item) => formatDate(item.timeStamp)))];
+            dates.sort((a, b) => new Date(b) - new Date(a)); // 날짜 최신순 정렬
 
             setMappedHistory(mapped);
             setUniqueDates(dates);
