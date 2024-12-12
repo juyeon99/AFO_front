@@ -113,7 +113,7 @@ const SpicesList = () => {
         { name: 'Floral', color: '#FF80C1' },
         { name: 'Oriental', color: '#C061FF' },
         { name: 'Powdery', color: '#FFFFFF' },
-        { name: 'Tobacco Leather', color: '#000000' },
+        { name: 'Tabacco Leather', color: '#000000' },
     ];
 
     // 라인 별 색깔
