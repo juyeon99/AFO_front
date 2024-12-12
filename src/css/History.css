@@ -29,7 +29,7 @@ body {
     margin-top: 10px;
     position: relative; /* 아래 선을 중앙 정렬할 수 있도록 relative로 설정 */
     width: 80%; /* 전체 너비의 80% */
-    font-family: 'Nanum Myeongjo';
+    font-family: "Gowun Batang", serif;
 }
 
 .empty-history-message{
@@ -40,7 +40,7 @@ body {
 }
 
 .history-date-button {
-    font-family: 'Nanum Myeongjo', serif;
+    font-family: "Gowun Batang", serif;
     background: none;
     border: none;
     font-size: 1rem;
@@ -76,8 +76,8 @@ body {
 /* 제목 스타일 */
 .history-main-title{
     font-size: 1.2rem;
-    font-family: 'Nanum Gothic', sans-serif;
-    font-weight: 500;
+    font-family: "Gowun Batang", serif;
+    font-weight: bold;
 }
 
 .history-title {
@@ -85,6 +85,7 @@ body {
     font-weight: bold;
     text-align: center;
     margin-bottom: 20px;
+    font-family: "Gowun Batang", serif;
 }
 
 /* 카드 컨테이너 */
@@ -132,12 +133,14 @@ body {
     font-weight: bold;
     color: #000000;
     margin-top: 30px;
+    font-family: "Gowun Batang", serif;
 }
 .card-perfume-brand{
     font-size: 1rem;
     font-weight: bold;
     color: #000000;
     margin-top: -8px;
+    font-family: "Gowun Batang", serif;
 }
 
 /* 설명 텍스트 사이의 가로 선 */

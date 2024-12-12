@@ -21,7 +21,7 @@
 }
 
 .spices-title {
-    font-family: 'NanumMyeongjo', serif;
+    font-family: "Gowun Batang", serif;
     font-size: 24px;
     font-weight: bold;
 }
@@ -82,7 +82,7 @@
     padding: 10px 20px;
     border: 1px solid #000000;
     border-radius: 35px;
-    font-family: 'NanumMyeongjo', serif;
+    font-family: "Gowun Batang", serif;
     font-size: 14px;
     text-align: center;
     display: flex;
@@ -181,14 +181,14 @@
 }
 
 .spices-name {
-    font-family: 'NanumMyeongjo', serif;
+    font-family: "Gowun Batang", serif;
     font-size: 18px;
     text-align: center;
     margin-bottom: 10px;
 }
 
 .spices-nameKr {
-    font-family: 'NanumMyeongjo', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 12px;
     text-align: center;
     margin-bottom: 10px;
