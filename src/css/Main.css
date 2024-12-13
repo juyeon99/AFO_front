@@ -203,13 +203,15 @@ body {
     justify-content: center;
     gap: 50px;
     margin: 20px;
+    align-items: center;
 }
 
 .additional-image {
-    width: 30%;
+    width: 40%;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 80px;
+    height: 20%;
 }
 
 .highlight {
