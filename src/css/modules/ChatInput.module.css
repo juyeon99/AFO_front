@@ -1,0 +1,96 @@
+.inputAreaWrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #EFEDED;
+    padding: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.inputArea {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 8px;
+    background: transparent;
+}
+
+.fileUpload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.uploadIcon {
+    width: 24px;
+    height: 24px;
+}
+
+.sendButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.imagePreviewContainer {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    max-width: 100%;
+    position: absolute;
+    translate: 150px -150px;
+    justify-content: center;
+}
+
+.imagePreviewCard {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    max-width: 200px;
+    translate: -20px -60px;
+}
+
+.imagePreview {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.removeImageButton {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

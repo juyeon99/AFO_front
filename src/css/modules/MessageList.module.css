@@ -1,0 +1,59 @@
+.messagesContainer {
+    height: calc(100vh - 200px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;  /* 메시지 간격 더 넓게 */
+    padding: 40px;  /* 전체 패딩 증가 */
+}
+
+.message {
+    display: flex;
+    width: 100%;  /* 전체 너비 사용 */
+    min-height: 60px;  /* 최소 높이 설정 */
+}
+
+.userMessage {
+    justify-content: flex-end;
+}
+
+.botMessage {
+    justify-content: flex-start;
+}
+
+.messageContent {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 20px;  /* 글자 크기 더 크게 */
+    line-height: 1.6;
+    max-width: 1000px;  /* 메시지 내용 최대 너비 증가 */
+    padding: 0 20px;  /* 좌우 여백 */
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.uploadedImage {
+    max-width: 350px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+/* 스크롤바 스타일링 */
+.messagesContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+.messagesContainer::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messagesContainer::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 4px;
+}

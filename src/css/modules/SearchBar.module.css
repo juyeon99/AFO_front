@@ -1,0 +1,41 @@
+.searchBar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    translate: 80px 60px;
+}
+
+.searchActive {
+    translate: 170px -70px;
+    width: 1000px;
+}
+
+.searchInactive {
+    translate: 85px -70px;
+}
+
+.searchInput {
+    width: 25%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+}
+
+.searchButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    transform: translateX(-60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.searchIcon {
+    width: 25px;
+    height: 25px;
+}
