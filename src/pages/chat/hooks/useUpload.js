@@ -20,7 +20,7 @@ export const useUpload = () => {
         }
     };
 
-    const handleRemoveImage = (index) => {
+    const handleRemoveImage = () => {
         setSelectedImages([]);
         if (fileInputRef.current) {
             fileInputRef.current.value = ''; // 파일 입력 초기화
@@ -32,7 +32,8 @@ export const useUpload = () => {
             input: {
                 handleImageUpload,
                 handleRemoveImage,
-                fileInputRef
+                fileInputRef,
+                selectedImages
             },
             preview: {
                 selectedImages

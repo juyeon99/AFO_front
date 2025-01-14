@@ -22,9 +22,7 @@ const ChatHeader = memo(({ onGoBack }) => {
             </NavLink>
 
             <p className={styles.subtitle}>
-                일상의 순간을 향으로 기록해보세요. <br />
-                원하는 향의 느낌을 이미지 또는 텍스트로 작성하면,
-                센티크가 향을 추천해 줄거예요 :)
+                일상의 순간을 향으로 기록해보세요.
             </p>
         </div>
     );

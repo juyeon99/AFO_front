@@ -5,37 +5,70 @@ import { useState, useCallback } from 'react';
  */
 export const useSearch = (messages) => {
     const [searchInput, setSearchInput] = useState('');
-    const [highlightedIndexes, setHighlightedIndexes] = useState([]);
-    const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0);
+    const [filteredMessages, setFilteredMessages] = useState([]);
+    const [highlightedMessageIndexes, setHighlightedMessageIndexes] = useState([]);
+    const [currentHighlightedIndex, setCurrentHighlightedIndex] = useState(null);
+    const [isSearchMode, setIsSearchMode] = useState(false);
 
-    const handleSearch = useCallback(() => {
+    const handleSearchChange = (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        setSearchInput(query);
+        
+        if (!query) {
+            setFilteredMessages([]);
+            return;
+        }
+
+        const filtered = messages.filter(msg => 
+            typeof msg.content === 'string' && 
+            msg.content.toLowerCase().includes(query)
+        );
+        setFilteredMessages(filtered);
+    };
+
+    const handleSearch = () => {
         if (!searchInput) return;
 
-        const newHighlightedIndexes = messages
-            .map((msg, index) => msg.content?.includes(searchInput) ? index : -1)
-            .filter(index => index !== -1);
+        const matchingIndexes = messages.reduce((acc, msg, index) => {
+            if (msg.content?.toLowerCase().includes(searchInput.toLowerCase())) {
+                acc.push(index);
+            }
+            return acc;
+        }, []);
 
-        setHighlightedIndexes(newHighlightedIndexes);
-        setCurrentHighlightIndex(0);
-    }, [searchInput, messages]);
+        setHighlightedMessageIndexes(matchingIndexes);
+        if (matchingIndexes.length > 0) {
+            setCurrentHighlightedIndex(matchingIndexes.length - 1);
+        }
+    };
 
-    const clearSearch = useCallback(() => {
+    const clearSearch = () => {
         setSearchInput('');
-        setHighlightedIndexes([]);
-        setCurrentHighlightIndex(0);
-    }, []);
+        setFilteredMessages([]);
+        setIsSearchMode(false);
+        setHighlightedMessageIndexes([]);
+        setCurrentHighlightedIndex(null);
+    };
+
+    const toggleSearchMode = () => {
+        setIsSearchMode(prev => !prev);
+    };
 
     return {
         searchProps: {
             controls: {
                 searchInput,
                 setSearchInput,
+                handleSearchChange,
                 handleSearch,
-                clearSearch
+                clearSearch,
+                isSearchMode,
+                toggleSearchMode
             },
             highlighting: {
-                highlightedIndexes,
-                currentHighlightIndex
+                highlightedMessageIndexes,
+                currentHighlightedIndex,
+                filteredMessages
             }
         }
     };

@@ -4,11 +4,11 @@ import LoadingDots from './LoadingDots';
 import styles from '../../../css/modules/MessageList.module.css';
 
 const MessageList = memo(({
-    messages,
-    isLoading,
-    highlightedIndexes,
+    messages = [],
+    isLoading = false,
+    highlightedIndexes = [],
     currentHighlightIndex,
-    searchInput
+    searchInput = ''
 }) => {
     return (
         <div className={styles.messageBox}>
@@ -16,9 +16,11 @@ const MessageList = memo(({
                 {messages.map((message, index) => (
                     <div
                         key={message.id}
-                        className={`${styles.message} ${message.type === 'AI' ? styles.botMessage : styles.userMessage
-                            }`}
+                        className={`${styles.message} ${
+                            message.type === 'USER' ? styles.userMessage : styles.botMessage
+                        }`}
                     >
+                        {/* AI 메시지일 때는 항상 로고 표시 */}
                         {message.type === 'AI' && (
                             <img
                                 src="/images/logo-bot.png"
@@ -26,9 +28,14 @@ const MessageList = memo(({
                                 className={styles.avatar}
                             />
                         )}
-                        <div className={styles.messageContent}>
-                            {message.imageUrl && (
-                                <div className={styles.imageContainer}>
+                        <div className={styles.messageWrapper}>
+                            <div className={styles.messageContent}>
+                                <p className={styles.messageText}>
+                                    {message.content}
+                                </p>
+                            </div>
+                            {message.type === 'USER' && message.imageUrl && (
+                                <div className={styles.imageWrapper}>
                                     <img
                                         src={message.imageUrl}
                                         alt="Uploaded"
@@ -36,34 +43,10 @@ const MessageList = memo(({
                                     />
                                 </div>
                             )}
-                            <MessageItem
-                                message={message}
-                                isHighlighted={
-                                    highlightedIndexes.includes(index) &&
-                                    index === currentHighlightIndex
-                                }
-                                searchInput={searchInput}
-                            />
-                            {message.uploadedImage && (
-                                <div className={styles.uploadedImage}>
-                                    <img
-                                        src={message.uploadedImage}
-                                        alt="Uploaded"
-                                        className={styles.uploadedImage}
-                                    />
-                                </div>
-                            )}
-                            {message.recommendations && (
-                                <div className={styles.recommendationCard}>
-                                    <img
-                                        src={message.perfumeImage}
-                                        alt="Perfume"
-                                        className={styles.perfumeImage}
-                                    />
-                                    {/* 추천 정보 표시 */}
-                                </div>
-                            )}
                         </div>
+                        {message.type === 'USER' && (
+                            <div className={styles.colorCircle} />
+                        )}
                     </div>
                 ))}
                 {isLoading && <LoadingDots />}

@@ -12,9 +12,20 @@ export const useMessages = () => {
         id: uuidv4(),
         type: 'AI',
         content: '안녕하세요. 센티크입니다. 당신에게 어울리는 향을 찾아드리겠습니다.',
-        mode: 'chat'
+        mode: 'chat',
+        isInitialMessage: true
     }]);
+
+    // 채팅 모드 관련 상태
+    const [chatMode, setChatMode] = useState("chat");
+    const [recommendedPerfumes, setRecommendedPerfumes] = useState([]);
+    const [hasReceivedRecommendation, setHasReceivedRecommendation] = useState(false);
+    const [nonMemberChatCount, setNonMemberChatCount] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+    const [retryAvailable, setRetryAvailable] = useState(false);
+
+    // 색상 관련 상태
+    const [color, setColor] = useState('#D9D9D9');
 
     const addMessage = async (content, imageUrl = null) => {
         // 사용자 메시지 추가
@@ -53,9 +64,35 @@ export const useMessages = () => {
         }
     };
 
+    const handleRetry = () => {
+        if (retryAvailable && messages[messages.length - 1]?.type === 'USER') {
+            addMessage(messages[messages.length - 1].content, messages[messages.length - 1].imageUrl);
+        }
+    };
+
+    const getColorForCategory = (lineId, filters) => {
+        if (!lineId) return '#D9D9D9';
+        const filter = filters.find(f => Number(f.id) === Number(lineId));
+        return filter?.color || '#D9D9D9';
+    };
+
     return {
         messages,
+        setMessages,
+        chatMode,
+        setChatMode,
+        recommendedPerfumes,
+        setRecommendedPerfumes,
+        hasReceivedRecommendation,
+        setHasReceivedRecommendation,
+        nonMemberChatCount,
+        setNonMemberChatCount,
         isLoading,
-        addMessage
+        retryAvailable,
+        color,
+        setColor,
+        addMessage,
+        handleRetry,
+        getColorForCategory
     };
 };

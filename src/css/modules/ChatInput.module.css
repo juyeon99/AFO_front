@@ -6,6 +6,7 @@
     background-color: #EFEDED;
     padding: 20px;
     border-top: 1px solid #e0e0e0;
+    position: relative;
 }
 
 .inputArea {
@@ -49,13 +50,15 @@
 }
 
 .imagePreviewContainer {
-    display: flex;
-    gap: 10px;
-    padding: 10px 0;
-    max-width: 100%;
     position: absolute;
-    translate: 150px -150px;
-    justify-content: center;
+    bottom: 100%; /* 입력창 바로 위에 위치 */
+    left: 0;
+    right: 0;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    z-index: 1000;
 }
 
 .imagePreviewCard {
@@ -67,15 +70,13 @@
     border-radius: 10px;
     background-color: #f9f9f9;
     max-width: 200px;
-    translate: -20px -60px;
 }
 
 .imagePreview {
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
     object-fit: cover;
-    border-radius: 5px;
-    margin-right: 10px;
+    border-radius: 8px;
 }
 
 .removeImageButton {

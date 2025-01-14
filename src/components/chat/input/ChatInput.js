@@ -14,30 +14,22 @@ const ChatInput = memo(({
     fileInputRef
 }) => {
     const [input, setInput] = useState('');
-    const [previewUrls, setPreviewUrls] = useState([]);
 
-    // 이미지가 변경될 때마다 미리보기 URL 업데이트
-    // React.useEffect(() => {
-    //     if (selectedImages.length > 0) {
-    //         // const urls = selectedImages.map(image => URL.createObjectURL(image));
-    //         setPreviewUrls(urls);
-
-    //         // cleanup function
-    //         return () => urls.forEach(url => URL.revokeObjectURL(url));
-    //     }
-    // }, [selectedImages]);
-
-    // input 변경 핸들러 추가
+    // handleInputChange 함수 추가
     const handleInputChange = (e) => {
         setInput(e.target.value);
     };
 
+
     // 메시지 전송 핸들러
     const handleSendMessage = () => {
         if (input.trim() || selectedImages.length > 0) {
-            const imageToSend = selectedImages.length > 0 ? selectedImages[0] : null;
-            onSend(input, imageToSend);
-            setInput('');  // 입력창 초기화
+            // 하나의 이미지만 전송
+            const imageUrl = selectedImages.length > 0 ? selectedImages[0] : null;
+
+            onSend(input, imageUrl);
+            setInput('');
+            handleRemoveImage(); // 이미지 초기화
         }
     };
 
@@ -85,7 +77,7 @@ const ChatInput = memo(({
 
                 <button
                     className={styles.sendButton}
-                    onClick={onSend}
+                    onClick={handleSendMessage}
                     disabled={!input.trim() && selectedImages.length === 0}
                 >
                     ➤
