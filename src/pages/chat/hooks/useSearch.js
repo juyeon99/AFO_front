@@ -1,7 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
 /**
- * 검색 기능을 위한 커스텀 훅
+ * 채팅 내용을 검색하는 Hook
+ * 
+ * 이 Hook으로 할 수 있는 것들:
+ * 1. 채팅 내용에서 원하는 단어 찾기
+ * 2. 검색된 메시지 강조 표시하기
+ * 3. 검색 결과 사이를 위아래로 이동하기
  */
 export const useSearch = (messages) => {
     const [searchInput, setSearchInput] = useState('');
@@ -10,66 +15,65 @@ export const useSearch = (messages) => {
     const [currentHighlightedIndex, setCurrentHighlightedIndex] = useState(null);
     const [isSearchMode, setIsSearchMode] = useState(false);
 
-    const handleSearchChange = (e) => {
-        const query = e.target.value.toLowerCase().trim();
-        setSearchInput(query);
-        
-        if (!query) {
-            setFilteredMessages([]);
+    // 검색 실행
+    const handleSearch = () => {
+        if (!searchInput.trim()) {
+            setHighlightedMessageIndexes([]);
+            setCurrentHighlightedIndex(null);
+            setIsSearchMode(false);
             return;
         }
 
-        const filtered = messages.filter(msg => 
-            typeof msg.content === 'string' && 
-            msg.content.toLowerCase().includes(query)
-        );
-        setFilteredMessages(filtered);
-    };
+        setIsSearchMode(true);
 
-    const handleSearch = () => {
-        if (!searchInput) return;
+        // 메시지 내용에서 검색어 찾기
+        const matchingIndexes = messages.filter(msg => msg.content)  // content가 있는 메시지만 필터링
+            .reduce((acc, msg, index) => {
+                const content = msg.content.toLowerCase();
+                const searchTerm = searchInput.toLowerCase();
 
-        const matchingIndexes = messages.reduce((acc, msg, index) => {
-            if (msg.content?.toLowerCase().includes(searchInput.toLowerCase())) {
-                acc.push(index);
-            }
-            return acc;
-        }, []);
+                if (content.includes(searchTerm)) {
+                    acc.push(index);
+                }
+                return acc;
+            }, []);
 
         setHighlightedMessageIndexes(matchingIndexes);
-        if (matchingIndexes.length > 0) {
-            setCurrentHighlightedIndex(matchingIndexes.length - 1);
+        setCurrentHighlightedIndex(matchingIndexes.length > 0 ? 0 : null);
+    };
+
+    // 이전 검색 결과로 이동
+    const goToPreviousHighlight = () => {
+        if (currentHighlightedIndex > 0) {
+            setCurrentHighlightedIndex(prev => prev - 1);
         }
     };
 
+    // 다음 검색 결과로 이동
+    const goToNextHighlight = () => {
+        if (currentHighlightedIndex < highlightedMessageIndexes.length - 1) {
+            setCurrentHighlightedIndex(prev => prev + 1);
+        }
+    };
+
+    // 검색 초기화
     const clearSearch = () => {
         setSearchInput('');
         setFilteredMessages([]);
-        setIsSearchMode(false);
         setHighlightedMessageIndexes([]);
         setCurrentHighlightedIndex(null);
-    };
-
-    const toggleSearchMode = () => {
-        setIsSearchMode(prev => !prev);
+        setIsSearchMode(false);
     };
 
     return {
-        searchProps: {
-            controls: {
-                searchInput,
-                setSearchInput,
-                handleSearchChange,
-                handleSearch,
-                clearSearch,
-                isSearchMode,
-                toggleSearchMode
-            },
-            highlighting: {
-                highlightedMessageIndexes,
-                currentHighlightedIndex,
-                filteredMessages
-            }
-        }
+        searchInput,
+        setSearchInput,
+        handleSearch,
+        goToPreviousHighlight,
+        goToNextHighlight,
+        clearSearch,
+        currentHighlightedIndex,
+        highlightedMessageIndexes,
+        isSearchMode
     };
 };

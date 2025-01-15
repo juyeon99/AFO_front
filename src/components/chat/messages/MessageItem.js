@@ -2,15 +2,29 @@ import React, { memo } from 'react';
 import styles from '../../../css/modules/MessageItem.module.css';
 
 /**
- * 개별 메시지 아이템을 렌더링하는 컴포넌트
- * @param {Object} message - 메시지 데이터 객체
- * @param {boolean} isHighlighted - 검색 결과 하이라이트 여부
- * @param {string} searchInput - 검색어
+ * 채팅 메시지의 개별 항목을 표시하는 컴포넌트
+ * 
+ * 주요 기능:
+ * - 사용자/AI 메시지 구분하여 다른 스타일로 표시
+ * - 검색어 하이라이트 기능
+ * - 이미지 첨부 기능 (사용자 메시지)
+ * - 초기 메시지 특별 스타일 지원
+ * 
+ * @component
+ * @param {Object} props
+ * @param {Object} props.message - 메시지 정보 (type, content, images 등)
+ * @param {boolean} props.isHighlighted - 검색 결과 하이라이트 여부
+ * @param {string} props.searchInput - 검색어
+ * @param {Function} props.openModal - 이미지 클릭시 모달 열기 함수
+ * @param {string} props.color - 메시지 장식용 컬러
  */
+
 const MessageItem = memo(({
     message,
     isHighlighted,
     searchInput,
+    openModal,
+    color
 }) => {
     /**
    * 검색어와 일치하는 텍스트를 하이라이트 처리하는 함수
@@ -56,35 +70,55 @@ const MessageItem = memo(({
         <div className={`
             ${styles.messageItem}
             ${message?.type === 'USER' ? styles.userMessage : styles.botMessage}
-            ${message?.imageUrl ? styles.withImageAndText : ''}
+            ${message?.images?.length > 0 && message.content ? styles.withImageAndText : ''}
             ${isHighlighted ? styles.highlighted : ''}
         `}>
-            {/* AI 메시지인 경우 봇 표시 */}
+            {/* AI 메시지 렌더링 */}
             {message?.type === 'AI' && (
-                <img
-                    src="/images/logo-bot.png"
-                    alt="Bot Avatar"
-                    className={styles.avatar}
-                />
-            )}
-            <div className={styles.messageContent}>
-                {/* 사용자가 이미지를 첨부한 경우 이미지 표시 */}
-                {message?.type === 'USER' && message?.imageUrl && (
-                    <div className={styles.imageContainer}>
-                        <img
-                            src={message.imageUrl}
-                            alt="첨부 이미지"
-                            className={styles.uploadedImage}
+                <>
+                    <img
+                        src="/images/logo-bot.png"
+                        alt="Bot Avatar"
+                        className={styles.avatar}
+                    />
+                    <div className={styles.messageContent}>
+                        <p className={styles.messageText}>
+                            {highlightText(message.content)}
+                        </p>
+                        <div
+                            className={styles.colorBar}
+                            style={{ backgroundColor: color }}
                         />
                     </div>
-                )}
-                {/* 메시지 내용이 있는 경우 텍스트 표시 */}
-                {message?.content && (
-                    <p className={styles.messageText}>
-                        {highlightText(message.content)}
-                    </p>
-                )}
-            </div>
+                </>
+            )}
+
+            {/* 사용자 메시지 렌더링 */}
+            {message?.type === 'USER' && (
+                <div className={styles.messageContent}>
+                    {/* 이미지가 있는 경우 이미지 갤러리 표시 */}
+                    {message.images && message.images.length > 0 && (
+                        <div className={styles.imageContainer}>
+                            {message.images.map((image, idx) => (
+                                <img
+                                    key={idx}
+                                    alt="Uploaded"
+                                    className={styles.uploadedImage}
+                                    onClick={() => openModal(image.url)}
+                                />
+                            ))}
+                        </div>
+                    )}
+                    {/* 텍스트 메시지가 있는 경우 표시 */}
+                    {message.content && (
+                        <p className={styles.messageText}>
+                            {highlightText(message.content)}
+                        </p>
+                    )}
+                    <div className={styles.colorCircle} />
+                </div>
+            )}
+
         </div>
     );
 });
