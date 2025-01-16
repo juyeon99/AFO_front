@@ -88,19 +88,6 @@
     border-radius: 4px;
 }
 
-/* 검색된 단어만 하이라이트 */
-.highlight {
-    background-color: rgba(255, 224, 130, 0.5); /* 연한 노란색 */
-    border-radius: 2px;
-    padding: 0 2px;
-    display: inline; /* 인라인 요소로 표시 */
-}
-
-/* 현재 선택된 검색 결과 */
-.currentHighlight {
-    background-color: rgba(255, 183, 77, 0.7); /* 진한 주황색 */
-}
-
 /* 메시지 컨테이너의 기본 스타일 유지 */
 .message {
     display: flex;

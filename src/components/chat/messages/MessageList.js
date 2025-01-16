@@ -43,27 +43,58 @@ const MessageList = memo(({
     // 검색어에 따른 메시지 내용 하이라이트 처리
     const renderMessageContent = (content, index) => {
         if (!searchInput || !content) return content;
-
+    
         try {
             const escapedSearchInput = searchInput.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`(${escapedSearchInput})`, 'gi');
-
-            // 검색어와 일치하는 부분만 하이라이트
-            return content.split(regex).map((part, i) => {
-                const isMatch = part.toLowerCase() === searchInput.toLowerCase();
-                return isMatch ? (
-                    <span
-                        key={i}
-                        className={`${styles.highlight} ${
-                            // 현재 선택된 검색 결과인 경우에만 currentHighlight 클래스 추가
-                            highlightedMessageIndexes?.[currentHighlightedIndex] === index ?
-                                styles.currentHighlight : ''
-                            }`}
-                    >
-                        {part}
-                    </span>
-                ) : part;
-            });
+            const text = content.toString();
+            let lastIndex = 0;
+            const parts = [];
+            let match;
+    
+            while ((match = regex.exec(text)) !== null) {
+                if (lastIndex !== match.index) {
+                    parts.push({
+                        text: text.slice(lastIndex, match.index),
+                        isMatch: false
+                    });
+                }
+                parts.push({
+                    text: match[0],
+                    isMatch: true
+                });
+                lastIndex = regex.lastIndex;
+            }
+    
+            if (lastIndex < text.length) {
+                parts.push({
+                    text: text.slice(lastIndex),
+                    isMatch: false
+                });
+            }
+    
+            return (
+                <span>
+                    {parts.map((part, i) => {
+                        if (part.isMatch && highlightedMessageIndexes[currentHighlightedIndex] === index) {
+                            return (
+                                <mark
+                                    key={i}
+                                    style={{
+                                        backgroundColor: '#fff740',
+                                        padding: '2px 4px',
+                                        borderRadius: '2px',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    {part.text}
+                                </mark>
+                            );
+                        }
+                        return <span key={i}>{part.text}</span>;
+                    })}
+                </span>
+            );
         } catch (error) {
             console.error('Error in renderMessageContent:', error);
             return content;
@@ -78,14 +109,9 @@ const MessageList = memo(({
                     <div
                         key={message.id || index}
                         ref={el => messageRefs.current[index] = el}
-                        // 메시지 타입과 검색 상태에 따른 스타일 적용
+                        id={`message-${index}`}  // scrollToMessage를 위한 id 추가
                         className={`${styles.message} ${message.type === 'USER' ? styles.userMessage : styles.botMessage
-                            } ${
-                            // 검색 결과에 포함된 메시지 하이라이트
-                            highlightedMessageIndexes?.includes(index) ? styles.highlightedMessage : ''
-                            } ${
-                            // 현재 선택된 검색 결과 강조
-                            index === highlightedMessageIndexes?.[currentHighlightedIndex] ? styles.currentHighlight : ''
+                            } ${highlightedMessageIndexes?.includes(index) ? styles.highlightedMessage : ''
                             }`}
                     >
                         {/* AI 메시지인 경우 봇 아바타 표시 */}
@@ -124,9 +150,9 @@ const MessageList = memo(({
                                     </div>
                                 )}
                                 {/* 메시지 텍스트 내용 (검색어 하이라이트 포함) */}
-                                <p className={styles.messageText}>
+                                <div className={styles.messageText}>
                                     {renderMessageContent(message.content, index)}
-                                </p>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -22,20 +22,30 @@ const SearchBar = ({
     highlightedMessageIndexes,   // 검색된 메시지 인덱스 배열
 }) => {
 
+    // 검색어 입력 처리
+    const handleChange = (e) => {
+        const newValue = e.target.value;
+        setSearchInput(newValue);
+    };
+
+    // 입력값 변경 감지 및 검색 처리
+    useEffect(() => {
+        if (!searchInput.trim()) {
+            clearSearch();
+            return;
+        }
+        handleSearch();
+    }, [searchInput]);
+
+    // 키보드 이벤트 핸들러 추가
     // 키보드 이벤트 핸들러 추가
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (searchInput) {  // 검색어가 있을 때만 동작
                 if (e.key === 'Enter') {
-                    if (e.shiftKey) {
-                        // Shift + Enter: 이전 검색 결과로
-                        e.preventDefault();
-                        goToPreviousHighlight();
-                    } else {
-                        // Enter: 다음 검색 결과로
-                        e.preventDefault();
-                        goToNextHighlight();
-                    }
+                    // Enter: 검색 실행
+                    e.preventDefault();
+                    handleSearch();
                 } else if (e.key === 'ArrowUp') {
                     // 위 화살표: 이전 검색 결과로
                     e.preventDefault();
@@ -50,12 +60,7 @@ const SearchBar = ({
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [searchInput, goToPreviousHighlight, goToNextHighlight]);
-
-    const handleInputChange = (e) => {
-        setSearchInput(e.target.value);
-        handleSearch(e.target.value);
-    };
+    }, [searchInput, goToPreviousHighlight, goToNextHighlight, handleSearch]);
 
     // 검색 결과 개수 표시를 위한 계산
     const totalResults = highlightedMessageIndexes?.length || 0;
@@ -70,8 +75,7 @@ const SearchBar = ({
                 placeholder="검색할 단어를 입력해주세요"
                 className={styles.searchInput}
                 value={searchInput}
-                onChange={handleInputChange}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                onChange={handleChange}
             />
 
             {/* 검색 버튼 */}
@@ -93,23 +97,24 @@ const SearchBar = ({
                         </span>
                     )}
 
-                    {/* 이전 검색 결과로 이동 버튼 */}
-                    <button
-                        className={styles.arrowButton}
-                        onClick={goToPreviousHighlight}
-                        disabled={!totalResults || currentHighlightedIndex === 0}
-                    >
-                        ▲
-                    </button>
 
-                    {/* 다음 검색 결과로 이동 버튼 */}
-                    <button
-                        className={styles.arrowButton}
-                        onClick={goToNextHighlight}
-                        disabled={!totalResults || currentHighlightedIndex === totalResults - 1}
-                    >
-                        ▼
-                    </button>
+                    {/* 위/아래 화살표 버튼을 하나의 컨테이너로 묶음 */}
+                    <div className={styles.arrowButtonGroup}>
+                        <button
+                            className={styles.arrowButton}
+                            onClick={goToPreviousHighlight}
+                            disabled={!totalResults || currentHighlightedIndex === 0}
+                        >
+                            ▴
+                        </button>
+                        <button
+                            className={styles.arrowButton}
+                            onClick={goToNextHighlight}
+                            disabled={!totalResults || currentHighlightedIndex === totalResults - 1}
+                        >
+                            ▾
+                        </button>
+                    </div>
 
                     {/* 검색어 초기화 버튼 */}
                     <button
@@ -122,6 +127,6 @@ const SearchBar = ({
             )}
         </div>
     );
-};
+}
 
 export default SearchBar;

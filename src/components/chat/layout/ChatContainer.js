@@ -57,10 +57,12 @@ const ChatContainer = memo(({
                 <ChatHeader onGoBack={handleGoBack} />
 
                 {/* 검색창 */}
-                <SearchBar {...finalSearchProps} />
+                <SearchBar {...searchProps } />
 
                 {/* 메시지 목록 */}
-                <MessageList {...messageProps} />
+                <MessageList {...messageProps}
+                searchInput={searchProps?.searchInput}
+                />
 
                 {/* 메시지 입력창 */}
                 <ChatInput {...inputProps}
