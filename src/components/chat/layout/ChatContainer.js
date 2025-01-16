@@ -51,19 +51,29 @@ const ChatContainer = memo(({
     const finalSearchProps = searchProps || defaultSearchProps;
 
     return (
-        <div className={styles.containerWrapper}>
-            <div className={styles.container}>
+        <div className={styles.chatLayout}>
+            <div className={styles.headerSection}>
                 {/* 상단 헤더 */}
                 <ChatHeader onGoBack={handleGoBack} />
 
                 {/* 검색창 */}
-                <SearchBar {...searchProps } />
+                <SearchBar {...finalSearchProps} />
+            </div>
 
+            {/* 메세지 가림막 추가 */}
+            <div className={styles.messageOverlay} />
+
+            <div className={styles.messageSection}>
                 {/* 메시지 목록 */}
                 <MessageList {...messageProps}
-                searchInput={searchProps?.searchInput}
+                    searchInput={searchProps?.searchInput}
                 />
+            </div>
 
+            {/* 하단 메시지 가림막 */}
+            <div className={styles.inputOverlay} />
+
+            <div className={styles.inputSection}>
                 {/* 메시지 입력창 */}
                 <ChatInput {...inputProps}
                     selectedImages={selectedImages}
@@ -85,5 +95,8 @@ const ChatContainer = memo(({
         </div>
     );
 });
+
+// 개발 도구에서 컴포넌트를 식별하기 위한 이름 설정
+ChatContainer.displayName = 'ChatContainer';
 
 export default ChatContainer;

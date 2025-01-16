@@ -66,6 +66,10 @@ export const useMessages = () => {
     * 3. 응답 받으면 AI 메시지 추가
     */
     const addMessage = async (content, images = []) => {
+        console.log('useMessages에서 받은 데이터:', {
+            content: content,
+            images: images
+        });
         // 사용자 메시지 추가
         const userMessage = {
             id: uuidv4(),
@@ -79,20 +83,25 @@ export const useMessages = () => {
         // AI 응답 요청
         setIsLoading(true);
         try {
-            // 이미지와 텍스트 모두 전송
-            const response = await dispatch(fetchChatResponse({
-                content: content.trim(),
-                image: images[0]
-            }));
+            // ChatAPICalls.js의 형식에 맞춰 데이터 전달
+            const response = await dispatch(fetchChatResponse(
+                content,           // userInput
+                images[0],        // imageFile
+                null              // userId (필요한 경우 추가)
+            ));
 
-            if (response?.payload?.data) {
+            console.log('API 응답 전체:', response);
+
+            if (response) {
                 const aiMessage = {
-                    id: uuidv4(),
+                    id: response.id || uuidv4(),
                     type: 'AI',
-                    content: response.payload.data.content,
-                    images: response.payload.data.imageUrl,
-                    mode: 'chat'
+                    content: response.content,  // API 응답의 content 필드 사용
+                    mode: 'chat',
+                    recommendations: response.recommendations || null,
+                    timestamp: response.timeStamp || new Date().toISOString()
                 };
+                console.log('생성된 AI 메시지:', aiMessage); 
                 setMessages(prev => [...prev, aiMessage]);
                 setRetryAvailable(false);
             }

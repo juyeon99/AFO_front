@@ -32,6 +32,10 @@ const ChatInput = memo(({
         if (input.trim() || selectedImages.length > 0) {
             // 선택된 이미지들의 URL만 추출
             const imageUrls = selectedImages.map(img => img.url);
+            console.log('ChatInput에서 전송하는 데이터:', {
+                input: input,
+                imageUrls: imageUrls
+            });
             // 메시지와 이미지 전송
             onSend(input, imageUrls);
             // 입력창 초기화

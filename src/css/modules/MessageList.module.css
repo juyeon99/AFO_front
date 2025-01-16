@@ -101,3 +101,7 @@
     flex: 1;
     /* 배경색 관련 스타일 제거 */
 }
+
+.botMessage .messageText {
+    text-align: left;
+}

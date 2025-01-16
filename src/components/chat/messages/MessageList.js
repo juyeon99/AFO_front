@@ -25,6 +25,17 @@ const MessageList = memo(({
 }) => {
     // 각 메시지 요소에 대한 참조를 저장하는 ref 배열
     const messageRefs = useRef([]);
+    const messagesEndRef = useRef(null);
+
+    // 스크롤을 최하단으로 이동시키는 함수
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // messages가 변경될 때마다 스크롤 실행
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     // 검색 결과 간 이동 시 해당 메시지로 스크롤하는 효과
     useEffect(() => {
@@ -43,7 +54,7 @@ const MessageList = memo(({
     // 검색어에 따른 메시지 내용 하이라이트 처리
     const renderMessageContent = (content, index) => {
         if (!searchInput || !content) return content;
-    
+
         try {
             const escapedSearchInput = searchInput.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regex = new RegExp(`(${escapedSearchInput})`, 'gi');
@@ -51,7 +62,7 @@ const MessageList = memo(({
             let lastIndex = 0;
             const parts = [];
             let match;
-    
+
             while ((match = regex.exec(text)) !== null) {
                 if (lastIndex !== match.index) {
                     parts.push({
@@ -65,14 +76,14 @@ const MessageList = memo(({
                 });
                 lastIndex = regex.lastIndex;
             }
-    
+
             if (lastIndex < text.length) {
                 parts.push({
                     text: text.slice(lastIndex),
                     isMatch: false
                 });
             }
-    
+
             return (
                 <span>
                     {parts.map((part, i) => {
@@ -104,61 +115,67 @@ const MessageList = memo(({
     return (
         <div className={styles.messageBox}>
             <div className={styles.messagesContainer}>
-                {/* 메시지 목록을 순회하며 각 메시지 렌더링 */}
                 {messages.map((message, index) => (
                     <div
                         key={message.id || index}
                         ref={el => messageRefs.current[index] = el}
-                        id={`message-${index}`}  // scrollToMessage를 위한 id 추가
+                        id={`message-${index}`}
                         className={`${styles.message} ${message.type === 'USER' ? styles.userMessage : styles.botMessage
                             } ${highlightedMessageIndexes?.includes(index) ? styles.highlightedMessage : ''
                             }`}
                     >
-                        {/* AI 메시지인 경우 봇 아바타 표시 */}
+                        {/* AI 메시지 렌더링 */}
                         {message.type === 'AI' && (
-                            <img
-                                src="/images/logo-bot.png"
-                                alt="Bot Avatar"
-                                className={styles.avatar}
-                            />
+                            <>
+                                <img
+                                    src="/images/logo-bot.png"
+                                    alt="Bot Avatar"
+                                    className={styles.avatar}
+                                />
+                                <div className={styles.messageWrapper}>
+                                    <div className={styles.messageContent}>
+                                        <div className={styles.messageText}>
+                                            {message.content}
+                                        </div>
+                                        {message.mode === 'recommendation' && message.recommendations && (
+                                            <div className={styles.recommendations}>
+                                                {message.recommendations}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </>
                         )}
-                        <div className={styles.messageWrapper}>
-                            <div className={styles.messageContent}>
-                                {/* 여러 이미지가 있는 경우의 처리 */}
-                                {message.images && message.images.length > 0 && (
-                                    <div className={styles.imageContainer}>
-                                        {message.images.map((image, idx) => (
-                                            <img
-                                                key={idx}
-                                                src={image.url}
-                                                alt="Uploaded"
-                                                className={styles.uploadedImage}
-                                                onClick={() => openImageModal(image.url)}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-                                {/* 사용자 메시지의 단일 이미지 처리 */}
-                                {message.type === 'USER' && message.imageUrl && (
-                                    <div className={styles.imageWrapper}>
-                                        <img
-                                            src={message.imageUrl}
-                                            alt="Uploaded"
-                                            className={styles.uploadedImage}
-                                            onClick={() => openImageModal(message.imageUrl)}
-                                        />
-                                    </div>
-                                )}
-                                {/* 메시지 텍스트 내용 (검색어 하이라이트 포함) */}
-                                <div className={styles.messageText}>
-                                    {renderMessageContent(message.content, index)}
+
+                        {/* 사용자 메시지 렌더링 */}
+                        {message.type === 'USER' && (
+                            <div className={styles.messageWrapper}>
+                                <div className={styles.messageContent}>
+                                    {message.content && (
+                                        <div className={styles.messageText}>
+                                            {renderMessageContent(message.content, index)}
+                                        </div>
+                                    )}
+                                    {message.images && message.images.length > 0 && (
+                                        <div className={styles.imageContainer}>
+                                            {message.images.map((image, idx) => (
+                                                <img
+                                                    key={idx}
+                                                    src={image.url}
+                                                    alt="Uploaded"
+                                                    className={styles.uploadedImage}
+                                                    onClick={() => openImageModal(image.url)}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 ))}
-                {/* 로딩 상태 표시 */}
                 {isLoading && <LoadingDots />}
+                <div ref={messagesEndRef} />
             </div>
         </div>
     );
