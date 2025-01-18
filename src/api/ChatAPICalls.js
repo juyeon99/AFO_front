@@ -2,6 +2,11 @@ import apis from "./Apis";
 
 // 채팅 추천 요청
 export const requestRecommendations = async (userInput, imageFile = null, userId = null) => {
+    console.log('ChatAPICalls에서 받은 데이터:', {
+        userInput: userInput,
+        imageUrl: imageFile,
+        userId: userId
+    });
     try {
         if (!imageFile && (!userInput || !userInput.trim())) {
             throw new Error("이미지 또는 사용자 입력 중 하나는 필수입니다.");
