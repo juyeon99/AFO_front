@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Gowun+Dodum&family=Hahmlet:wght@100..900&family=Nanum+Gothic&family=Noto+Serif+KR:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
+
+.perfumeListContainer {
+    position: relative;
+    width: 1200px;
+    margin: 0 auto;
+    background: #EFEDED;
+    padding: 20px;
+    box-sizing: border-box;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.perfumeHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    transform: translateY(-60px);
+}
+
+.perfumeTitle {
+    font-family: "Gowun Batang", serif;
+    font-size: 24px;
+    font-weight: bold;
+    translate: 5px 50px;
+}
+
+.searchContainer {
+    position: absolute;
+    max-width: 200px;
+    width: 100%;
+    translate: 840px 50px;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border: 1px solid #333;
+    background-color: #EFEDED;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.searchIcon {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translate(0px, -20px);
+    cursor: pointer;
+}
+
+.dividerLine {
+    width: 95%;
+    height: 1px;
+    background-color: #333;
+    margin-top: 60px;
+    transform: translateY(-70px);
+}
+
+.cardContainer {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* 관리자 컨트롤 버튼 스타일 */
+.adminControls {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.addButton,
+.checkboxButton,
+.deleteButton {
+    padding: 8px 16px;
+    border: 1px solid #333;
+    border-radius: 20px;
+    background-color: #EFEDED;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 40px;
+    text-align: center;
+}
+
+.addButton:hover,
+.checkboxButton:hover,
+.deleteButton:hover {
+    background-color: #000;
+    color: white;
+}
