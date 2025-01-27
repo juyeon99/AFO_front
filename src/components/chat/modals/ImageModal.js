@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import styles from '../../../css/modules/Modal.module.css';
+import styles from '../../../css/chat/Modal.module.css';
 
 /**
  * 이미지 모달 컴포넌트

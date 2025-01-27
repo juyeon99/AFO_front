@@ -5,7 +5,7 @@ import ChatInput from '../input/ChatInput';
 import SearchBar from '../search/SearchBar';
 import ImageModal from '../modals/ImageModal';
 import LoginModal from '../modals/LoginModal';
-import styles from '../../../css/modules/ChatContainer.module.css';
+import styles from '../../../css/chat/ChatContainer.module.css';
 import { useUpload } from '../../../pages/chat/hooks/useUpload';
 
 /**

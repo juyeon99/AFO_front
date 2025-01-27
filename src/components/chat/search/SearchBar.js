@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import styles from '../../../css/modules/SearchBar.module.css';
+import styles from '../../../css/chat/SearchBar.module.css';
 
 /**
  * 채팅 내용 검색을 위한 검색바 컴포넌트

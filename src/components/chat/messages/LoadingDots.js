@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../../css/modules/Loading.module.css';
+import styles from '../../../css/chat/Loading.module.css';
 
 /**
  * AI가 응답을 생성하는 동안 표시되는 로딩 애니메이션 컴포넌트

@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { NavLink } from 'react-router-dom';
-import styles from '../../../css/modules/ChatHeader.module.css';
+import styles from '../../../css/chat/ChatHeader.module.css';
 
 /**
  * 채팅 화면 상단의 헤더 컴포넌트
