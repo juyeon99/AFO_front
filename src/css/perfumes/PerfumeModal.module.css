@@ -4,79 +4,298 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 300;
+    overflow: hidden;
 }
 
-.modal {
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    width: 500px;
-    max-width: 90%;
+.modalContainer {
+    width: 550px;
+    max-height: 90vh;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.modalContent {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    height: 800px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     position: relative;
+    text-align: left;
+    height: 600px;
 }
 
-.closeButton {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
-}
-
-.imageUpload {
-    margin-bottom: 20px;
+.modalContainerSuccess {
+    background-color: #EFEDED;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    position: relative;
     text-align: center;
 }
 
+.modalTitle {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.modalRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.modalRow2 {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
+    margin-left: 50px;
+    margin-right: 50px;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+
+.modalRowName,
+.modalRowBrand,
+.modalRowDescription,
+.modalRowGrade,
+.modalRowSingleNote,
+.modalRowTopNote,
+.modalRowMiddleNote,
+.modalRowBaseNote,
+.imageUrlInput {
+    flex-basis: 65%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #EFEDED;
+}
+
+.modalRowConcentration {
+    flex-basis: 70%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #EFEDED;
+}
+
+.modalRowDescription {
+    resize: none;
+    height: 80px;
+}
+
+.imageUrlInput {
+    margin-left: 300px;
+}
+
 .imagePreview {
-    max-width: 200px;
-    max-height: 200px;
-    margin-bottom: 10px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
 }
 
 .fileInput {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
+    display: none;
 }
 
-.modal form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.modal input,
-.modal textarea {
-    padding: 10px;
+.imageUpload {
+    width: 50px;
+    height: 50px;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #EFEDED;
+    transform: translateX(-260px);
 }
 
-.modal textarea {
-    height: 100px;
-    resize: vertical;
+.placeholder {
+    font-size: 20px;
+    color: #aaa;
+    font-weight: bold;
+}
+
+.successMessage {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
 .modalActions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
+    gap: 15px;
+}
+
+.saveButton,
+.cancelButton,
+.cancelButtonSuccess {
+    padding: 10px 20px;
+    border: none;
+    border: 1px solid black;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #fff;
+    color: rgb(37, 37, 37);
+    border-radius: 5px;
+}
+
+.modalContainerDelete {
+    background-color: #EFEDED;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    position: relative;
+    text-align: center;
+}
+
+.modalTitleDelete {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.modalActionsDelete {
+    display: flex;
+    justify-content: center;
     gap: 10px;
     margin-top: 20px;
 }
 
-.submitButton,
-.cancelButton {
-    padding: 8px 16px;
+.confirmButton,
+.cancelButtonDelete {
+    padding: 10px 20px;
     border: 1px solid black;
-    background-color: white;
+    border-radius: 5px;
     cursor: pointer;
-    border-radius: 4px;
+    background-color: #fff;
+}
+
+.formLabel {
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+.modalRowImageLabel {
+    font-family: 'Nanum Gothic', sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+.imageUrlsSection {
+    margin-bottom: 20px;
+}
+
+.imageUrlInput {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.removeUrlButton {
+    padding: 5px 10px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.addUrlButton {
+    padding: 8px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.imageInputContainer {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex: 1;
+}
+
+.imagePreviewBox {
+    width: 45px;
+    height: 45px;
+    background-color: #EFEDED;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 20px;
+    color: #666;
+}
+
+.previewImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modalRowImageUrl {
+    flex: 1;
+    height: 45px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #EFEDED;
+}
+
+.addImageButton {
+    width: 45px;
+    height: 45px;
+    background-color: #EFEDED;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 20px;
+    color: #666;
+}
+
+.imagePagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.paginationDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ddd;
+}
+
+.activeDot {
+    background-color: #666;
 }

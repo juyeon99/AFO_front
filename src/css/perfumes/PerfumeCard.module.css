@@ -1,10 +1,7 @@
-.cardWrapper {
+.card {
     position: relative;
     width: 200px;
     height: 320px;
-}
-
-.card {
     background: #FFFFFF;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 20px;
@@ -17,18 +14,51 @@
     overflow: hidden;
     transition: all 0.3s ease-in-out;
     margin-bottom: 10px;
+    cursor: pointer;
 }
-
 .card:hover {
     background-color: #EFEDED;
     transform: scale(1.05);
     box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.3);
 }
 
+.imageContainer {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
 .image {
     width: 120px;
     height: 120px;
     margin-bottom: 10px;
+}
+
+.imagePagination {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 2;
+}
+
+.paginationDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.activeDot {
+    background-color: white;
+    transform: scale(1.2);
 }
 
 .name {
@@ -38,22 +68,20 @@
     margin-bottom: 10px;
 }
 
-.dividerSmall {
+.divider {
     width: 80%;
     height: 1px;
     background-color: #000000;
-    margin: 10px auto;
+    margin: 0 auto 10px auto;
 }
 
-.brand {
-    font-size: 14px;
-    color: #666;
-}
-
+.category,
 .grade {
     font-size: 14px;
-    color: #888;
-    margin-top: 5px;
+    text-align: center;
+    color: #000000;
+    margin-top: 10px;
+    font-family: 'Nanum Gothic';
 }
 
 .description {
@@ -64,7 +92,7 @@
     width: 100%;
     height: 100%;
     background-color: #ffffff;
-    font-size: 14px;
+    font-size: 13px;
     padding: 20px 25px 10px 25px;
     display: flex;
     flex-direction: column;
@@ -75,32 +103,37 @@
     box-sizing: border-box;
 }
 
-.description p {
-    margin: 8px 0;
-}
-
 .card:hover .description {
     bottom: 0;
 }
 
-.descriptionSingleNote,
-.descriptionMultiNote {
-    font-family: 'Nanum Gothic', sans-serif;
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.descriptionSingleNote strong,
-.descriptionMultiNote strong {
-    color: #a73cff;
-    font-weight: bold;
+.cardControls {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    display: flex;
+    gap: 8px;
+    z-index: 20;
 }
 
 .checkbox {
     position: absolute;
     top: 15px;
     left: 15px;
-    z-index: 1;
+    width: 15px;
+    height: 15px;
+    appearance: none;
+    border: 1px solid #333;
+    border-radius: 50%;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 20;
+}
+
+.checkbox:checked {
+    background-color: #333;
+    border-color: #333;
 }
 
 .editButton {
@@ -111,8 +144,17 @@
     border: none;
     cursor: pointer;
     padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
 }
 
 .editButton:hover {
     color: #007bff;
+}
+
+.singleNote,
+.multiNote {
+    font-size: 12px;
 }

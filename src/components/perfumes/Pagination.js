@@ -1,92 +1,64 @@
 import React from 'react';
 import styles from '../../css/perfumes/PerfumePagination.module.css';
 
-// 한 번에 보여줄 최대 페이지 번호 개수
-const MAX_VISIBLE_PAGES = 5;
+const PerfumePagination = ({ currentPage, totalItems, itemsPerPage, onPageChange }) => {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const paginationGroup = Math.floor((currentPage - 1) / 10);
+    const pageStart = paginationGroup * 10 + 1;
+    const pageEnd = Math.min((paginationGroup + 1) * 10, totalPages);
 
-/**
- * 페이지네이션 컴포넌트
- * @param {number} currentPage - 현재 페이지 번호
- * @param {number} totalPages - 전체 페이지 수
- * @param {function} onPageChange - 페이지 변경 핸들러 함수
- */
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-    // 현재 보여줄 페이지 번호들을 저장할 배열
-    const pageNumbers = [];
-
-    // 현재 페이지가 속한 그룹 번호 계산
-    const currentGroup = Math.ceil(currentPage / MAX_VISIBLE_PAGES);
-    // 전체 그룹 수 계산
-    const totalGroups = Math.ceil(totalPages / MAX_VISIBLE_PAGES);
-    
-    // 현재 그룹의 시작 페이지와 끝 페이지 계산
-    const startPage = (currentGroup - 1) * MAX_VISIBLE_PAGES + 1;
-    const endPage = Math.min(currentGroup * MAX_VISIBLE_PAGES, totalPages);
-
-    // 시작 페이지부터 끝 페이지까지의 번호를 배열에 추가
-    for (let i = startPage; i <= endPage; i++) {
-        pageNumbers.push(i);
-    }
-
-    // 이전 그룹으로 이동하는 핸들러
-    const handlePrevGroup = () => {
-        const prevGroupFirstPage = Math.max(startPage - MAX_VISIBLE_PAGES, 1);
-        onPageChange(prevGroupFirstPage);
+    const handlePreviousGroup = () => {
+        if (paginationGroup > 0) {
+            onPageChange(paginationGroup * 10);
+        }
     };
 
-    // 다음 그룹으로 이동하는 핸들러
     const handleNextGroup = () => {
-        const nextGroupFirstPage = Math.min(endPage + 1, totalPages);
-        onPageChange(nextGroupFirstPage);
+        if ((paginationGroup + 1) * 10 < totalPages) {
+            onPageChange((paginationGroup + 1) * 10 + 1);
+        }
     };
 
     return (
         <div className={styles.pagination}>
-            {/* 첫 페이지로 이동하는 버튼 */}
             <button
-                className={styles.pageButton}
-                onClick={() => onPageChange(1)}
-                disabled={currentPage === 1}
+                className={`${styles.pageButton} ${paginationGroup === 0 ? styles.disabled : ''}`}
+                onClick={handlePreviousGroup}
+                disabled={paginationGroup === 0}
             >
                 {'<<'}
             </button>
 
-            {/* 이전 그룹으로 이동하는 버튼 */}
             <button
-                className={styles.pageButton}
-                onClick={handlePrevGroup}
-                disabled={currentGroup === 1}
+                className={`${styles.pageButton} ${currentPage === 1 ? styles.disabled : ''}`}
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
             >
                 {'<'}
             </button>
-            
-            {/* 페이지 번호 버튼들 */}
-            {pageNumbers.map(number => (
+
+            {Array.from({ length: pageEnd - pageStart + 1 }, (_, index) => (
                 <button
-                    key={number}
-                    className={`${styles.pageButton} ${
-                        currentPage === number ? styles.active : ''
-                    }`}
-                    onClick={() => onPageChange(number)}
+                    key={index + pageStart}
+                    className={`${styles.pageButton} ${currentPage === index + pageStart ? styles.active : ''}`}
+                    onClick={() => onPageChange(index + pageStart)}
                 >
-                    {number}
+                    {index + pageStart}
                 </button>
             ))}
-            
-            {/* 다음 그룹으로 이동하는 버튼 */}
+
             <button
-                className={styles.pageButton}
-                onClick={handleNextGroup}
-                disabled={currentGroup === totalGroups}
+                className={`${styles.pageButton} ${currentPage === totalPages ? styles.disabled : ''}`}
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
             >
                 {'>'}
             </button>
 
-            {/* 마지막 페이지로 이동하는 버튼 */}
             <button
-                className={styles.pageButton}
-                onClick={() => onPageChange(totalPages)}
-                disabled={currentPage === totalPages}
+                className={`${styles.pageButton} ${pageEnd === totalPages ? styles.disabled : ''}`}
+                onClick={handleNextGroup}
+                disabled={pageEnd === totalPages}
             >
                 {'>>'}
             </button>
@@ -94,4 +66,4 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     );
 };
 
-export default Pagination;
+export default PerfumePagination;
