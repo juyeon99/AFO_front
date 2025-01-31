@@ -73,7 +73,10 @@ const SpicesCard = ({
                 <input
                     type="checkbox"
                     checked={selected}
-                    onChange={onSelect}
+                    onChange={(e) => {
+                        e.stopPropagation();
+                        onSelect(spice.id);
+                    }}
                     className={styles.checkbox}
                 />
             )}
@@ -113,6 +116,13 @@ const SpicesCard = ({
                                     {keyword}
                                 </span>
                             ))}
+                            <p className={styles.category}>{spice.lineName} 계열</p>
+                    {/* 수정 버튼 (관리자만 표시) */}
+                    {isAdmin && (
+                        <button onClick={onEdit} className={styles.editButton}>
+                            <Edit size={16} />
+                        </button>
+                    )}
                         </div>
                     </div>
                 </div>
