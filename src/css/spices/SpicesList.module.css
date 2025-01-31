@@ -84,7 +84,7 @@
 .adminControls {
     gap: 5px;
     margin-left: 130px;
-    translate: 1000px -20px;
+    translate: 950px -50px;
     display: flex;
     position: absolute;
 }
