@@ -99,6 +99,12 @@ const SpicesList = () => {
         handleReset();
     };
 
+    const handleEditClick = (spice) => {
+        setSelectedSpice(spice);
+        setIsEditing(true);
+        setShowEditModal(true);
+    };
+
     return (
         <>
             <div className={styles.container}>
@@ -128,15 +134,14 @@ const SpicesList = () => {
                         />
                     </div>
                 </div>
-
+                
                 {/* 필터 컴포넌트 */}
+                <div>
                 <SpicesFilters
                     activeFilters={activeFilters}
                     setActiveFilters={setActiveFilters}
                 />
-                <div className={styles.divider}></div>
-
-                {/* 관리자 컨트롤 버튼들 */}
+                 {/* 관리자 컨트롤 버튼들 */}
                 {role === 'ADMIN' && (
                     <div className={styles.adminControls}>
                         <button onClick={handleAddButtonClick} className={styles.addButton}>
@@ -148,28 +153,36 @@ const SpicesList = () => {
                         >
                             ✓
                         </button>
-                        {showCheckboxes && (
-                            <button onClick={handleDeleteButtonClick} className={styles.deleteButton}>
-                                <Trash2 size={20} />
-                            </button>
-                        )}
+                        <button onClick={handleDeleteButtonClick} className={styles.deleteButton}>
+                            <Trash2 size={20} />
+                        </button>
                     </div>
                 )}
+                </div>
+
+                <div className={styles.divider}></div>
 
                 {/* 향료 카드 그리드 */}
                 <div className={styles.cardContainer}>
                     {filteredSpices
                         .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                         .map((spice) => (
-                            <SpicesCard
-                                key={spice.id}
-                                spice={spice}
-                                isAdmin={role === 'ADMIN'}
-                                showCheckboxes={showCheckboxes}
-                                selected={selectedCard === spice.id}
-                                onSelect={() => setSelectedCard(spice.id)}
-                                onEdit={() => handleEditButtonClick(spice)}
-                            />
+                            <div key={spice.id} className={styles.card}>
+                                <SpicesCard
+                                    spice={spice}
+                                    isAdmin={role === 'ADMIN'}
+                                    showCheckboxes={showCheckboxes}
+                                    selected={selectedCard === spice.id}
+                                    onSelect={() => {
+                                        if (selectedCard === spice.id) {
+                                            setSelectedCard(null);
+                                        } else {
+                                            setSelectedCard(spice.id);
+                                        }
+                                    }}
+                                    onEdit={() => handleEditClick(spice)}
+                                />
+                            </div>
                         ))}
                 </div>
                 
