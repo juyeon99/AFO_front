@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Gowun+Dodum&family=Hahmlet:wght@100..900&family=Nanum+Gothic&family=Noto+Serif+KR:wght@200..900&display=swap');
+
+.container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: #EFEDED;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+}
+
+.logo {
+    padding-top: 15px;
+    max-width: 150px;
+    max-height: 150px;
+    margin: 0 auto;
+    display: block;
+    translate: -10px -40px;
+    margin-bottom: 20px;
+}
+
+.mainTitle {
+    font-family: 'NanumMyeongjo';
+    font-size: 24px;
+    text-align: center;
+    margin: 10px 0;
+    transform: translateY(-60px);
+}
+
+.categoryTag {
+    font-family: 'GowunBatang';
+    font-weight: 700;
+    font-size: 20px;
+    text-align: center;
+    transform: translateY(-50px);
+    margin: 0px 0;
+}
+
+.diffuserGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+.diffuserCard {
+    position: relative;
+    width: 100%;
+    max-width: 280px;
+    height: 380px;
+    perspective: 1500px;
+    margin: 0 auto;
+}
+
+.cardInner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+/* 호버 시 카드 뒤집기 */
+.diffuserCard:hover .cardInner {
+    transform: rotateY(180deg);
+}
+
+.cardFront, .cardBack {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cardFront {
+    transform: rotateY(0deg);
+}
+
+.cardBack {
+    transform: rotateY(180deg);
+    background: linear-gradient(145deg, #ffffff, #f5f5f5);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 뒷면에 향 퍼지는 효과 추가 */
+.cardBack::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, 
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    z-index: 1;
+    animation: fragranceWave 3s ease-out infinite;
+}
+
+.cardBack::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, 
+        rgba(255, 255, 255, 0.6) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    z-index: 1;
+    animation: fragranceWave 3s ease-out infinite 1s;
+}
+
+@keyframes fragranceWave {
+    0% {
+        transform: translate(-50%, -50%) scale(0.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+    }
+}
+
+.diffuserDescription {
+    font-family: 'GowunBatang';
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    padding: 20px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards 0.3s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.diffuserImage {
+    width: 80%;
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.divider {
+    width: 100%;
+    height: 1px;
+    background: #000000;
+    margin: 20px 0;
+}
+
+.diffuserName {
+    font-family: 'NanumMyeongjo';
+    font-size: 18px;
+    text-align: center;
+}
+
+.routineBox {
+    max-width: 80%;
+    margin: 120px auto;
+    padding: 30px;
+    border: 1px solid #000000;
+    background: #EFEDED;
+}
+
+.routineText {
+    font-family: 'GowunBatang';
+    font-size: 20px;
+    line-height: 50px;
+    text-align: center;
+}

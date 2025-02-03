@@ -20,6 +20,7 @@ import AdminMembers from './pages/admin/AdminMembers';
 import AdminPerfumeList from './pages/admin/AdminPerfumeList';
 import ErrorScreen from './Fail';
 import Therapy from './pages/therapy/Therapy';
+import TherapyDiffuserRecommend from './components/therapy/TherapyDiffuserRecommend';
 
 // 원래 로그인
 import LoginTest from "./pages/test/LoginTest";
@@ -57,7 +58,9 @@ function App() {
             <Route path="/history" element={<History />} />
             <Route path='/member' element={<AdminMembers />} />
             <Route path='/therapy' element={<Therapy />} />
+            <Route path='/therapy/recommend' element={<TherapyDiffuserRecommend />} />
           </Route>
+
 
           <Route index element={<Main />} />
           <Route path="/login" element={<Login />} />

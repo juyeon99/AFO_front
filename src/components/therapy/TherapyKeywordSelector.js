@@ -130,6 +130,17 @@ const TherapyKeywordSelector = ({ category, onBack }) => {
         }
     };
 
+    const handleConfirm = () => {
+        if (selectedKeyword) {
+            navigate('/therapy/recommend', {
+                state: {
+                    category,
+                    keyword: selectedKeyword
+                }
+            });
+        }
+    };
+
     return (
         <div className={styles.container}>
             {/* 로고 및 헤더 영역 */}
@@ -181,7 +192,11 @@ const TherapyKeywordSelector = ({ category, onBack }) => {
             )}
 
             {/* 결정 버튼 */}
-            <button className={styles.confirmButton}>
+            <button
+                className={styles.confirmButton}
+                onClick={handleConfirm}
+                disabled={!selectedKeyword}
+            >
                 결정하기
             </button>
         </div>
