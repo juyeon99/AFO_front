@@ -12,7 +12,7 @@ const Footer = () => {
         { title: '인스타그램', icon: <FaInstagram />, path: '#' },
         { title: '페이스북', icon: <FaFacebook />, path: '#' },
         { title: '트위터', icon: <FaTwitter />, path: '#' },
-        { title: '유튜브', icon: <FaYoutube />, path: '#' },
+        { title: '유튜브', icon: <FaYoutube />, path: 'https://www.youtube.com/@AllForOne-1216' },
         { title: '깃허브', icon: <FaGithub />, path: 'https://github.com/Project-AllForOne' }
     ];
 
