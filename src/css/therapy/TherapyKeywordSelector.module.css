@@ -26,16 +26,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.backArrow {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: -30px;
-    /* 제목 위로 올리기 */
-    font-size: 24px;
-    cursor: pointer;
+    transform: translateY(-20px);
 }
 
 .mainTitle {
@@ -158,21 +149,74 @@
     margin-top: 20px;
 }
 
-.confirmButton {
-    position: fixed;
-    /* 버튼 위치 고정 */
-    bottom: 80px;
+.buttonWrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1000px;
+    padding: 0;
+    position: fixed; /* 위치 고정 */
+    bottom: 120px; /* 하단에서의 거리 */
     left: 50%;
-    transform: translateX(-50%);
-    width: 10.94%;
-    padding: 10px 0;
-    background: #EFEDED;
-    border: 1px solid #000000;
-    font-size: 20px;
-    color: #000000;
-    cursor: pointer;
+    transform: translateX(-50%); /* 중앙 정렬 */
+    z-index: 10; /* 다른 요소들 위에 표시 */
+}
+
+.wellnessButton {
+    position: relative;
+    padding: 12px 30px;
+    background: #F3F9F1;  /* 연한 민트 그린 계열 */
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
     font-family: 'Gowun Batang', serif;
-    font-weight: bold;
-    z-index: 10;
-    /* 다른 요소들 위에 표시 */
+    color: #333;  /* 깊은 녹색 */
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 8px rgba(44, 85, 48, 0.1);
+    overflow: hidden;
+}
+
+.wellnessButton:hover {
+    background: #c2dbb9;
+    box-shadow: 0 4px 12px rgba(44, 85, 48, 0.15);
+}
+
+/* 버튼 위치 조정 */
+.prevButton {
+    position: absolute;
+    left: 60px;
+}
+
+
+.confirmButton {
+    position: absolute;
+    right: 60px;
+}
+
+
+/* 비활성화 상태 */
+.wellnessButton:disabled {
+    background: #E8E8E8;
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 850px) {
+    .buttonWrapper {
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    .buttonWrapper {
+        bottom: 80px;
+    }
+    
+    .wellnessButton {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
 }

@@ -109,9 +109,10 @@ const TherapyKeywordSelector = ({ category, onBack }) => {
     // 컴포넌트 마운트 시 스크롤 위치 조정
     useEffect(() => {
         const scrollToKeywords = () => {
-            const backArrowElement = document.querySelector(`.${styles.backArrow}`);
-            if (backArrowElement) {
-                const offset = backArrowElement.offsetTop + 130; // 화살표 위에 20px 여백
+            const logo = document.querySelector(`.${styles.logo}`);
+            
+            if (logo) {
+                const offset = logo.offsetTop + 80;
                 window.scrollTo({
                     top: offset,
                     behavior: 'smooth'
@@ -151,7 +152,6 @@ const TherapyKeywordSelector = ({ category, onBack }) => {
                 onClick={() => navigate('/')}
             />
             <div className={styles.header}>
-                <span className={styles.backArrow} onClick={onBack}>←</span>
                 <h1 className={styles.mainTitle}>필요한 효과를 선택하세요.</h1>
             </div>
 
@@ -191,14 +191,22 @@ const TherapyKeywordSelector = ({ category, onBack }) => {
                 <TherapyKeywordDescription keyword={selectedKeyword} />
             )}
 
-            {/* 결정 버튼 */}
-            <button
-                className={styles.confirmButton}
-                onClick={handleConfirm}
-                disabled={!selectedKeyword}
-            >
-                결정하기
-            </button>
+            {/* 버튼 영역 */}
+            <div className={styles.buttonWrapper}>
+                <button
+                    className={`${styles.wellnessButton} ${styles.prevButton}`}
+                    onClick={onBack}
+                >
+                    <span className={styles.buttonText}>이전으로</span>
+                </button>
+                <button
+                    className={`${styles.wellnessButton} ${styles.confirmButton}`}
+                    onClick={handleConfirm}
+                    disabled={!selectedKeyword}
+                >
+                    <span className={styles.buttonText}>결정하기</span>
+                </button>
+            </div>
         </div>
     );
 };

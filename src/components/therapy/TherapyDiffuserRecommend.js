@@ -40,25 +40,19 @@ const TherapyDiffuserRecommend = () => {
                 {/* 선택된 데이터의 제품들을 매핑하여 카드로 표시 */}
                 {selectedData.products.map((product, index) => (
                     <div key={index} className={styles.diffuserCard}>
-                        <div className={styles.cardInner}>
-                            {/* 카드 앞면: 제품 이미지와 이름 */}
-                            <div className={styles.cardFront}>
-                                <img
-                                    src={product.image}
-                                    alt={product.name}
-                                    className={styles.diffuserImage}
-                                />
-                                <div className={styles.divider}></div>
-                                <p className={styles.diffuserName}>
-                                    {product.name} {product.volume}
-                                </p>
-                            </div>
-                            {/* 카드 뒷면: 제품 설명 */}
-                            <div className={styles.cardBack}>
-                                <p className={styles.diffuserDescription}>
-                                    {product.description}
-                                </p>
-                            </div>
+                        <div className={styles.cardFront}>
+                            <img
+                                src={product.image}
+                                alt={product.name}
+                                className={styles.diffuserImage}
+                            />
+                            <div className={styles.divider}></div>
+                            <p className={styles.diffuserName}>
+                                {product.name} {product.volume}
+                            </p>
+                            <p className={styles.diffuserDescription}>
+                                {product.description}
+                            </p>
                         </div>
                     </div>
                 ))}
