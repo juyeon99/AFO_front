@@ -116,6 +116,7 @@ const Sidebar = () => {
                         <a href="/perfumelist" className="sidebar-link">향수 알아가기</a>
                         <a href="/chat" className="sidebar-link">향수 추천</a>
                         <a href="/history" className="sidebar-link">향기 히스토리</a>
+                        <a href="/therapy" className="sidebar-link">향 테라피</a>
 
                         {/* 관리자 전용 링크 */}
                         {isAdmin && (
