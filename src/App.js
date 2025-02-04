@@ -21,6 +21,7 @@ import AdminPerfumeList from './pages/admin/AdminPerfumeList';
 import ErrorScreen from './Fail';
 import Therapy from './pages/therapy/Therapy';
 import TherapyDiffuserRecommend from './components/therapy/TherapyDiffuserRecommend';
+import PerfumeDetail from './components/perfumes/PerfumeDetail';
 
 // 원래 로그인
 import LoginTest from "./pages/test/LoginTest";
@@ -55,6 +56,7 @@ function App() {
             <Route path='/FAQ' element={<FAQ />} />
             <Route path='/spiceslist' element={<SpicesList />} />
             <Route path='/perfumelist' element={<PerfumeList />} />
+            <Route path='/perfumes/:id' element={<PerfumeDetail />} />
             <Route path="/history" element={<History />} />
             <Route path='/member' element={<AdminMembers />} />
             <Route path='/therapy' element={<Therapy />} />

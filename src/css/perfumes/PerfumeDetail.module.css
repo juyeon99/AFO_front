@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Gowun+Dodum&family=Hahmlet:wght@100..900&family=Nanum+Gothic&family=Noto+Serif+KR:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap');
+
+.container {
+    position: relative;
+    max-width: 1920px;        /* width를 max-width로 변경 */
+    min-width: 1200px;        /* 최소 너비 설정 */
+    height: 2294px;
+    background: #EFEDED;
+    margin: 0 auto;           /* 중앙 정렬을 위해 추가 */
+    padding: 0 20px;          /* 좌우 여백 추가 */
+    box-sizing: border-box; 
+}
+
+.logo {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    left: calc(50% - 180px/2);
+    top: -39px;
+}
+
+/* 상단 향수 이름 추가 */
+.topNameEn {
+    position: absolute;
+    width: 146px;
+    height: 30px;
+    left: 352px;
+    top: 224px;
+    font-family: 'Inter';
+    font-size: 36px;
+    line-height: 30px;
+}
+
+/* 하단 향수 이름 추가 */
+.bottomName {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 970px; /* 위치 조정 */
+    right: 380px;
+}
+
+.bottomNameEn {
+    font-size: 25px; /* 크기 조정 */
+    font-weight: 700;
+    font-family: 'Gowun Batang', serif;
+}
+
+
+.bottomNameKr {
+    font-size: 25px; /* 크기 조정 */
+    font-family: 'Gowun Batang', serif;
+}
+
+/* .bottomDivider {
+} */
+
+/* 메인 이미지 */
+.mainImage {
+    position: absolute;
+    width: 450px;
+    height: 470px;
+    left: 348px; /* 기존 값 */
+    top: 336px; /* 기존 값 */
+}
+
+
+.mainImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 브랜드 정보 */
+.brandInfo {
+    position: absolute;
+    width: 327px;
+    left: 415px;
+    top: 800px;
+    text-align: center;
+}
+
+.brandInfo h3 {
+    font-family: 'Gowun Batang', serif;
+    font-size: 30px;
+    line-height: 45px;
+}
+
+.brandInfo p {
+    font-family: 'Gowun Batang', serif;
+    font-size: 25px;
+    line-height: 20px;
+    margin-top: 10px;
+}
+
+/* 노트 섹션 */
+.notes {
+    position: absolute;
+    width: 772px;
+    left: 931px;
+    top: 380px;
+}
+
+.noteItem {
+    position: relative;
+    margin-bottom: 80px;
+    text-align: center;
+    font-family: 'Gowun Batang', serif;
+    line-height: 20px;
+}
+
+.noteType {
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.noteNames {
+    font-size: 18px;
+    color: #494949;
+}
+
+/* 노트 구분선 */
+.noteDivider {
+    width: 747px;
+    height: 1px;
+    background: #000000;
+    margin: 0px 0;
+    transform: translateY(-40px);
+}
+
+/* 향수 설명 */
+.description {
+    position: absolute;
+    width: 529px;
+    left: 1052px;
+    top: 800px;
+    font-family: 'Gowun Batang', serif;
+    font-size: 24px;
+    line-height: 36px;
+    text-align: center;
+    max-height: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+}
+
+
+/* 메인 구분선 */
+.divider {
+    position: absolute;
+    width: 1380px;
+    height: 1px;
+    left: calc(50% - 1380px/2 + 5px);
+    top: 1126px; /* 기존 유지 */
+    background: #000000;
+}
+
+.ingredients {
+    position: absolute;
+    width: 772px;
+    left: 931px;
+    top: 980px;
+}
+
+.ingredientsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ingredientItem {
+    background: #FFFFFF;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* 스크롤바 */
+.scrollbar {
+    position: absolute;
+    width: 37px;
+    height: 998px;
+    right: 0;
+    top: 281px;
+    background: #DFDFDF;
+}
+
+.scrollThumb {
+    position: absolute;
+    width: 37px;
+    height: 77px;
+    background: #626262;
+    top: 31px;
+}
