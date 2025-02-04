@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import styles from '../../../css/modules/MessageItem.module.css';
+import styles from '../../../css/chat/MessageItem.module.css';
 
 /**
  * 채팅 메시지의 개별 항목을 표시하는 컴포넌트

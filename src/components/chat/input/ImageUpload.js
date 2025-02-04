@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import styles from '../../../css/modules/ChatInput.module.css';
+import styles from '../../../css/chat/ChatInput.module.css';
 
 /**
  * 이미지 업로드 버튼 컴포넌트

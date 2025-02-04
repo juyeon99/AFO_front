@@ -1,7 +1,7 @@
 import React, { memo, useRef, useEffect } from 'react';
 import MessageItem from './MessageItem';
 import LoadingDots from './LoadingDots';
-import styles from '../../../css/modules/MessageList.module.css';
+import styles from '../../../css/chat/MessageList.module.css';
 
 /**
  * 채팅 메시지 목록을 표시하는 컴포넌트

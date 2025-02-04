@@ -1,6 +1,6 @@
 import React, { useState, memo } from 'react';
 import ImageUpload from './ImageUpload';
-import styles from '../../../css/modules/ChatInput.module.css';
+import styles from '../../../css/chat/ChatInput.module.css';
 
 /**
  * 채팅 입력창 컴포넌트
