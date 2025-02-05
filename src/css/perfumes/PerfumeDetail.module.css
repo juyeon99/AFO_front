@@ -5,11 +5,11 @@
     position: relative;
     max-width: 1920px;        /* width를 max-width로 변경 */
     min-width: 1200px;        /* 최소 너비 설정 */
-    height: 2294px;
     background: #EFEDED;
     margin: 0 auto;           /* 중앙 정렬을 위해 추가 */
     padding: 0 20px;          /* 좌우 여백 추가 */
-    box-sizing: border-box; 
+    box-sizing: border-box;
+    overflow: visible; 
 }
 
 .logo {
@@ -174,22 +174,4 @@
     padding: 8px 16px;
     border-radius: 5px;
     font-size: 14px;
-}
-
-/* 스크롤바 */
-.scrollbar {
-    position: absolute;
-    width: 37px;
-    height: 998px;
-    right: 0;
-    top: 281px;
-    background: #DFDFDF;
-}
-
-.scrollThumb {
-    position: absolute;
-    width: 37px;
-    height: 77px;
-    background: #626262;
-    top: 31px;
 }
