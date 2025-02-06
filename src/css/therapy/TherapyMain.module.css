@@ -19,7 +19,9 @@
     margin: 0 auto;
     display: block;
     translate: -10px -40px;
+    cursor: pointer;
 }
+
 
 .heading {
     font-size: 24px;
