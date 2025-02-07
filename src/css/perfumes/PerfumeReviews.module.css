@@ -68,10 +68,11 @@
     display: flex;
     gap: 37px;
     margin-bottom: 40px;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 더 자연스러운 이징 */
+    transition: transform 0.1s ease-out;
     justify-content: flex-start;
     margin: 0 auto;
     width: fit-content;
+    will-change: transform;
 }
 
 .reviewCard {
@@ -149,7 +150,8 @@
     transform: translate(-50%, -50%);
     cursor: grab;
     user-select: none;
-    transition: left 0.3s ease-out;
+    transition: none;
+    will-change: left;
 }
 
 .sliderHandle:active {

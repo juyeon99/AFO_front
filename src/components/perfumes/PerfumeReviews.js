@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styles from '../../css/perfumes/PerfumeReviews.module.css';
 import perfumeData from '../../data/PerfumeData';
 import ReviewSlider from '../../components/perfumes/ReviewSlider';
+import SimilarPerfumes from '../../components/perfumes/SimilarPerfumes';
 
 const PerfumeReviews = ({ perfumeId }) => {
     const [selectedReview, setSelectedReview] = useState(null);
@@ -45,26 +46,33 @@ const PerfumeReviews = ({ perfumeId }) => {
     useEffect(() => {
         const handleGlobalMouseMove = (e) => {
             if (isDragging) {
+                e.preventDefault();
+
                 const sliderLine = document.querySelector(`.${styles.sliderLine}`);
                 const rect = sliderLine.getBoundingClientRect();
-                
-                const newPosition = e.clientX - rect.left;
-                const maxPosition = rect.width - 100;
-                
-                const boundedPosition = Math.max(0, Math.min(newPosition, maxPosition));
-                const percentage = (boundedPosition / maxPosition) * 100;
-                
-                const cardWidth = 196 + 37;
-                const maxScroll = (allReviews.length - CARDS_PER_PAGE) * cardWidth;
-                const newOffset = Math.min((percentage / 100) * maxScroll, maxScroll);
-                
-                setSliderLeft(percentage);
-                setCardOffset(newOffset);
 
-                const approximatePage = Math.floor((newOffset / maxScroll) * totalPages) + 1;
-                if (approximatePage !== currentPage && approximatePage > 0 && approximatePage <= totalPages) {
-                    setCurrentPage(approximatePage);
-                }
+                const cardWidth = 196 + 37; // 카드 너비 + gap
+                const containerWidth = 1362 - 40; // 컨테이너 너비
+
+                // 전체 스크롤 가능한 너비 계산
+                const totalWidth = cardWidth * (allReviews.length - 1); // 전체 카드의 스크롤 가능한 너비
+                const maxScrollable = Math.max(0, totalWidth); // 음수 방지
+
+                const mouseX = e.clientX;
+                const sliderStart = rect.left;
+                const sliderWidth = rect.width - 100;
+
+                const relativeX = mouseX - sliderStart;
+                const percentage = Math.max(0, Math.min(100, (relativeX / sliderWidth) * 100));
+
+                requestAnimationFrame(() => {
+                    // 스크롤 위치 계산 및 경계값 처리
+                    const newOffset = Math.min((percentage / 100) * maxScrollable, maxScrollable);
+
+                    // 슬라이더와 카드 위치 업데이트
+                    setSliderLeft(percentage);
+                    setCardOffset(newOffset);
+                });
             }
         };
 
@@ -74,14 +82,15 @@ const PerfumeReviews = ({ perfumeId }) => {
             }
         };
 
-        document.addEventListener('mousemove', handleGlobalMouseMove);
-        document.addEventListener('mouseup', handleGlobalMouseUp);
+        // 성능 최적화를 위한 passive 이벤트 리스너
+        window.addEventListener('mousemove', handleGlobalMouseMove, { passive: false });
+        window.addEventListener('mouseup', handleGlobalMouseUp);
 
         return () => {
-            document.removeEventListener('mousemove', handleGlobalMouseMove);
-            document.removeEventListener('mouseup', handleGlobalMouseUp);
+            window.removeEventListener('mousemove', handleGlobalMouseMove);
+            window.removeEventListener('mouseup', handleGlobalMouseUp);
         };
-    }, [isDragging, currentPage, allReviews.length, totalPages]);
+    }, [isDragging, allReviews.length]);
 
     return (
         <div className={styles.reviewsContainer}>
@@ -142,6 +151,12 @@ const PerfumeReviews = ({ perfumeId }) => {
                     setSliderLeft={setSliderLeft}
                     setCardOffset={setCardOffset}
                 />
+            </div>
+
+
+            {/* 유사 향수 섹션 추가 */}
+            <div className={styles.similarPerfumesSection}>
+                <SimilarPerfumes perfumeId={perfumeId} />
             </div>
         </div>
     );

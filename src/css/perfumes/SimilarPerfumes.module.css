@@ -1,0 +1,38 @@
+.similarContainer {
+    margin-top: 40px;
+    padding: 20px;
+    background: #f8f8f8;
+    border-radius: 10px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.similarList {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+}
+
+.similarCard {
+    min-width: 200px;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.similarCard:hover {
+    transform: scale(1.05);
+}
+
+.similarCard img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}

@@ -14,7 +14,7 @@
 }
 
 /* 디버깅을 위한 임시 스타일 */
-.container::before {
+/* .container::before {
     content: '';
     position: absolute; 
     left: 50%;
@@ -23,7 +23,7 @@
     width: 1px;
     background-color: red;
     z-index: 1000;
-}
+} */
 
 .logo {
     position: absolute;
