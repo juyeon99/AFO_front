@@ -1,0 +1,178 @@
+.reviewsContainer {
+    position: relative;
+    width: 1362px;
+    margin: 0 auto;
+    top: 1196px;
+}
+
+.topReviewsSection {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.topReviewCard {
+    width: 1362px;
+    height: 81px;
+    background: #FFFFFF;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+}
+
+.topReviewCard h4 {
+    width: 180px;
+    height: 80px;
+    font-family: 'Inter';
+    font-size: 20px;
+    line-height: 30px;
+    display: flex;
+    align-items: center;
+    color: #000000;
+}
+
+.reviewListSection {
+    margin-top: 120px;
+}
+
+.reviewsHeader {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 30px;
+}
+
+.writeReviewBtn {
+    width: 210px;
+    height: 35px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    font-family: 'Inter';
+    font-size: 20px;
+    line-height: 30px;
+    color: #000000;
+    border: none;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+}
+
+.reviewCardsContainer {
+    position: relative;
+    width: 1362px;
+    overflow: hidden;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.reviewCards {
+    display: flex;
+    gap: 37px;
+    margin-bottom: 40px;
+    transition: transform 0.1s ease-out;
+    justify-content: flex-start;
+    margin: 0 auto;
+    width: fit-content;
+    will-change: transform;
+}
+
+.reviewCard {
+    min-width: 196px;
+    height: 334px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    transition: transform 0.3s ease-out;
+}
+
+.reviewCard.selected {
+    border: 3px solid #FF0000;
+}
+
+.perfumeThumb {
+    width: 108px;
+    height: 95px;
+    object-fit: contain;
+    display: block; /* block 요소로 변경 */
+    margin: 0 auto; /* 좌우 마진 auto로 설정하여 가운데 정렬 */
+}
+
+.divider {
+    width: 136px;
+    height: 1px;
+    background: #000000;
+    margin: 10px 0;
+}
+
+.reviewContent {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #494949;
+    text-align: center;
+    margin: 40px 0;
+}
+
+.reviewerName {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+}
+
+.sliderContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: 40px;
+}
+
+.sliderLine {
+    width: 100%;
+    height: 2px;
+    background: #000000;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sliderHandle {
+    position: absolute;
+    width: 100px;
+    height: 20px;
+    background: #FFFFFF;
+    border: 1px solid #000000;
+    border-radius: 10px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    cursor: grab;
+    user-select: none;
+    transition: none;
+    will-change: left;
+}
+
+.sliderHandle:active {
+    cursor: grabbing;
+}
+
+.pagination {
+    display: flex;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.paginationDot {
+    width: 15px;
+    height: 15px;
+    background: #A4A4A4;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.paginationDot.active {
+    background: #000000;
+}

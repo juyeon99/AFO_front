@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Gowun+Dodum&family=Hahmlet:wght@100..900&family=Nanum+Gothic&family=Noto+Serif+KR:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap');
+
+.container {
+    position: relative;
+    max-width: 1920px;
+    min-width: 1200px;
+    background: #EFEDED;
+    margin: 0 auto;
+    padding: 0 20px 300px; /* 푸터를 위한 하단 패딩 추가 */
+    box-sizing: border-box;
+    overflow: visible;
+    min-height: calc(100vh + 1400px);
+}
+
+/* 디버깅을 위한 임시 스타일 */
+/* .container::before {
+    content: '';
+    position: absolute; 
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: red;
+    z-index: 1000;
+} */
+
+.logo {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    left: calc(50% - 180px/2);
+    top: -39px;
+}
+
+/* 상단 향수 이름 추가 */
+.topNameEn {
+    position: absolute;
+    left: 352px;
+    top: 224px;
+    font-family: 'Inter';
+    font-size: 36px;
+    line-height: 1.2; /* 줄 간격 조정 */
+    max-width: calc(50vw - 200px); /* 화면 중앙까지의 너비 */
+    white-space: pre-wrap; /* 공백과 줄바꿈 유지하면서 자동 줄바꿈 */
+    overflow: visible;
+    text-align: left;
+    word-wrap: break-word; /* 긴 단어 줄바꿈 */
+    height: auto; /* 높이 자동 조정 */
+}
+
+/* 긴 제목일 경우에만 적용되는 스타일 */
+.longTitleCustom {
+    left: 340px !important; /* !important로 기본 위치 덮어쓰기 */
+    top: 160px !important;
+    font-size: 32px;
+    width: 500px;
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    white-space: pre-wrap;
+    justify-content: center;
+    word-wrap: break-word;
+    text-align: center;
+}
+
+/* 하단 향수 이름 추가 */
+.bottomName {
+    position: absolute;
+    width: 450px; /* 메인 이미지와 동일한 너비 */
+    left: 348px; /* 메인 이미지와 동일한 left 값 */
+    top: 970px;
+    text-align: center;
+}
+
+.bottomNameEn {
+    font-size: 25px; /* 크기 조정 */
+    font-weight: 700;
+    font-family: 'Gowun Batang', serif;
+    margin-bottom: -4px;
+}
+
+.bottomNameKr {
+    font-size: 25px; /* 크기 조정 */
+    font-family: 'Gowun Batang', serif;
+}
+
+/* 메인 이미지 */
+.mainImage {
+    position: absolute;
+    width: 450px;
+    height: 470px;
+    left: 348px; /* 기존 값 */
+    top: 336px; /* 기존 값 */
+}
+
+.mainImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 브랜드 정보 */
+.brandInfo {
+    position: absolute;
+    width: 450px; /* 메인 이미지와 동일한 너비 */
+    left: 348px; /* 메인 이미지와 동일한 left 값 */
+    top: 800px;
+    text-align: center;
+}
+
+/* 브랜드와 향수 이름 사이의 구분선 */
+.bottomDivider {
+    position: absolute;
+    width: 450px; /* 메인 이미지와 동일한 너비 */
+    height: 1px;
+    left: 348px; /* 메인 이미지와 동일한 left 값 */
+    top: 960px; /* brandInfo와 bottomName 사이 */
+    background-color: #000000;
+}
+
+.brandInfo h3 {
+    font-family: 'Gowun Batang', serif;
+    font-size: 30px;
+    line-height: 45px;
+}
+
+.brandInfo p {
+    font-family: 'Gowun Batang', serif;
+    font-size: 25px;
+    line-height: 20px;
+    margin-top: 10px;
+}
+
+/* 노트 섹션 */
+.notes {
+    position: absolute;
+    width: 772px;
+    left: 931px;
+    top: 380px;
+}
+
+.noteItem {
+    position: relative;
+    margin-bottom: 80px;
+    text-align: center;
+    font-family: 'Gowun Batang', serif;
+    line-height: 20px;
+}
+
+.noteType {
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.noteNames {
+    font-size: 18px;
+    color: #494949;
+}
+
+/* 노트 구분선 */
+.noteDivider {
+    width: 747px;
+    height: 1px;
+    background: #000000;
+    margin: 0px 0;
+    transform: translateY(-40px);
+}
+
+/* 향수 설명 */
+.description {
+    position: absolute;
+    width: 529px;
+    left: 1052px;
+    top: 800px;
+    font-family: 'Gowun Batang', serif;
+    font-size: 24px;
+    line-height: 36px;
+    text-align: center;
+    max-height: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+}
+
+
+/* 메인 구분선 */
+.divider {
+    position: relative;
+    width: 1380px;
+    height: 1px;
+    left: calc(50% - 1380px/2 + 5px);
+    top: 1126px; /* 기존 유지 */
+    background: #000000;
+}
+
+.ingredients {
+    position: absolute;
+    width: 772px;
+    left: 931px;
+    top: 980px;
+}
+
+.ingredientsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ingredientItem {
+    background: #FFFFFF;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 14px;
+}
