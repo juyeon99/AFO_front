@@ -28,6 +28,7 @@
     display: block;
     translate: -10px -40px;
     margin-bottom: 20px;
+    cursor: pointer;
 }
 
 .mainTitle {
@@ -49,7 +50,7 @@
 
 .diffuserGrid {
     display: grid;
-    grid-template-columns: repeat(3, 280px);
+    grid-template-columns: repeat(2, 280px);
     gap: 150px;
     width: 1040px;
     margin: 20px auto;

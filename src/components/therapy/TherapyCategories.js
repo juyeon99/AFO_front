@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import TherapyKeywordSelector from "../../components/therapy/TherapyKeywordSelector";
 import styles from "../../css/therapy/TherapyCategories.module.css";
 import { useNavigate } from 'react-router-dom';
 
@@ -49,20 +48,17 @@ const TherapyCategories = ({ onClose }) => {
         setTimeout(scrollToCategories, 100);
     }, []);
 
-    // 뒤로가기 처리 및 스크롤 위치 조정
-    const handleBack = () => {
-        setSelectedCategory(null);
-        setTimeout(() => {
-            const circleMenuElement = document.querySelector(`.${styles.circleMenu}`);
-            if (circleMenuElement) {
-                const offset = circleMenuElement.offsetTop - window.innerHeight / 3 + circleMenuElement.offsetHeight / 2;
-                window.scrollTo({
-                    top: offset,
-                    behavior: 'smooth'
-                });
+    // 카테고리 선택 핸들러 추가
+    const handleCategorySelect = (categoryName) => {
+        // 키워드 없이 카테고리만 전달하되, 기존 데이터 구조 유지
+        navigate('/therapy/recommend', {
+            state: {
+                category: categoryName,
+                keyword: { name: categoryName }  // 기존 구조 유지를 위해 동일한 값 전달
             }
-        }, 100);
+        });
     };
+
 
     return (
         <div className={styles.container}>
@@ -81,28 +77,19 @@ const TherapyCategories = ({ onClose }) => {
 
             {/* 카테고리 선택 영역 */}
             <div className={styles.categoriesContainer}>
-                {selectedCategory ? (
-                    // 카테고리 선택 후 키워드 선택 화면
-                    <TherapyKeywordSelector
-                        category={selectedCategory}
-                        onBack={handleBack}
-                    />
-                ) : (
-                    // 원형 메뉴로 카테고리 표시
-                    <div className={styles.circleMenu}>
-                        {categories.map((category, index) => (
-                            <div
-                                key={category.name}
-                                className={`${styles.categoryItem} ${styles[`position${index}`]} ${categoryStyles[category.name]}`}
-                                onClick={() => setSelectedCategory(category.name)}
-                                data-name={category.name}
-                            >
-                                <img src={category.image} alt={category.name} className={styles.categoryImage} />
-                            </div>
-                        ))}
-                        <button className={styles.closeButton} onClick={onClose}>CLOSE</button>
-                    </div>
-                )}
+                <div className={styles.circleMenu}>
+                    {categories.map((category, index) => (
+                        <div
+                            key={category.name}
+                            className={`${styles.categoryItem} ${styles[`position${index}`]} ${categoryStyles[category.name]}`}
+                            onClick={() => handleCategorySelect(category.name)}
+                            data-name={category.name}
+                        >
+                            <img src={category.image} alt={category.name} className={styles.categoryImage} />
+                        </div>
+                    ))}
+                    <button className={styles.closeButton} onClick={onClose}>CLOSE</button>
+                </div>
             </div>
         </div>
     );

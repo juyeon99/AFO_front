@@ -8,10 +8,16 @@ const TherapyDiffuserRecommend = () => {
     // 이전 페이지에서 전달된 상태값을 받기 위한 location 훅
     const location = useLocation();
     // location.state에서 category와 keyword 추출 (값이 없을 경우 빈 객체 사용)
-    const { category, keyword } = location.state || {};
+    const { category } = location.state || {};
+
+    // 디버깅을 위한 로그
+    console.log('Location State:', location.state);
+    console.log('Category:', category);
+    console.log('Diffuser Data:', diffuserData);
+    console.log('Selected Data:', diffuserData[category]);
 
     // 선택된 카테고리와 키워드에 해당하는 디퓨저 데이터 가져오기
-    const selectedData = diffuserData[category]?.[keyword.name];
+    const selectedData = diffuserData[category];
 
     // 데이터가 없는 경우 에러 메시지 표시
     if (!selectedData) {
