@@ -144,6 +144,11 @@ function Main() {
                     <NavLink to="/chat">
                         <button className="main-start-button">START ▶</button>
                     </NavLink>
+                    {role === 'ADMIN' && (
+                        <NavLink to="/dashboard">
+                            <button className="main-start-button">START ▶</button>
+                        </NavLink>
+                    )}
                 </div>
             </div>
 
