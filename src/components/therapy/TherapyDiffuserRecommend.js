@@ -53,11 +53,12 @@ const TherapyDiffuserRecommend = () => {
                                 className={styles.diffuserImage}
                             />
                             <div className={styles.divider}></div>
+                            <p className={styles.diffuserBrand}>{product.brand}</p>
                             <p className={styles.diffuserName}>
-                                {product.name} {product.volume}
+                                {product.name}
                             </p>
                             <p className={styles.diffuserDescription}>
-                                {product.description}
+                                {product.content}
                             </p>
                         </div>
                     </div>
