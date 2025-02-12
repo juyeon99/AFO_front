@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styles from "../../css/therapy/TherapyCategories.module.css";
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import ColorLoadingScreen from '../../components/loading/ColorLoadingScreen';
+import { fetchTherapyResponse, selectLoading } from '../../module/TherapyModule';
+
 
 // 향기 테라피의 메인 카테고리 선택 컴포넌트
 // 원형 메뉴 형태로 카테고리를 표시하고 선택할 수 있게 함
@@ -29,7 +33,9 @@ const categoryStyles = {
 const TherapyCategories = ({ onClose }) => {
     // 선택된 카테고리 상태 관리
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const loading = useSelector(selectLoading);
 
     // 컴포넌트가 마운트될 때 자동 스크롤
     useEffect(() => {
@@ -49,19 +55,29 @@ const TherapyCategories = ({ onClose }) => {
     }, []);
 
     // 카테고리 선택 핸들러 추가
-    const handleCategorySelect = (categoryName) => {
-        // 키워드 없이 카테고리만 전달하되, 기존 데이터 구조 유지
-        navigate('/therapy/recommend', {
-            state: {
-                category: categoryName,
-                keyword: { name: categoryName }  // 기존 구조 유지를 위해 동일한 값 전달
-            }
-        });
-    };
+    const handleCategorySelect = async (categoryName) => {
+        try {
+            // API 요청 (loading 상태는 reducer에서 자동으로 처리됨)
+            await dispatch(fetchTherapyResponse(categoryName));
 
+            // API 요청이 성공하면 페이지 이동
+            navigate('/therapy/recommend', {
+                state: {
+                    category: categoryName,
+                    keyword: { name: categoryName }
+                }
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
     return (
         <div className={styles.container}>
+            {loading && (
+                <ColorLoadingScreen loadingText="디퓨저를 찾는 중..." />
+            )}
+
             {/* 카테고리 선택 전 초기 화면 */}
             {!selectedCategory && (
                 <>
