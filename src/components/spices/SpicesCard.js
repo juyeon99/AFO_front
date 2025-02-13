@@ -1,5 +1,6 @@
 import React from 'react';
 import { Edit } from 'lucide-react';
+import line_ from '../../data/line_.json';
 import styles from '../../css/spices/SpicesCard.module.css';
 
 /**
@@ -62,6 +63,26 @@ const SpicesCard = ({
     onCheckboxChange,
     onEditClick
 }) => {
+
+    // 계열별 색상을 가져오는 함수
+    const getLineColor = (lineName) => {
+        const line = line_.find(l => l.name === lineName);
+        return line ? `#${line.color}` : '#EFEDED';
+    };
+
+    // 배경색에 따른 텍스트 색상 계산
+    const getTextColor = (backgroundColor) => {
+        const hex = backgroundColor.replace('#', '');
+        const brightness =
+            parseInt(hex.slice(0, 2), 16) * 0.299 +
+            parseInt(hex.slice(2, 4), 16) * 0.587 +
+            parseInt(hex.slice(4, 6), 16) * 0.114;
+        return brightness > 128 ? '#000000' : '#FFFFFF';
+    };
+
+    const lineColor = getLineColor(spice.lineName);
+    const textColor = getTextColor(lineColor);
+
     return (
         <div className={styles.cardWrapper}>
             {/* 체크박스 */}
@@ -103,7 +124,7 @@ const SpicesCard = ({
                 </div>
 
                 {/* 카드 뒷면 */}
-                <div className={styles.back}>
+                <div className={styles.back} style={{ backgroundColor: lineColor, color: textColor }}>
                     <h3 className={styles.nameKr}>{spice.nameKr}</h3>
                     <div className={styles.divider}></div>
                     <div className={styles.description}>

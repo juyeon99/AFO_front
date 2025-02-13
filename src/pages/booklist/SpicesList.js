@@ -44,6 +44,7 @@ const SpicesList = () => {
         handleSubmit,
         handlePageChange,
         totalPages,
+        setActiveFilters,
     } = useSpicesState(spices);
 
     if (isLoading) {
@@ -82,7 +83,7 @@ const SpicesList = () => {
                 <div>
                     <SpicesFilters
                         activeFilters={activeFilters}
-                        handleFilterClick={handleFilterClick}
+                        setActiveFilters={setActiveFilters}
                         role={role}
                         handleAddButtonClick={handleAddButtonClick}
                         handleCheckboxToggle={handleCheckboxToggle}
