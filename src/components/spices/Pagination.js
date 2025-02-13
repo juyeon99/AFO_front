@@ -2,7 +2,7 @@ import React from 'react';
 import styles from '../../css/spices/SpicesPagination.module.css';
 
 // 한 번에 보여줄 최대 페이지 번호 개수
-const MAX_VISIBLE_PAGES = 5;
+const MAX_VISIBLE_PAGES = 10;
 
 /**
  * 페이지네이션 컴포넌트

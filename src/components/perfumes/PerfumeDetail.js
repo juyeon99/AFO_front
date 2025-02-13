@@ -2,46 +2,46 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from '../../css/perfumes/PerfumeDetail.module.css';
 import PerfumeReviews from './PerfumeReviews';
-import perfumeData from '../../data/PerfumeData';
-import { noteData, spiceData } from '../../data/NoteData';
+import { useSelector } from 'react-redux';
+import { selectPerfumes } from '../../module/PerfumeModule';
 
 const PerfumeDetail = () => {
     const { id } = useParams();
-    const perfume = perfumeData.find(p => p.id === parseInt(id));
     const navigate = useNavigate();
     const [isLongTitle, setIsLongTitle] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+    const perfumes = useSelector(selectPerfumes);
+    const perfume = perfumes?.find(p => p.id === parseInt(id));
+
+    // 제목 길이 체크 useEffect
     useEffect(() => {
         // 초기화를 포함한 조건 체크
-        if (perfume.name) {
-            if (perfume.name.length > 20) {
+        if (perfume.nameEn) {
+            if (perfume.nameEn.length > 20) {
                 setIsLongTitle(true);
             } else {
                 setIsLongTitle(false); // 20글자 이하일 경우 false로 설정
             }
         }
-    }, [perfume.name]);
+    }, [perfume.nameEn]);
 
-    // ingredients 문자열을 파싱하는 함수
-    const parseIngredients = (ingredients) => {
-        if (!ingredients) return [];
-        return ingredients.split(',').map(item => item.trim());
-    };
+    // 이미지 자동 전환을 위한 useEffect
+    useEffect(() => {
+        if (perfume?.imageUrlList?.length > 1) {
+            const interval = setInterval(() => {
+                setCurrentImageIndex(prev =>
+                    prev === perfume.imageUrlList.length - 1 ? 0 : prev + 1
+                );
+            }, 3000);
 
-    // 향수의 노트 정보를 가져오는 함수
-    const getNotesByType = (perfumeId, noteType) => {
-        return noteData
-            .filter(note => note.perfume_id === perfumeId && note.note_type === noteType)
-            .map(note => spiceData[note.spice_id].korean_name);
-    };
+            return () => clearInterval(interval);
+        }
+    }, [perfume?.imageUrlList?.length]);
 
     if (!perfume) {
         return <div>향수를 찾을 수 없습니다.</div>;
     }
-
-    const topNotes = getNotesByType(perfume.id, "top");
-    const middleNotes = getNotesByType(perfume.id, "middle");
-    const baseNotes = getNotesByType(perfume.id, "base");
 
     return (
         <div className={styles.container}>
@@ -59,33 +59,66 @@ const PerfumeDetail = () => {
                 position: 'relative',
                 paddingBottom: '100px'
             }}>
+
                 {/* 상단 향수 이름 */}
-                <h1 className={`${styles.topNameEn} ${isLongTitle ? styles.longTitleCustom : ''}`}>
-                    {perfume.name}
-                </h1>
+                <div className={styles.topSection}>
+                    <h1 className={`${styles.topNameEn} ${isLongTitle ? styles.longTitleCustom : ''}`}>
+                        {perfume.nameEn}
+                    </h1>
+                </div>
 
                 <div className={styles.contentWrapper}>
                     <div className={styles.imageSection}>
-                        <img src={perfume.imageUrls[0]} alt={perfume.name} className={styles.mainImage} />
+                        <div className={styles.imageContainer}>
+                            {perfume?.imageUrlList?.map((imageUrl, index) => (
+                                <img
+                                    key={index}
+                                    src={imageUrl}
+                                    alt={`${perfume?.nameKr} ${index + 1}`}
+                                    className={`${styles.mainImage} ${currentImageIndex === index ? styles.active : ''}`}
+                                    style={{ opacity: currentImageIndex === index ? 1 : 0 }}
+                                />
+                            ))}
+
+                            {/* 페이징 도트 */}
+                            <div className={styles.dots}>
+                                {perfume?.imageUrlList?.map((_, index) => (
+                                    <span
+                                        key={index}
+                                        className={`${styles.dot} ${currentImageIndex === index ? styles.activeDot : ''}`}
+                                        onClick={() => setCurrentImageIndex(index)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
                     </div>
 
                     <div className={styles.infoSection}>
+                        {/* 메인 어코드 */}
+                        <div className={styles.mainAccords}>
+                            {perfume.mainAccord?.split('/')?.map((accord, index) => (
+                                <span key={index} className={styles.accordItem}>
+                                    #{accord.trim()}
+                                </span>
+                            ))}
+                        </div>
+
                         {/* 노트 정보 */}
                         <div className={styles.notes}>
                             <div className={styles.noteDivider}></div>
                             <div className={styles.noteItem}>
                                 <span className={styles.noteType}>Top</span>
-                                <p className={styles.noteNames}>{topNotes.join(', ')}</p>
+                                <p className={styles.noteNames}>{perfume.topNote}</p>
                             </div>
                             <div className={styles.noteDivider}></div>
                             <div className={styles.noteItem}>
                                 <span className={styles.noteType}>Middle</span>
-                                <p className={styles.noteNames}>{middleNotes.join(', ')}</p>
+                                <p className={styles.noteNames}>{perfume.middleNote}</p>
                             </div>
                             <div className={styles.noteDivider}></div>
                             <div className={styles.noteItem}>
                                 <span className={styles.noteType}>Base</span>
-                                <p className={styles.noteNames}>{baseNotes.join(', ')}</p>
+                                <p className={styles.noteNames}>{perfume.baseNote}</p>
                             </div>
                             <div className={styles.noteDivider}></div>
                         </div>
@@ -93,30 +126,52 @@ const PerfumeDetail = () => {
                         {/* 성분 정보 */}
                         <div className={styles.ingredients}>
                             <div className={styles.ingredientsList}>
-                                {parseIngredients(perfume.ingredients).map((ingredient, index) => (
-                                    <span key={index} className={styles.ingredientItem}>
-                                        {ingredient}
-                                    </span>
-                                ))}
+                                {/* 항상 보이는 축약된 리스트 */}
+                                <div className={styles.shortList}>
+                                    {perfume?.ingredients?.split(',').map((ingredient, index, array) => {
+                                        if (array.length > 5 && index === 4) {
+                                            return <span key={index} className={styles.ingredientItem}>...</span>;
+                                        }
+                                        if (index < 4 || index === array.length - 1) {
+                                            return (
+                                                <span key={index} className={styles.ingredientItem}>
+                                                    {ingredient.trim()}
+                                                </span>
+                                            );
+                                        }
+                                        return null;
+                                    })}
+                                </div>
+
+                                {/* 성분이 5개 초과일 때만 fullList 렌더링 */}
+                                {perfume?.ingredients?.split(',').length > 5 && (
+                                    <div className={styles.fullList}>
+                                        {perfume?.ingredients?.split(',').map((ingredient, index) => (
+                                            <span key={index} className={styles.ingredientItem}>
+                                                {ingredient.trim()}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         {/* 브랜드 정보 */}
                         <div className={styles.brandInfo}>
                             <h3>{perfume.brand}</h3>
-                            <p>{perfume.koreanBrand}</p>
+                            <p>{perfume.grade}</p>
                         </div>
                         <div className={styles.bottomDivider}></div>
 
                         {/* 하단 향수 이름 */}
                         <div className={styles.bottomName}>
-                            <h2 className={styles.bottomNameEn}>{perfume.name}</h2>
-                            <p className={styles.bottomNameKr}>{perfume.koreanName}</p>
+                            <h2 className={styles.bottomNameEn}>{perfume.nameEn}</h2>
+                            <p className={styles.bottomNameKr}>{perfume.nameKr}</p>
                         </div>
 
                         {/* 향수 설명 */}
                         <p className={styles.description}>
-                            {perfume.description}
+                            {perfume.content}
                         </p>
                     </div>
                 </div>

@@ -4,6 +4,7 @@ import apis from "./Apis";
 export const getAllPerfumes = async () => {
     try {
         const response = await apis.get("/products");
+        console.log("향수 조회 응답:", response);
         return response.data;
     } catch (error) {
         console.error("Error fetching perfumes:", error);
