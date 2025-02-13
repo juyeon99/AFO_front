@@ -22,7 +22,6 @@ import ErrorScreen from './Fail';
 import Therapy from './pages/therapy/Therapy';
 import TherapyDiffuserRecommend from './components/therapy/TherapyDiffuserRecommend';
 import PerfumeDetail from './components/perfumes/PerfumeDetail';
-import AdminDashboard from './pages/admin/AdminDashboard';
 
 // 원래 로그인
 import LoginTest from "./pages/test/LoginTest";
@@ -62,7 +61,6 @@ function App() {
             <Route path='/member' element={<AdminMembers />} />
             <Route path='/therapy' element={<Therapy />} />
             <Route path='/therapy/recommend' element={<TherapyDiffuserRecommend />} />
-            <Route path='/dashboard' element={<AdminDashboard />} />
           </Route>
 
 

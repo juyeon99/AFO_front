@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import '../../css/admin/ChartComponent.css';
 
 // Chart.js 설정
 ChartJS.register(ArcElement, Tooltip, Legend);
