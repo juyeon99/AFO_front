@@ -89,7 +89,7 @@ function AdminMembers() {
                                     <th>역할</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody>  
                                 {currentMembers.map((member) => (
                                     <tr key={member.email}>
                                         <td>{member.name}</td>
