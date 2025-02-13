@@ -1,6 +1,8 @@
 import '../css/Main.css';
 import React, { useEffect, useState, useRef } from 'react';
 import { NavLink } from 'react-router-dom'
+import DashboardModal from './admin/DashboardModal';
+import { ChartColumnIncreasing } from "lucide-react"; 
 
 function Main() {
     const [scrollY, setScrollY] = useState(0);
@@ -17,6 +19,7 @@ function Main() {
     const additionalSectionRef1 = useRef(null);
     const additionalSectionRef2 = useRef(null);
     const fadeInSectionRef = useRef(null);
+    const [isDashboardOpen, setIsDashboardOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -119,9 +122,21 @@ function Main() {
 
                 {/* 관리자 문구 */}
                 {role === 'ADMIN' && (
-                    <div className="admin-banner">
-                        관리자 페이지
-                    </div>
+                    <>
+                        <div className="admin-banner">
+                            관리자입니다.
+                        </div>
+                        <button 
+                            className="dashboard-button"
+                            onClick={() => setIsDashboardOpen(true)}
+                        >
+                            사용자 대시보드 <ChartColumnIncreasing size={20} style={{ marginRight: '5px', verticalAlign: 'middle'}} />
+                        </button>
+                        <DashboardModal 
+                            isOpen={isDashboardOpen}
+                            onClose={() => setIsDashboardOpen(false)}
+                        />
+                    </>
                 )}
 
                 <video
@@ -144,11 +159,7 @@ function Main() {
                     <NavLink to="/chat">
                         <button className="main-start-button">START ▶</button>
                     </NavLink>
-                    {role === 'ADMIN' && (
-                        <NavLink to="/dashboard">
-                            <button className="main-start-button">START ▶</button>
-                        </NavLink>
-                    )}
+
                 </div>
             </div>
 

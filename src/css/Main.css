@@ -258,3 +258,34 @@ body {
     background-color: #CDC6CE;
     transform: scale(1.1);
 }
+
+/* Main.css 수정 */
+.admin-banner {
+    position: absolute;
+    top: 20px;
+    right: 50px;
+    color: white;
+    font-family: 'Nanum Gothic';
+    z-index: 100;
+}
+
+.dashboard-button {
+    position: absolute;
+    top: 50px;  /* admin-banner 아래에 위치하도록 조정 */
+    right: 50px;
+    font-family: 'Nanum Myeongjo';
+    font-size: 15px;
+    color: white;
+    border: 2px solid white;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    z-index: 100;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.dashboard-button:hover {
+    background: rgba(240, 240, 240, 0.3); /* 투명도 70% */
+}
