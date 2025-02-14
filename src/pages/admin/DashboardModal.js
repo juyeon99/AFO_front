@@ -1,146 +1,149 @@
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
-import '../../css/admin/DashboardModal.css';
-import ChartComponent from './ChartComponent'; // ChartComponent 임포트
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import { HelpCircle } from "lucide-react";
+import "../../css/admin/DashboardModal.css";
+import ChartComponent from "./ChartComponent";
 
 const DashboardModal = ({ isOpen, onClose }) => {
     const [isDetailPage, setIsDetailPage] = useState(false);
+    const iconNames = Object.keys(LucideIcons);
 
-    // 향수 데이터
-    const perfumeDataLastWeek = [1447, 1283, 1100, 978, 856]; // 지난 주 향수 데이터
-    const perfumeDataThisWeek = [1447, 1283, 1100, 978, 856]; // 이번 주 향수 데이터
-    const perfumeLabels = ['넘버5 오 드 퍼퓸', '필로시코스 오 드 퍼퓸', '우드 세이지 앤 씨 솔트 오 드 코롱', '블랑쉬 오 드 퍼퓸', '엔젤스 웨어 오 드 퍼퓸'];
+    const findKeywordIcon = (keyword) => {
+        if (!keyword) return HelpCircle;
+        const exactMatch = iconNames.find((name) => name.toLowerCase() === keyword.toLowerCase());
+        if (exactMatch) return LucideIcons[exactMatch];
 
-    // 키워드 데이터
-    const keywordDataLastWeek = [958, 976, 1102, 1228, 1362]; // 지난 주 키워드 데이터
-    const keywordDataThisWeek = [958, 976, 1102, 1228, 1362]; // 이번 주 키워드 데이터
-    const keywordLabels = ['청량한', '따뜻한', '겨울', '시트러스', '우디'];
+        const partialMatch = iconNames.find((name) => name.toLowerCase().includes(keyword.toLowerCase()));
+        if (partialMatch) return LucideIcons[partialMatch];
 
-    // 상세 페이지로 전환
+        const getSimilarity = (str1, str2) => {
+            let matches = 0;
+            const minLength = Math.min(str1.length, str2.length);
+            for (let i = 0; i < minLength; i++) {
+                if (str1[i] === str2[i]) matches++;
+            }
+            return matches / Math.max(str1.length, str2.length);
+        };
+
+        let bestMatch = { icon: HelpCircle, score: 0 };
+        for (const name of iconNames) {
+            const similarity = getSimilarity(name.toLowerCase(), keyword.toLowerCase());
+            if (similarity > bestMatch.score) {
+                bestMatch = { icon: LucideIcons[name], score: similarity };
+            }
+        }
+
+        return bestMatch.icon;
+    };
+
+    const formatChange = (change) => {
+        const value = parseInt(change);
+        return value > 0 ? `▲${value}%` : `▼${Math.abs(value)}%`;
+    };
+
+    const keywordData = [
+        { label: "청량한", count: 120, change: 17 },
+        { label: "따뜻한", count: 110, change: 10 },
+        { label: "겨울", count: 98, change: -5 },
+        { label: "시트러스", count: 96, change: 8 },
+        { label: "우디", count: 85, change: -12 },
+    ];
+
+    const perfumeData = [
+        { brand: "샤넬", name: "넘버5 오 드 퍼퓸", count: 62, change: 25, image: "/images/chanel.png" },
+        { brand: "딥티크", name: "필로시코스 오 드 퍼퓸", count: 58, change: 17, image: "/images/diptyque.png" },
+        { brand: "조 말론", name: "우드 세이지 앤 씨 솔트 오 드 코롱", count: 49, change: -5, image: "/images/jomalone.png" },
+    ];
+
+    const perfumeDataLastWeek = [1447, 1283, 1100, 978, 856];
+    const perfumeDataThisWeek = [1447, 1283, 1100, 978, 856];
+    const perfumeLabels = [
+        "넘버5 오 드 퍼퓸",
+        "필로시코스 오 드 퍼퓸",
+        "우드 세이지 앤 씨 솔트 오 드 코롱",
+        "블랑쉬 오 드 퍼퓸",
+        "엔젤스 웨어 오 드 퍼퓸",
+    ];
+
+    const keywordDataLastWeek = [958, 976, 1102, 1228, 1362];
+    const keywordDataThisWeek = keywordData.map((item) => item.count);
+    const keywordLabels = keywordData.map((item) => item.label);
+
+    const top3Keywords = keywordData.slice(0, 3);
+    const top3Perfumes = perfumeData.slice(0, 3);
+
     const goToDetailPage = () => setIsDetailPage(true);
-    // 메인 페이지로 돌아가기
     const goBackToMainPage = () => setIsDetailPage(false);
 
     useEffect(() => {
-        if (isDetailPage) {
-            // 상세 페이지로 이동 시 추가 로직이 있다면 처리
-            console.log("상세 페이지로 이동");
-        } else {
-            // 메인 페이지로 돌아갈 때 추가 로직이 있다면 처리
-            console.log("메인 페이지로 돌아가기");
-        }
+        console.log(isDetailPage ? "상세 페이지로 이동" : "메인 페이지로 돌아가기");
     }, [isDetailPage]);
 
     if (!isOpen) return null;
 
     return (
         <div className="dashboard-modal-overlay" onClick={onClose}>
-            <div className="dashboard-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="dashboard-modal-content" onClick={(e) => e.stopPropagation()}>
                 <button className="dashboard-close-button" onClick={onClose}>
                     <X size={24} />
                 </button>
 
-                {/* 상세 페이지 보기 버튼과 돌아가기 버튼은 같은 위치에 배치 */}
-                <button
-                    className="dashboard-toggle-button"
-                    onClick={isDetailPage ? goBackToMainPage : goToDetailPage}
-                >
-                    {isDetailPage ? '< 돌아가기' : '상세 페이지 보기 >'}
+                <button className="dashboard-toggle-button" onClick={isDetailPage ? goBackToMainPage : goToDetailPage}>
+                    {isDetailPage ? "< 돌아가기" : "상세 페이지 보기 >"}
                 </button>
 
-                {/* 첫 번째 페이지 (주간 인기 키워드 및 향수 카드) */}
                 {!isDetailPage && (
                     <div key="mainPage" className="dashboard-section">
                         <h2 className="dashboard-section-title">주간 인기 키워드</h2>
                         <div className="dashboard-grid">
-                            {/* 시트러스 카드 */}
-                            <div className="dashboard-card">
-                                <div className="dashboard-card-inner">
-                                    <img src="/images/citrus-line.png" alt="시트러스" className="dashboard-card-icon" />
-                                    <h3 className="dashboard-card-label">시트러스</h3>
-                                    <p className="dashboard-card-stats">사용자의 선택 횟수: 120회</p>
-                                    <p className="dashboard-card-change">지난 날부터 대비 ▲17%</p>
-                                </div>
-                            </div>
-                            {/* 청량함 카드 */}
-                            <div className="dashboard-card">
-                                <div className="dashboard-card-inner">
-                                    <img src="/images/fresh-line.png" alt="청량함" className="dashboard-card-icon" />
-                                    <h3 className="dashboard-card-label">청량함</h3>
-                                    <p className="dashboard-card-stats">사용자의 선택 횟수: 98회</p>
-                                    <p className="dashboard-card-change">지난 날부터 대비 ▲17%</p>
-                                </div>
-                            </div>
-                            {/* 우디 카드 */}
-                            <div className="dashboard-card">
-                                <div className="dashboard-card-inner">
-                                    <img src="/images/woody-line.png" alt="우디" className="dashboard-card-icon" />
-                                    <h3 className="dashboard-card-label">우디</h3>
-                                    <p className="dashboard-card-stats">사용자의 선택 횟수: 96회</p>
-                                    <p className="dashboard-card-change">지난 날부터 대비 ▼12%</p>
-                                </div>
-                            </div>
+                            {top3Keywords.map(({ label, count, change }) => {
+                                const IconComponent = findKeywordIcon(label);
+                                return (
+                                    <div key={label} className="dashboard-card">
+                                        <div className="dashboard-card-inner">
+                                            <IconComponent size={40} className="dashboard-card-icon" />
+                                            <h3 className="dashboard-card-label">{label}</h3>
+                                            <p className="dashboard-card-stats">사용자의 선택 횟수: {count}회</p>
+                                            <p className="dashboard-card-change">지난 주 대비 {formatChange(change)}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         <h2 className="dashboard-section-title">주간 인기 향수</h2>
                         <div className="dashboard-grid">
-                            {/* 샤넬 향수 카드 */}
-                            <div className="dashboard-card">
-                                <div className="dashboard-card-inner">
-                                    <img src="/images/chanel.png" alt="샤넬" className="dashboard-card-perfume" />
-                                    <h3 className="dashboard-card-label">샤넬</h3>
-                                    <p className="dashboard-card-name">넘버5 오 드 퍼퓸</p>
-                                    <p className="dashboard-card-stats">추천 횟수: 62회</p>
-                                    <p className="dashboard-card-change">지난 날부터 대비 ▲25%</p>
+                            {top3Perfumes.map(({ brand, name, count, change, image }) => (
+                                <div key={name} className="dashboard-card">
+                                    <div className="dashboard-card-inner">
+                                        <img src={image} alt={brand} className="dashboard-card-perfume" />
+                                        <h3 className="dashboard-card-label">{brand}</h3>
+                                        <p className="dashboard-card-name">{name}</p>
+                                        <p className="dashboard-card-stats">추천 횟수: {count}회</p>
+                                        <p className="dashboard-card-change">지난 주 대비 {formatChange(change)}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            {/* 딥티크 향수 카드 */}
-                            <div className="dashboard-card">
-                                <div className="dashboard-card-inner">
-                                    <img src="/images/diptyque.png" alt="딥티크" className="dashboard-card-perfume" />
-                                    <h3 className="dashboard-card-label">딥티크</h3>
-                                    <p className="dashboard-card-name">필로시코스 오 드 퍼퓸</p>
-                                    <p className="dashboard-card-stats">추천 횟수: 58회</p>
-                                    <p className="dashboard-card-change">지난 날부터 대비 ▲17%</p>
-                                </div>
-                            </div>
-                            {/* 조 말론 향수 카드 */}
-                            <div className="dashboard-card">
-                                <div className="dashboard-card-inner">
-                                    <img src="/images/jomalone.png" alt="조 말론" className="dashboard-card-perfume" />
-                                    <h3 className="dashboard-card-label">조 말론</h3>
-                                    <p className="dashboard-card-name">우드 세이지 앤 씨 솔트 오 드 코롱</p>
-                                    <p className="dashboard-card-stats">추천 횟수: 49회</p>
-                                    <p className="dashboard-card-change">지난 날부터 대비 ▼5%</p>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 )}
 
-                {/* Second Page - Detailed Charts for Keywords and Perfumes */}
                 {isDetailPage && (
                     <div className="dashboard-section">
                         <h2 className="dashboard-section-title">주간 인기 키워드</h2>
                         <div className="chart-container">
-                            {/* 두 개의 차트를 한 번에 표시 */}
                             <ChartComponent title="지난주 인기 키워드" labels={keywordLabels} data={keywordDataLastWeek} />
                             <ChartComponent title="이번주 인기 키워드" labels={keywordLabels} data={keywordDataThisWeek} />
                         </div>
 
                         <h2 className="dashboard-section-title">주간 인기 향수</h2>
                         <div className="chart-container">
-                            {/* 두 개의 향수 차트를 한 번에 표시 */}
                             <ChartComponent title="지난주 인기 향수" labels={perfumeLabels} data={perfumeDataLastWeek} />
                             <ChartComponent title="이번주 인기 향수" labels={perfumeLabels} data={perfumeDataThisWeek} />
                         </div>
-
-                        <button className="dashboard-toggle-button" onClick={goBackToMainPage}>
-                            돌아가기 &lt;
-                        </button>
                     </div>
                 )}
-
             </div>
         </div>
     );
