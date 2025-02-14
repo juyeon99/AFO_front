@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit } from 'lucide-react';
+import { Edit, Trash2 , Plus, Check} from 'lucide-react';
 import line_ from '../../data/line_.json';
 import styles from '../../css/spices/SpicesCard.module.css';
 
@@ -72,12 +72,12 @@ const SpicesCard = ({
 
     // 배경색에 따른 텍스트 색상 계산
     const getTextColor = (backgroundColor) => {
-        const hex = backgroundColor.replace('#', '');
-        const brightness =
-            parseInt(hex.slice(0, 2), 16) * 0.299 +
-            parseInt(hex.slice(2, 4), 16) * 0.587 +
-            parseInt(hex.slice(4, 6), 16) * 0.114;
-        return brightness > 128 ? '#000000' : '#FFFFFF';
+        const darkColors = ["A1522C", "86390F", "C061FF", "000000", "FF5757"]; // 흰색 글씨 적용할 색상 리스트
+    
+        const hex = backgroundColor.replace('#', '').toUpperCase();
+    
+        // 특정 색상 목록에 포함되면 흰색, 나머지는 검은색
+        return darkColors.includes(hex) ? '#FFFFFF' : '#000000';
     };
 
     const lineColor = getLineColor(spice.lineName);
@@ -105,7 +105,7 @@ const SpicesCard = ({
                         onEditClick(spice);
                     }}
                 >
-                    <Edit size={16} color="#333" />
+                    <Edit size={16} color={textColor} />
                 </button>
             )}
 
@@ -125,10 +125,10 @@ const SpicesCard = ({
 
                 {/* 카드 뒷면 */}
                 <div className={styles.back} style={{ backgroundColor: lineColor, color: textColor }}>
-                    <h3 className={styles.nameKr}>{spice.nameKr}</h3>
-                    <div className={styles.divider}></div>
+                    <h3 className={styles.nameKrBack}>{spice.nameKr}</h3>
+                    <div className={styles.divider} style={{ backgroundColor: textColor }}></div>
                     <div className={styles.description}>
-                        <p className={styles.mainDescription}>
+                        <p className={styles.mainDescription} style={{ color: textColor }}>
                             {getMainDescription(spice.contentKr)}
                         </p>
                         <div className={styles.keyPoints}>

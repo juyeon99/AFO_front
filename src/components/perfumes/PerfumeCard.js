@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Edit } from 'lucide-react';
+import { Edit,Trash2  } from 'lucide-react';
 import styles from '../../css/perfumes/PerfumeCard.module.css';
 import { useNavigate } from 'react-router-dom';
 

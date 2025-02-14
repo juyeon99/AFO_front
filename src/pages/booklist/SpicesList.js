@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, Plus, Check, Trash2 } from 'lucide-react';
 import { selectSpices } from '../../module/SpicesModule';
 import SpicesFilters from '../../components/spices/SpicesFilters';
 import SpicesCard from '../../components/spices/SpicesCard';
@@ -45,6 +45,7 @@ const SpicesList = () => {
         handlePageChange,
         totalPages,
         setActiveFilters,
+        showSuccessModal,
     } = useSpicesState(spices);
 
     if (isLoading) {
@@ -80,6 +81,29 @@ const SpicesList = () => {
                     </div>
                 </div>
 
+                {role === 'ADMIN' && (
+                    <div className={styles.listControls}>
+                        <button
+                            className={styles.controlButton}
+                            onClick={handleAddButtonClick}
+                        >
+                            <Plus size={16} color="#333" />
+                        </button>
+                        <button
+                            className={styles.controlButton}
+                            onClick={handleCheckboxToggle}
+                        >
+                            <Check size={16} color="#333" />
+                        </button>
+                        <button
+                            className={styles.controlButton}
+                            onClick={handleDeleteButtonClick}
+                        >
+                            <Trash2 size={16} color="#333" />
+                        </button>
+                    </div>
+                )}
+
                 <div>
                     <SpicesFilters
                         activeFilters={activeFilters}
@@ -94,7 +118,7 @@ const SpicesList = () => {
                 <div className={styles.divider}></div>
 
                 <div className={styles.cardContainer}>
-                {filteredSpices
+                    {filteredSpices
                         .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                         .map((spice) => (
                             <div key={spice.id} className={styles.card}>
@@ -122,10 +146,8 @@ const SpicesList = () => {
                     spice={selectedSpice}
                     onSubmit={handleSubmit}
                     isEditing={isEditing}
-                    isDeleting={isDeleting}
-                    onDelete={handleDeleteConfirm}
-                    onDeleteClose={() => setIsDeleting(false)}
                     successMessage={successMessage}
+                    showSuccessModal={showSuccessModal}
                     onSuccessClose={handleSuccessClose}
                 />
             </div>
