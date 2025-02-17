@@ -2,35 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styles from '../../css/perfumes/PerfumeDetail.module.css';
 import PerfumeReviews from './PerfumeReviews';
-import { useSelector } from 'react-redux';
-import { selectPerfumes } from '../../module/PerfumeModule';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectPerfumes, fetchPerfumeById } from '../../module/PerfumeModule';
 
 const PerfumeDetail = () => {
+    const dispatch = useDispatch();
     const { id } = useParams();
     const navigate = useNavigate();
     const [isLongTitle, setIsLongTitle] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const location = useLocation();
 
+    const perfumes = useSelector(selectPerfumes);
+    const perfume = perfumes?.find(p => p.id === parseInt(id));
+
+    // 개별 향수 데이터 로드
+    useEffect(() => {
+        if (!perfume) {
+            dispatch(fetchPerfumeById(id));
+        }
+    }, [dispatch, id, perfume]);
+
     // 이전 페이지 정보 확인용
     useEffect(() => {
         console.log('Previous page:', location.state?.previousPage);
     }, [location]);
 
-    const perfumes = useSelector(selectPerfumes);
-    const perfume = perfumes?.find(p => p.id === parseInt(id));
-
     // 제목 길이 체크 useEffect
     useEffect(() => {
         // 초기화를 포함한 조건 체크
-        if (perfume.nameEn) {
+        if (perfume?.nameEn) {
             if (perfume.nameEn.length > 20) {
                 setIsLongTitle(true);
             } else {
                 setIsLongTitle(false); // 20글자 이하일 경우 false로 설정
             }
         }
-    }, [perfume.nameEn]);
+    }, [perfume?.nameEn]);
 
     // 이미지 자동 전환을 위한 useEffect
     useEffect(() => {
@@ -69,7 +77,7 @@ const PerfumeDetail = () => {
                 {/* 상단 향수 이름 */}
                 <div className={styles.topSection}>
                     <h1 className={`${styles.topNameEn} ${isLongTitle ? styles.longTitleCustom : ''}`}>
-                        {perfume.nameEn}
+                        {perfume?.nameEn}
                     </h1>
                 </div>
 

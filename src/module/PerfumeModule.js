@@ -1,5 +1,5 @@
 import { createActions, handleActions } from "redux-actions";
-import { getAllPerfumes, modifyPerfumes, deletePerfumes, createPerfumes } from "../api/PerfumeAPICalls";
+import { getAllPerfumes, modifyPerfumes, deletePerfumes, createPerfumes, getProductDetail } from "../api/PerfumeAPICalls";
 
 // 초기 상태
 const initialState = {
@@ -22,6 +22,9 @@ export const {
         createPerfumeStart,
         createPerfumeSuccess,
         createPerfumeFail,
+        fetchPerfumeByIdStart,
+        fetchPerfumeByIdSuccess,
+        fetchPerfumeByIdFail,
         
     },
 } = createActions({
@@ -38,6 +41,9 @@ export const {
         CREATE_PERFUME_START: () => {},
         CREATE_PERFUME_SUCCESS: (perfume) => perfume,
         CREATE_PERFUME_FAIL: (error) => error,
+        FETCH_PERFUME_BY_ID_START: () => {},
+        FETCH_PERFUME_BY_ID_SUCCESS: (perfume) => perfume,
+        FETCH_PERFUME_BY_ID_FAIL: (error) => error,
     },
 });
 
@@ -84,6 +90,15 @@ export const createPerfume = (perfumeData) => async (dispatch) => {
     }
 };
 
+export const fetchPerfumeById = (productId) => async (dispatch) => {
+    try {
+        dispatch(fetchPerfumeByIdStart());
+        const perfume = await getProductDetail(productId);
+        dispatch(fetchPerfumeByIdSuccess(perfume));
+    } catch (error) {
+        dispatch(fetchPerfumeByIdFail(error.message || "향수 상세 정보 불러오기 실패"));
+    }
+};
 
 // 리듀서
 const perfumeReducer = handleActions(
@@ -150,6 +165,24 @@ const perfumeReducer = handleActions(
             error: null,
         }),
         [createPerfumeFail]: (state, { payload }) => ({
+            ...state,
+            loading: false,
+            error: payload,
+        }),
+        [fetchPerfumeByIdStart]: (state) => ({
+            ...state,
+            loading: true,
+            error: null,
+        }),
+        [fetchPerfumeByIdSuccess]: (state, { payload }) => ({
+            ...state,
+            perfumes: state.perfumes.some(p => p.id === payload.id)
+                ? state.perfumes.map(p => (p.id === payload.id ? payload : p))
+                : [...state.perfumes, payload],
+            loading: false,
+            error: null,
+        }),
+        [fetchPerfumeByIdFail]: (state, { payload }) => ({
             ...state,
             loading: false,
             error: payload,

@@ -12,6 +12,17 @@ export const getAllPerfumes = async () => {
     }
 };
 
+// 향수 상세 조회
+export const getProductDetail = async (productId) => {
+    try {
+        const response = await apis.get(`/products/${productId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching product detail:", error);
+        throw error;
+    }
+};
+
 // 향수 수정 
 export const modifyPerfumes = async (perfumeData) => {
     try {
@@ -45,4 +56,16 @@ export const createPerfumes = async (perfumeData) => {
         throw error;
     }
 }
+
+// 유사 향수 조회
+export const getSimilarPerfumes = async (productId) => {
+    try {
+        const response = await apis.get(`/products/${productId}/similar`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching similar perfumes:", error);
+        throw error;
+    }
+};
+
 

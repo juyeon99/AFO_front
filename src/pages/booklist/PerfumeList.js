@@ -8,8 +8,17 @@ import PerfumeModal from '../../components/perfumes/PerfumeModal';
 import LoadingScreen from '../../components/loading/LoadingScreen';
 import usePerfumeState from './hooks/usePerfumeState';
 import styles from '../../css/perfumes/PerfumeList.module.css';
+import { useDispatch } from 'react-redux';
+import { fetchPerfumes } from '../../module/PerfumeModule';
+import { useEffect } from 'react';
 
 const PerfumeList = () => {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(fetchPerfumes());
+    }, [dispatch]);
+    
     const navigate = useNavigate();
     const {
         searchTerm,

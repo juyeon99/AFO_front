@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../css/perfumes/SimilarPerfumes.module.css';
+import { getSimilarPerfumes } from '../../api/PerfumeAPICalls';
 
 const SimilarPerfumes = ({ perfumeId }) => {
     const [similarPerfumes, setSimilarPerfumes] = useState([]);
 
     useEffect(() => {
-        fetch(`http://localhost:8000/recommend/${perfumeId}`)
-            .then(res => res.json())
-            .then(data => setSimilarPerfumes(data))
-            .catch(err => console.error("유사 향수 불러오기 실패", err));
+        if (perfumeId) {
+            getSimilarPerfumes(perfumeId)
+                .then(setSimilarPerfumes)
+                .catch(err => console.error("유사 향수 불러오기 실패", err));
+        }
     }, [perfumeId]);
 
     return (
