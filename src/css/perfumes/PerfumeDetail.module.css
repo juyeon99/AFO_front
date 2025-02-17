@@ -33,6 +33,13 @@
     top: -39px;
 }
 
+.topSection {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
 /* 상단 향수 이름 추가 */
 .topNameEn {
     position: absolute;
@@ -64,6 +71,31 @@
     text-align: center;
 }
 
+.mainAccords {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    width: 772px;      /* notes와 동일한 너비 */
+    position: relative; /* absolute 제거 */
+    top: 220PX;
+    justify-content: center;
+    left: 931px;
+}
+
+.accordItem {
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 25px;
+    font-weight: 600;
+    font-family: 'Gowun Batang', serif;
+
+}
+
+.accordItem:hover {
+    background: #FFFFFF;
+}
+
 /* 하단 향수 이름 추가 */
 .bottomName {
     position: absolute;
@@ -85,27 +117,66 @@
     font-family: 'Gowun Batang', serif;
 }
 
-/* 메인 이미지 */
-.mainImage {
+/* 이미지 컨테이너 */
+.imageContainer {
     position: absolute;
     width: 450px;
     height: 470px;
-    left: 348px; /* 기존 값 */
-    top: 336px; /* 기존 값 */
+    left: 348px;
+    top: 270px;
 }
 
-.mainImage img {
+/* 메인 이미지 */
+.mainImage {
+    position: absolute;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: opacity 0.5s ease-in-out;
 }
 
+/* 페이징 도트 컨테이너 */
+.dots {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    z-index: 1;
+}
+
+/* 개별 도트 */
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* 활성화된 도트 */
+.activeDot {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* 활성화된 이미지 */
+.active {
+    opacity: 1;
+}
+
+/* 비활성화된 이미지 */
+.mainImage:not(.active) {
+    opacity: 0;
+}
 /* 브랜드 정보 */
 .brandInfo {
     position: absolute;
     width: 450px; /* 메인 이미지와 동일한 너비 */
     left: 348px; /* 메인 이미지와 동일한 left 값 */
-    top: 800px;
+    top: 750px;
     text-align: center;
 }
 
@@ -115,7 +186,7 @@
     width: 450px; /* 메인 이미지와 동일한 너비 */
     height: 1px;
     left: 348px; /* 메인 이미지와 동일한 left 값 */
-    top: 960px; /* brandInfo와 bottomName 사이 */
+    top: 940px; /* brandInfo와 bottomName 사이 */
     background-color: #000000;
 }
 
@@ -137,7 +208,7 @@
     position: absolute;
     width: 772px;
     left: 931px;
-    top: 380px;
+    top: 390px;
 }
 
 .noteItem {
@@ -172,7 +243,7 @@
     position: absolute;
     width: 529px;
     left: 1052px;
-    top: 800px;
+    top: 810px;
     font-family: 'Gowun Batang', serif;
     font-size: 24px;
     line-height: 36px;
@@ -198,17 +269,57 @@
     position: absolute;
     width: 772px;
     left: 931px;
-    top: 980px;
+    top: 940px;
 }
 
 .ingredientsList {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    max-width: 772px;
+}
+
+.shortList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: relative;  /* 추가 */
+    background-color: #EFEDED;
+    width: 100%;
+}
+
+.fullList {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: calc(100% + 20px);  /* 부모 너비 기준으로 계산 */
+    max-width: 772px;  /* 최대 너비 제한 */
+    height: auto;
+    min-height: calc(100% + 20px);
+    backdrop-filter: blur(3px);
+    padding: 15px;
+    border-radius: 12px;
+    background-color: rgba(239, 237, 237, 0.95);
+    z-index: 100;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    transition: all 0.3s ease;
+    align-content: flex-start;
+    overflow: hidden;  /* 내용이 넘치지 않도록 */
+}
+
+.ingredientsList:hover .fullList {
+    visibility: visible;
+    opacity: 1;
+    display: flex;
 }
 
 .ingredientItem {
-    background: #FFFFFF;
+    background: rgba(255, 255, 255, 0.6); 
     padding: 8px 16px;
     border-radius: 5px;
     font-size: 14px;

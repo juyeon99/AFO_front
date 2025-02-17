@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { 
-    fetchPerfumes, 
-    selectPerfumes, 
+import {
+    fetchPerfumes,
+    selectPerfumes,
     deletePerfume,
     createPerfume,
-    modifyPerfume 
+    modifyPerfume
 } from '../../../module/PerfumeModule';
 
 const usePerfumeState = () => {
     const dispatch = useDispatch();
     const perfumes = useSelector(selectPerfumes) || [];
 
+    // 기본 상태 관리
     const [searchTerm, setSearchTerm] = useState('');
     const [activeFilters, setActiveFilters] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -25,16 +26,30 @@ const usePerfumeState = () => {
     const [role, setRole] = useState(null);
     const [formData, setFormData] = useState({});
     const [imageUrls, setImageUrls] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [showUrlInput, setShowUrlInput] = useState(false);
+    const [imageUrlCount, setImageUrlCount] = useState(0);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const itemsPerPage = 12;
 
+    // 초기 데이터 로드
     useEffect(() => {
-        dispatch(fetchPerfumes());
-        const storedUser = JSON.parse(localStorage.getItem('auth'));
-        if (storedUser && storedUser.role) {
-            setRole(storedUser.role);
-        }
+        const loadInitialData = async () => {
+            setIsLoading(true);
+            try {
+                await dispatch(fetchPerfumes());
+                const storedUser = JSON.parse(localStorage.getItem('auth'));
+                if (storedUser && storedUser.role) {
+                    setRole(storedUser.role);
+                }
+            } catch (error) {
+                console.error("데이터 로드 실패:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadInitialData();
     }, [dispatch]);
 
     useEffect(() => {
@@ -45,11 +60,13 @@ const usePerfumeState = () => {
     }, [selectedPerfume]);
 
     const filteredPerfumes = perfumes.filter(perfume => {
-        const name = perfume?.name || '';
+        const name = perfume?.nameKr || '';
         const brand = perfume?.brand || '';
+        const content = perfume?.content || '';
         return (
-            (name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-            brand.toLowerCase().includes(searchTerm.toLowerCase())) &&
+            (name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                content.toLowerCase().includes(searchTerm.toLowerCase())) &&
             (activeFilters.length === 0 || activeFilters.includes(perfume.grade))
         );
     });
@@ -106,6 +123,7 @@ const usePerfumeState = () => {
     };
 
     const handleDeleteConfirm = async () => {
+        setIsLoading(true);
         try {
             await dispatch(deletePerfume(selectedCard));
             setSuccessMessage(`${selectedPerfume.name} 향수 카드가 삭제되었습니다!`);
@@ -116,6 +134,8 @@ const usePerfumeState = () => {
         } catch (error) {
             console.error("향수 삭제 실패:", error);
             alert("향수 삭제에 실패했습니다. 다시 시도해주세요.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -136,6 +156,7 @@ const usePerfumeState = () => {
 
     const handleImageUrlAdd = () => {
         setImageUrls([...imageUrls, '']);
+        setImageUrlCount(prev => prev + 1);
     };
 
     const handleImageUrlChange = (index, value) => {
@@ -146,6 +167,7 @@ const usePerfumeState = () => {
 
     const handleImageUrlRemove = (index) => {
         setImageUrls(imageUrls.filter((_, i) => i !== index));
+        setImageUrlCount(prev => prev - 1);
     };
 
     const handleSubmit = async (e) => {
@@ -166,26 +188,25 @@ const usePerfumeState = () => {
                 setSuccessMessage('향수가 성공적으로 추가되었습니다!');
             }
 
-            // 백그라운드에서 데이터 새로고침 및 모달 상태 초기화
-            setTimeout(() => {
-                dispatch(fetchPerfumes());
-                setShowAddModal(false);
-                setShowEditModal(false);
-                setFormData({});
-                setImageUrls([]);
-                setIsLoading(false);
-            }, 0);
-
+            handleModalClose();
+            await dispatch(fetchPerfumes());
         } catch (error) {
-            setIsLoading(false);
             console.error('향수 저장 실패:', error);
             alert('향수 저장에 실패했습니다. 다시 시도해주세요.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleSuccessClose = () => {
         setSuccessMessage('');
         dispatch(fetchPerfumes());
+    };
+
+    const totalPages = Math.ceil(filteredPerfumes.length / itemsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
     };
 
     return {
@@ -205,6 +226,11 @@ const usePerfumeState = () => {
         itemsPerPage,
         formData,
         imageUrls,
+        isLoading,
+        showUrlInput,
+        setShowUrlInput,
+        imageUrlCount,
+        currentImageIndex,
         setShowAddModal,
         setShowEditModal,
         setIsDeleting,
@@ -222,7 +248,9 @@ const usePerfumeState = () => {
         handleImageUrlAdd,
         handleImageUrlChange,
         handleImageUrlRemove,
-        handleSubmit
+        handleSubmit,
+        totalPages,
+        handlePageChange
     };
 };
 

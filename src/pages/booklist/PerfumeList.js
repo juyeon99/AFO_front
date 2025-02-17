@@ -19,7 +19,6 @@ const PerfumeList = () => {
         selectedCard,
         showAddModal,
         showEditModal,
-        selectedPerfume,
         successMessage,
         isDeleting,
         role,
@@ -36,7 +35,6 @@ const PerfumeList = () => {
         handleDeleteButtonClick,
         handleDeleteConfirm,
         handleSuccessClose,
-        setCurrentPage,
         setIsDeleting,
         handleModalClose,
         handleInputChange,
@@ -48,9 +46,12 @@ const PerfumeList = () => {
         setShowUrlInput,
         imageUrlCount,
         currentImageIndex,
+        handlePageChange,
+        totalPages,
+        isLoading,
     } = usePerfumeState();
 
-    if (!filteredPerfumes) {
+    if (isLoading) {
         return <LoadingScreen message="향수를 불러오는 중..." />;
     }
 
@@ -113,9 +114,8 @@ const PerfumeList = () => {
 
                 <PerfumePagination
                     currentPage={currentPage}
-                    totalItems={filteredPerfumes.length}
-                    itemsPerPage={itemsPerPage}
-                    onPageChange={setCurrentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
                 />
 
                 <PerfumeModal

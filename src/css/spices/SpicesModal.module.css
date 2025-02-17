@@ -199,4 +199,91 @@
     cursor: pointer;
 }
 
+.select {
+    width: 290px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #EFEDED;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* select 화살표 커스텀 스타일링 */
+.selectWrapper {
+    position: relative;
+    width: 270px;
+}
+
+.selectWrapper::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #333;
+    pointer-events: none;
+}
+
+.imageUploadContainer {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.imagePreviewContainer {
+    width: 60px;
+    height: 60px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: #EFEDED;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.previewImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.imageUrlInput {
+    width: 190px;
+    height: 25px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #EFEDED;
+    font-size: 14px;
+    transform: translateY(10PX);
+}
+
+.errorMessage {
+    color: red;
+    font-size: 12px;
+    position: absolute;
+    margin-top: 5px;
+}
+
+/* 기존 스타일 유지 */
+.formRow {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.label {
+    width: 100px;
+    text-align: right;
+    margin-right: 15px;
+    font-size: 14px;
+}
+
 

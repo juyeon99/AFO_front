@@ -27,38 +27,22 @@
     width: 100%;
     overflow: hidden;
     margin-bottom: 15px;
+    height: 120px;
 }
 
 .image {
     width: 120px;
     height: 120px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    transition: opacity 0.3s ease-in-out;
 }
 
-.imagePagination {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 8px;
-    z-index: 2;
+.fadeOut {
+    opacity: 0;
 }
 
-.paginationDot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.5);
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.activeDot {
-    background-color: white;
-    transform: scale(1.2);
+.fadeIn {
+    opacity: 1;
 }
 
 .name {

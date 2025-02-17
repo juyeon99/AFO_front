@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../css/perfumes/PerfumeReviews.module.css';
-import perfumeData from '../../data/PerfumeData';
 import ReviewSlider from '../../components/perfumes/ReviewSlider';
 import SimilarPerfumes from '../../components/perfumes/SimilarPerfumes';
+import { useSelector } from 'react-redux';
+import { selectPerfumes } from '../../module/PerfumeModule';
 
 const PerfumeReviews = ({ perfumeId }) => {
     const [selectedReview, setSelectedReview] = useState(null);
@@ -12,15 +13,15 @@ const PerfumeReviews = ({ perfumeId }) => {
     const [sliderLeft, setSliderLeft] = useState(0);
     const [cardOffset, setCardOffset] = useState(0);
 
-    const perfume = perfumeData.find(p => p.id === perfumeId);
-    const { expert: expertReviews, user: userReviews } = perfume.reviews;
+    const perfumes = useSelector(selectPerfumes);
+    const perfume = perfumes?.find(p => p.id === perfumeId);
+    const reviews = perfume?.reviews || { expert: [], user: [] };
 
-    const expertTopReview = expertReviews[0];
-    const userTopReview = userReviews[0];
+    const userTopReview = reviews.user?.[0] || { content: "사용자 리뷰가 없습니다.", reviewer: "" };
 
     const allReviews = Array.from(
         new Set(
-            [...expertReviews, ...userReviews].map(review => JSON.stringify({
+            [...(reviews.expert || []), ...(reviews.user || [])].map(review => JSON.stringify({
                 content: review.content,
                 reviewer: review.reviewer,
                 type: review.type
@@ -95,12 +96,6 @@ const PerfumeReviews = ({ perfumeId }) => {
     return (
         <div className={styles.reviewsContainer}>
             <div className={styles.topReviewsSection}>
-                <div className={styles.topReviewCard}>
-                    <h4>조향사 리뷰 top1</h4>
-                    <div className={styles.reviewContent}>
-                        <p>{expertTopReview.content}</p>
-                    </div>
-                </div>
                 <div className={styles.topReviewCard}>
                     <h4>사용자 리뷰 top1</h4>
                     <div className={styles.reviewContent}>

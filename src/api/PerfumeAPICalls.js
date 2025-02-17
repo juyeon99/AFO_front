@@ -3,7 +3,8 @@ import apis from "./Apis";
 // 향수 조회
 export const getAllPerfumes = async () => {
     try {
-        const response = await apis.get("/perfumes");
+        const response = await apis.get("/products");
+        console.log("향수 조회 응답:", response);
         return response.data;
     } catch (error) {
         console.error("Error fetching perfumes:", error);
@@ -14,7 +15,7 @@ export const getAllPerfumes = async () => {
 // 향수 수정 
 export const modifyPerfumes = async (perfumeData) => {
     try {
-        const response = await apis.put(`/perfumes`, perfumeData);
+        const response = await apis.put(`/products`, perfumeData);
         console.log("히하이ㅏ링라ㅣ아링", response)
         return response.data;
     } catch (error) {
@@ -24,9 +25,9 @@ export const modifyPerfumes = async (perfumeData) => {
 };
 
 // 향수 삭제
-export const deletePerfumes = async (perfumeId) => {
+export const deletePerfumes = async (productId) => {
     try {
-        const response = await apis.delete(`/perfumes/${perfumeId}`);
+        const response = await apis.delete(`/products/${productId}`);
         return response.data;
     } catch (error) {
         console.error("Error deleting perfume:", error);
@@ -37,7 +38,7 @@ export const deletePerfumes = async (perfumeId) => {
 // 향수 추가
 export const createPerfumes = async (perfumeData) => {
     try {
-        const response = await apis.post('/perfumes', perfumeData); 
+        const response = await apis.post('/products', perfumeData); 
         return response.data;
     } catch (error) {
         console.error("Error creating perfume:", error);
