@@ -10,11 +10,9 @@ const PerfumeModal = ({
     isDeleting,
     onDelete,
     onDeleteClose,
-    successMessage,
-    onSuccessClose,
     formData,
     setFormData,
-    imageUrlList,
+    imageUrlList = [],
     showUrlInput,
     setShowUrlInput,
     imageUrlCount,
@@ -25,13 +23,25 @@ const PerfumeModal = ({
     onImageUrlRemove,
     onSubmit
 }) => {
-    // ✅ 모든 useState를 컴포넌트 최상단에서 선언
-    const [imagePreview, setImagePreview] = useState(formData?.imageUrlList?.[0] || '');
+    // 이미지 URL 리스트가 undefined일 경우를 대비한 안전한 접근
+    const safeImageUrlList = imageUrlList || [];
+
+    // useState 초기값도 안전하게 설정
+    const [imagePreview, setImagePreview] = useState(safeImageUrlList[0] || '');
     const [editingImage, setEditingImage] = useState(false);
     const [imageError, setImageError] = useState(false);
 
-    // ✅ `imageUrlList`가 `undefined`일 경우 안전한 기본값 설정
-    const safeImageUrlList = Array.isArray(formData?.imageUrlList) ? formData.imageUrlList : [];
+    // 이미지 URL 변경 핸들러 수정
+    const handleImageUrlChange = (index, value) => {
+        if (onImageUrlChange) {
+            onImageUrlChange(index, value);
+        }
+        setImagePreview(value);
+        setImageError(false);
+    };
+
+    // ✅ `show`가 `false`면 아무것도 렌더링하지 않음
+    if (!show) return null;
 
     // ✅ 리스트 데이터를 쉼표로 구분하여 저장
     const kimonInputChange = (field, value) => {
@@ -40,24 +50,6 @@ const PerfumeModal = ({
             [field]: value.split(",").map((item) => item.trim())
         }));
     };
-
-    // ✅ 이미지 URL 변경 핸들러
-    const handleImageUrlChange = (index, value) => {
-        if (!setFormData) return;
-
-        setFormData((prev) => ({
-            ...prev,
-            imageUrlList: prev.imageUrlList
-                ? prev.imageUrlList.map((url, i) => (i === index ? value : url)) // ✅ 해당 index만 변경
-                : [value], // ✅ 기존 리스트가 없으면 새 배열 생성
-        }));
-
-        setImagePreview(value);
-        setImageError(false);
-    };
-
-    // ✅ `show`가 `false`면 아무것도 렌더링하지 않음
-    if (!show) return null;
 
     return (
         <div className={styles.modalBackdrop}>
@@ -130,108 +122,112 @@ const PerfumeModal = ({
                         />
                     </div>
                     <div className={styles.modalRow}>
-                    <label className={styles.formLabel}>싱글노트</label>
-                    <input
-                        type="text"
-                        className={styles.modalRowSingleNote}
-                        value={formData.singleNoteList ? formData.singleNoteList.join(", ") : ""} 
-                        onChange={(e) => kimonInputChange("singleNoteList", e.target.value)}
-                        placeholder="싱글노트를 입력하세요 (예: 라벤더, 바닐라)"
-                    />
+                        <label className={styles.formLabel}>싱글노트</label>
+                        <input
+                            type="text"
+                            className={styles.modalRowSingleNote}
+                            value={formData.singleNoteList ? formData.singleNoteList.join(", ") : ""}
+                            onChange={(e) => kimonInputChange("singleNoteList", e.target.value)}
+                            placeholder="싱글노트를 입력하세요 (예: 라벤더, 바닐라)"
+                        />
                     </div>
 
                     <div className={styles.modalRow}>
-                    <label className={styles.formLabel}>탑노트</label>
-                    <input
-                        type="text"
-                        className={styles.modalRowTopNote}
-                        value={formData.topNoteList ? formData.topNoteList.join(", ") : ""}
-                        onChange={(e) => kimonInputChange("topNoteList", e.target.value)}
-                        placeholder="탑노트를 입력하세요 (예: 레몬, 베르가못)"
-                    />
+                        <label className={styles.formLabel}>탑노트</label>
+                        <input
+                            type="text"
+                            className={styles.modalRowTopNote}
+                            value={formData.topNoteList ? formData.topNoteList.join(", ") : ""}
+                            onChange={(e) => kimonInputChange("topNoteList", e.target.value)}
+                            placeholder="탑노트를 입력하세요 (예: 레몬, 베르가못)"
+                        />
                     </div>
 
                     <div className={styles.modalRow}>
-                    <label className={styles.formLabel}>미들노트</label>
-                    <input
-                        type="text"
-                        className={styles.modalRowMiddleNote}
-                        value={formData.middleNoteList ? formData.middleNoteList.join(", ") : ""}
-                        onChange={(e) => kimonInputChange("middleNoteList", e.target.value)}
-                        placeholder="미들노트를 입력하세요 (예: 장미, 자스민)"
-                    />
+                        <label className={styles.formLabel}>미들노트</label>
+                        <input
+                            type="text"
+                            className={styles.modalRowMiddleNote}
+                            value={formData.middleNoteList ? formData.middleNoteList.join(", ") : ""}
+                            onChange={(e) => kimonInputChange("middleNoteList", e.target.value)}
+                            placeholder="미들노트를 입력하세요 (예: 장미, 자스민)"
+                        />
                     </div>
 
                     <div className={styles.modalRow}>
-                    <label className={styles.formLabel}>베이스노트</label>
-                    <input
-                        type="text"
-                        className={styles.modalRowBaseNote}
-                        value={formData.baseNoteList ? formData.baseNoteList.join(", ") : ""}
-                        onChange={(e) => kimonInputChange("baseNoteList", e.target.value)}
-                        placeholder="베이스노트를 입력하세요 (예: 샌달우드, 머스크)"
-                    />
+                        <label className={styles.formLabel}>베이스노트</label>
+                        <input
+                            type="text"
+                            className={styles.modalRowBaseNote}
+                            value={formData.baseNoteList ? formData.baseNoteList.join(", ") : ""}
+                            onChange={(e) => kimonInputChange("baseNoteList", e.target.value)}
+                            placeholder="베이스노트를 입력하세요 (예: 샌달우드, 머스크)"
+                        />
                     </div>
 
                     <div className={styles.modalRow}>
                         <label className={styles.formLabel}>이미지</label>
                         <div className={styles.imageInputContainer}>
                             {/* 이미지 미리보기 영역 */}
-                            <div className={styles.imagePreviewBox} onClick={() => setShowUrlInput(true)}>
-                                {(imageUrlList && imageUrlList.length > 0) ? (  
-                                <img
-                                    src={imageUrlList[0] }
-                                    alt="미리보기"
-                                    className={styles.previewImage}
-                                    onError={(e) => e.target.style.display = 'https://mblogthumb-phinf.pstatic.net/MjAyMDA1MDZfMTk3/MDAxNTg4Nzc1MjcwMTQ2.l8lHrUz8ZfSDCShKbMs8RzQj37B3jxpwRnQK7byS9k4g.OORSv5IlMThMSNj20nz7_OYBzSTkxwnV9QGGV8a3tVkg.JPEG.herbsecret/essential-oils-2738555_1920.jpg?type=w800'}
-                                />
-                            ) : (
-                                <span>+</span>
-                            )}
+                            <div className={styles.imageInputContainer}>
+                                <div className={styles.imagePreviewBox} onClick={() => setShowUrlInput(true)}>
+                                    {safeImageUrlList.length > 0 ? (
+                                        <img
+                                            src={safeImageUrlList[0]}
+                                            alt="미리보기"
+                                            className={styles.previewImage}
+                                            onError={(e) => {
+                                                e.target.src = 'https://mblogthumb-phinf.pstatic.net/MjAyMDA1MDZfMTk3/MDAxNTg4Nzc1MjcwMTQ2.l8lHrUz8ZfSDCShKbMs8RzQj37B3jxpwRnQK7byS9k4g.OORSv5IlMThMSNj20nz7_OYBzSTkxwnV9QGGV8a3tVkg.JPEG.herbsecret/essential-oils-2738555_1920.jpg?type=w800';
+                                                setImageError(true);
+                                            }}
+                                        />
+                                    ) : (
+                                        <span>+</span>
+                                    )}
+                                </div>
+                                {/* URL 입력 필드 */}
+                                {showUrlInput && (
+                                    <>
+                                        {showUrlInput && (
+                                            <input
+                                                type="text"
+                                                value={imageUrlList[0]}
+                                                onChange={(e) => handleImageUrlChange(0, e.target.value)}
+                                                onError={(e) => {
+                                                    e.target.src = 'https://mblogthumb-phinf.pstatic.net/MjAyMDA1MDZfMTk3/MDAxNTg4Nzc1MjcwMTQ2.l8lHrUz8ZfSDCShKbMs8RzQj37B3jxpwRnQK7byS9k4g.OORSv5IlMThMSNj20nz7_OYBzSTkxwnV9QGGV8a3tVkg.JPEG.herbsecret/essential-oils-2738555_1920.jpg?type=w800';
+                                                    setImageError(true);
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
+                                                placeholder="이미지 URL을 입력하세요"
+                                                className={styles.modalRowImageUrl}
+                                            />
+                                        )}
+                                    </>
+                                )}
+                                {/* 추가 버튼 */}
+                                <button
+                                    type="button"
+                                    onClick={onImageUrlAdd}
+                                    className={styles.addImageButton}
+                                >
+                                    +
+                                </button>
                             </div>
-
-                            {/* URL 입력 필드 */}
-                            {showUrlInput && (
-                                <>
-                                    {showUrlInput && (
-                                <input
-                                    type="text"
-                                    value={imageUrlList[0] }
-                                    onChange={(e) => handleImageUrlChange(0, e.target.value)}
-                                    onError={(e) => {
-                                        e.target.src = 'https://mblogthumb-phinf.pstatic.net/MjAyMDA1MDZfMTk3/MDAxNTg4Nzc1MjcwMTQ2.l8lHrUz8ZfSDCShKbMs8RzQj37B3jxpwRnQK7byS9k4g.OORSv5IlMThMSNj20nz7_OYBzSTkxwnV9QGGV8a3tVkg.JPEG.herbsecret/essential-oils-2738555_1920.jpg?type=w800';
-                                        setImageError(true);
-                                    }}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault(); 
-                                        }
-                                    }}
-                                    placeholder="이미지 URL을 입력하세요"
-                                    className={styles.modalRowImageUrl}
-                                />
-                            )}
-                                </>
-                            )}
-                            {/* 추가 버튼 */}
-                            <button
-                                type="button"
-                                onClick={onImageUrlAdd}
-                                className={styles.addImageButton}
-                            >
-                                +
-                            </button>
                         </div>
-                    </div>
 
-                    {/* 이미지 페이징 */}
-                    <div className={styles.imagePagination}>
-                        {Array(imageUrlCount).fill(null).map((_, index) => (
-                            <span
-                                key={index}
-                                className={`${styles.paginationDot} ${index === currentImageIndex ? styles.activeDot : ''}`}
-                            />
-                        ))}
+                        {/* 이미지 페이징 */}
+                        <div className={styles.imagePagination}>
+                            {Array(imageUrlCount).fill(null).map((_, index) => (
+                                <span
+                                    key={index}
+                                    className={`${styles.paginationDot} ${index === currentImageIndex ? styles.activeDot : ''}`}
+                                />
+                            ))}
+                        </div>
                     </div>
 
                     <div className={styles.modalActions}>
