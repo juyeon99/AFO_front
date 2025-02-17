@@ -9,9 +9,6 @@ const SpicesModal = ({
     spice,
     onSubmit,
     isEditing,
-    successMessage,
-    showSuccessModal,
-    onSuccessClose
 }) => {
     // 폼 데이터 상태
     const [formData, setFormData] = useState({
@@ -199,22 +196,6 @@ const SpicesModal = ({
                     </form>
                 </div>
             </div>
-
-            {/* 성공 메시지 모달 */}
-            {showSuccessModal && (
-                <div className={styles.successModalBackdrop}>
-                    <div className={styles.successModal}>
-                        <p>{successMessage}</p>
-                        <button
-                            onClick={onSuccessClose}
-                            className={styles.successButton}
-                        >
-                            확인
-                        </button>
-                    </div>
-                </div>
-            )}
-
         </>
     );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styles from '../../css/perfumes/PerfumeDetail.module.css';
 import PerfumeReviews from './PerfumeReviews';
 import { useSelector } from 'react-redux';
@@ -10,6 +10,12 @@ const PerfumeDetail = () => {
     const navigate = useNavigate();
     const [isLongTitle, setIsLongTitle] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const location = useLocation();
+
+    // 이전 페이지 정보 확인용
+    useEffect(() => {
+        console.log('Previous page:', location.state?.previousPage);
+    }, [location]);
 
     const perfumes = useSelector(selectPerfumes);
     const perfume = perfumes?.find(p => p.id === parseInt(id));

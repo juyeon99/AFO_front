@@ -9,7 +9,8 @@ const PerfumeCard = ({
     selectedCard,
     role,
     onCheckboxChange,
-    onEditClick
+    onEditClick,
+    currentPage
 }) => {
     const navigate = useNavigate();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -56,7 +57,9 @@ const PerfumeCard = ({
         }
         
         // 상세 페이지로 이동
-        navigate(`/perfumes/${perfume.id}`);
+        navigate(`/perfumes/${perfume.id}`, { 
+            state: { previousPage: currentPage } 
+        });
     };
 
 return (
