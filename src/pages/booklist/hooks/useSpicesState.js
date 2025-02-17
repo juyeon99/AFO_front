@@ -30,6 +30,9 @@ const useSpicesState = (spices) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [editingImage, setEditingImage] = useState(false);
 
+    // ✅ 체크박스 선택 항목 관리
+    const [selectedItems, setSelectedItems] = useState(new Set());
+
     // 페이지당 표시할 아이템 수
     const itemsPerPage = 12;
 
@@ -115,15 +118,23 @@ const useSpicesState = (spices) => {
         setCurrentPage(1);
     };
 
-    // 체크박스 토글 핸들러
-    const handleCheckboxToggle = () => {
-        setShowCheckboxes(prev => !prev);
-        setSelectedCard(null);
+    // ✅ 체크박스 상태 변경 핸들러
+    const handleCheckboxChange = (id) => {
+        setSelectedItems(prevSelected => {
+            const newSelected = new Set(prevSelected);
+            if (newSelected.has(id)) {
+                newSelected.delete(id);
+            } else {
+                newSelected.add(id);
+            }
+            return newSelected;
+        });
     };
 
-    // 카드 체크박스 변경 핸들러
-    const handleCardCheckboxChange = (id) => {
-        setSelectedCard(prev => prev === id ? null : id);
+    // ✅ 체크박스 UI 토글 핸들러
+    const handleCheckboxToggle = () => {
+        setShowCheckboxes(prev => !prev);
+        setSelectedItems(new Set()); // 선택된 항목 초기화
     };
 
     // 추가 버튼 클릭 핸들러
@@ -150,60 +161,61 @@ const useSpicesState = (spices) => {
     };
 
     // 삭제 버튼 클릭 핸들러
-    const handleDeleteButtonClick = () => {
-        if (!selectedCard) {
-            alert("삭제할 항목을 선택해주세요.");
+    const handleDeleteButtonClick = async () => {
+        if (selectedItems.size === 0) {
+            handleError("삭제할 항목을 선택하세요.");
             return;
         }
-        setIsDeleting(true);
+
+        setIsLoading(true);
+        try {
+            // 선택된 모든 항목 삭제
+            for (const id of selectedItems) {
+                await dispatch(deleteSpices(id));
+            }
+            setSelectedItems(new Set()); // 선택 항목 초기화
+            await dispatch(fetchSpices()); // 데이터 새로고침
+        } catch (error) {
+            console.error('Error:', error);
+            handleError("삭제에 실패했습니다. 다시 시도해주세요.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     // 폼 제출 핸들러
     const handleSubmit = async (formData) => {
+        console.log("✅ handleSubmit 실행됨, formData:", formData);
+
         if (!formData.nameEn || !formData.nameKr || !formData.contentKr) {
             handleError("모든 필수 항목을 입력해주세요.");
             return;
         }
-    
+
+        setIsLoading(true);  // ✅ 로딩 화면 즉시 표시
+
         try {
             if (isAdding) {
-                await dispatch(createSpices({
-                    nameEn: formData.nameEn,
-                    nameKr: formData.nameKr,
-                    lineName: formData.lineName,
-                    contentKr: formData.contentKr,
-                    imageUrlList: formData.imageUrlList || []
-                }));
-                setSuccessMessage('향료 추가가 완료되었습니다.');
+                await dispatch(createSpices(formData));
             } else if (isEditing) {
-                await dispatch(modifySpices({
-                    id: formData.id,
-                    nameEn: formData.nameEn,
-                    nameKr: formData.nameKr,
-                    lineName: formData.lineName,
-                    contentKr: formData.contentKr,
-                    imageUrlList: formData.imageUrlList || []
-                }));
-                setSuccessMessage('향료 수정이 완료되었습니다.');
+                await dispatch(modifySpices({ ...formData, id: formData.id }));
             }
-    
-            console.log("✅ `handleModalClose()` 실행됨 → 입력 모달 닫힘");
-            handleModalClose();
-    
-            // ✅ 다음 이벤트 루프에서 실행 (상태 업데이트 보장)
-            setTimeout(() => {
-                console.log("✅ `setShowSuccessModal(true);` 실행됨 → 성공 모달 표시");
-                setShowSuccessModal(true);
-            }, 0);
+
+            console.log("✅ 데이터 수정/추가 완료, 데이터 새로고침 시작");
+
+            await dispatch(fetchSpices());  // ✅ 데이터 새로고침
+
         } catch (error) {
             console.error("❌ `handleSubmit` 실패:", error);
             handleError("작업에 실패했습니다. 다시 시도해주세요.");
+        } finally {
+            setIsLoading(false);  // ✅ 로딩 종료
+            handleModalClose();  // ✅ 기존 입력 모달 닫기
         }
     };
-    
 
     // 모달 닫기 핸들러
-    const handleModalClose = () => {
+    const handleModalClose = async () => {
         console.log("📌 `handleModalClose` 실행됨 → 입력 모달 닫힘");
 
         setShowAddModal(false);
@@ -212,55 +224,21 @@ const useSpicesState = (spices) => {
         setImagePreview(null);
         setIsAdding(false);
         setIsEditing(false);
-    };
 
-
-    // 성공 메시지 닫기 핸들러
-    const handleSuccessClose = async () => {
-        console.log("✅ `handleSuccessClose()` 실행됨 → 성공 모달 닫힘");
-        setShowSuccessModal(false);
-        setSuccessMessage('');
-    
-        // ✅ 로딩 화면 표시
-        setIsLoading(true);
-    
+        setIsLoading(true);  // ✅ 로딩 시작
         try {
-            console.log("🔄 `fetchSpices()` 실행됨 → 데이터 새로고침");
-            await dispatch(fetchSpices());
-            console.log("✅ `fetchSpices()` 완료 → 화면 갱신 준비");
+            await dispatch(fetchSpices());  // ✅ 데이터 새로고침
         } catch (error) {
-            console.error("❌ `fetchSpices()` 실패:", error);
+            console.error("❌ 데이터 새로고침 실패:", error);
             handleError("데이터 새로고침에 실패했습니다.");
         } finally {
-            setTimeout(() => {
-                console.log("✅ 로딩 종료 → 화면 갱신");
-                setIsLoading(false);
-            }, 500); // 500ms 후 로딩 해제 (UI 깜빡임 방지)
+            setIsLoading(false);  // ✅ 로딩 종료
         }
     };
-    
 
-    // 삭제 확인 핸들러
-    const handleDeleteConfirm = async () => {
-        if (!selectedCard) {
-            handleError("삭제할 카드를 선택하세요.");
-            return;
-        }
-
-        setIsLoading(true);
-        try {
-            await dispatch(deleteSpices(selectedCard)); // ✅ unwrap 제거
-            setSuccessMessage('향료 삭제가 완료되었습니다.');
-            setShowSuccessModal(true);
-            setIsDeleting(false);
-            setSelectedCard(null);
-        } catch (error) {
-            console.error('Error:', error);
-            handleError("삭제에 실패했습니다. 다시 시도해주세요.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    useEffect(() => {
+        console.log("📢 `showSuccessModal` 변경됨:", showSuccessModal);
+    }, [showSuccessModal]);
 
     return {
         // 상태 반환
@@ -312,12 +290,9 @@ const useSpicesState = (spices) => {
         handleSearch,
         handleFilterClick,
         handleCheckboxToggle,
-        handleCardCheckboxChange,
         handleAddButtonClick,
         handleEditButtonClick,
         handleDeleteButtonClick,
-        handleDeleteConfirm,
-        handleSuccessClose,
         handleModalClose,
         handleSubmit,
         handlePageChange,
@@ -328,7 +303,11 @@ const useSpicesState = (spices) => {
         // 카드 컴포넌트용 핸들러
         onAddClick: handleAddButtonClick,
         onEditClick: handleEditButtonClick,
-        onDeleteClick: handleDeleteButtonClick
+        onDeleteClick: handleDeleteButtonClick,
+
+        // ✅ 체크박스 관련 핸들러
+        selectedItems,
+        handleCheckboxChange
     };
 };
 

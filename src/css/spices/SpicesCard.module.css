@@ -162,13 +162,40 @@
     border: none;
     cursor: pointer;
     z-index: 2;
-    transform-style: preserve-3d;
-    transition: transform 0.6s;
+}
+
+/* 카드 앞면일 때는 #333 */
+.cardWrapper .editButton {
+    color: #333;
+}
+
+/* 카드 뒷면일 때는 배경색에 맞는 색상 */
+.cardWrapper:hover .editButton svg {
+    color: var(--text-color);
 }
 
 .checkbox {
     position: absolute;
     top: 10px;
     left: 10px;
-    z-index: 2;
+    width: 15px;
+    height: 15px;
+    appearance: none;
+    border: 1px solid #333;
+    border-radius: 50%;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 2; /* 체크박스를 카드 위로 올림 */
+    transform-style: preserve-3d;
+}
+
+.checkbox:checked {
+    background-color: #333;
+    border-color: #333;
+}
+
+.cardWrapper:hover .checkbox,
+.cardWrapper:hover .editButton {
+    transform: rotateY(-360deg);
 }

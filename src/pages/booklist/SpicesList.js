@@ -33,7 +33,6 @@ const SpicesList = () => {
         handleSearch,
         handleFilterClick,
         handleCheckboxToggle,
-        handleCardCheckboxChange,
         handleAddButtonClick,
         handleEditButtonClick,
         handleDeleteButtonClick,
@@ -46,6 +45,8 @@ const SpicesList = () => {
         totalPages,
         setActiveFilters,
         showSuccessModal,
+        selectedItems,
+        handleCheckboxChange
     } = useSpicesState(spices);
 
     if (isLoading) {
@@ -81,30 +82,7 @@ const SpicesList = () => {
                     </div>
                 </div>
 
-                {role === 'ADMIN' && (
-                    <div className={styles.listControls}>
-                        <button
-                            className={styles.controlButton}
-                            onClick={handleAddButtonClick}
-                        >
-                            <Plus size={16} color="#333" />
-                        </button>
-                        <button
-                            className={styles.controlButton}
-                            onClick={handleCheckboxToggle}
-                        >
-                            <Check size={16} color="#333" />
-                        </button>
-                        <button
-                            className={styles.controlButton}
-                            onClick={handleDeleteButtonClick}
-                        >
-                            <Trash2 size={16} color="#333" />
-                        </button>
-                    </div>
-                )}
-
-                <div>
+                <div className={styles.filterControlsContainer}>
                     <SpicesFilters
                         activeFilters={activeFilters}
                         setActiveFilters={setActiveFilters}
@@ -113,6 +91,30 @@ const SpicesList = () => {
                         handleCheckboxToggle={handleCheckboxToggle}
                         handleDeleteButtonClick={handleDeleteButtonClick}
                     />
+
+                    {role === 'ADMIN' && (
+                        <div className={styles.listControls}>
+                            <button
+                                className={styles.controlButton}
+                                onClick={handleAddButtonClick}
+                            >
+                                <Plus size={16} color="#333" />
+                            </button>
+                            <button
+                                className={styles.controlButton}
+                                onClick={handleCheckboxToggle}
+                            >
+                                <Check size={16} color="#333" />
+                            </button>
+                            <button
+                                className={styles.controlButton}
+                                onClick={handleDeleteButtonClick}
+                                disabled={selectedItems.size === 0}
+                            >
+                                <Trash2 size={16} color="#333" />
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <div className={styles.divider}></div>
@@ -123,11 +125,12 @@ const SpicesList = () => {
                         .map((spice) => (
                             <div key={spice.id} className={styles.card}>
                                 <SpicesCard
+                                    key={spice.id}
                                     spice={spice}
                                     showCheckboxes={showCheckboxes}
-                                    selectedCard={selectedCard}
-                                    role={role}  // role prop 추가
-                                    onCheckboxChange={handleCardCheckboxChange}
+                                    role={role}
+                                    selectedItems={selectedItems}
+                                    handleCheckboxChange={handleCheckboxChange}
                                     onEditClick={handleEditButtonClick}
                                 />
                             </div>

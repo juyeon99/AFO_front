@@ -108,6 +108,7 @@ const PerfumeList = () => {
                                 role={role}
                                 onCheckboxChange={handleCardCheckboxChange}
                                 onEditClick={handleEditButtonClick}
+                                currentPage={currentPage}
                             />
                         ))}
                 </div>
