@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
     fetchPerfumes,
     selectPerfumes,
@@ -10,12 +11,18 @@ import {
 
 const usePerfumeState = () => {
     const dispatch = useDispatch();
+    const location = useLocation();
+    const navigate = useNavigate();
     const perfumes = useSelector(selectPerfumes) || [];
+
+    // URL에서 페이지 번호 가져오기
+    const queryParams = new URLSearchParams(location.search);
+    const initialPage = parseInt(queryParams.get('page')) || 1;
 
     // 기본 상태 관리
     const [searchTerm, setSearchTerm] = useState('');
     const [activeFilters, setActiveFilters] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(initialPage);
     const [showCheckboxes, setShowCheckboxes] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -32,6 +39,12 @@ const usePerfumeState = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const itemsPerPage = 12;
+
+    // URL 변경 감지 및 페이지 상태 업데이트
+    useEffect(() => {
+        const page = parseInt(queryParams.get('page')) || 1;
+        setCurrentPage(page);
+    }, [location.search]);
 
     // 초기 데이터 로드
     useEffect(() => {
@@ -204,17 +217,17 @@ const usePerfumeState = () => {
         dispatch(fetchPerfumes());
     };
 
-    const totalPages = Math.ceil(filteredPerfumes.length / itemsPerPage);
-
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
+        navigate(`/perfumelist?page=${pageNumber}`);
     };
+
+    const totalPages = Math.ceil(filteredPerfumes.length / itemsPerPage);
 
     return {
         searchTerm,
         activeFilters,
         currentPage,
-        setCurrentPage,
         showCheckboxes,
         selectedCard,
         showAddModal,
