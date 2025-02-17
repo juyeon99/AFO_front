@@ -25,10 +25,10 @@ const usePerfumeState = () => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [role, setRole] = useState(null);
     const [formData, setFormData] = useState({});
-    const [imageUrls, setImageUrls] = useState([]);
+    const [imageUrlList, setImageUrlList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showUrlInput, setShowUrlInput] = useState(false);
-    const [imageUrlCount, setImageUrlCount] = useState(0);
+    const [imageUrlCount, setImageUrlListCount] = useState(0);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const itemsPerPage = 12;
@@ -55,7 +55,7 @@ const usePerfumeState = () => {
     useEffect(() => {
         if (selectedPerfume) {
             setFormData(selectedPerfume);
-            setImageUrls(selectedPerfume.imageUrls || [selectedPerfume.imageUrl].filter(Boolean));
+            setImageUrlList(selectedPerfume.imageUrlList || [selectedPerfume.imageUrl].filter(Boolean));
         }
     }, [selectedPerfume]);
 
@@ -94,15 +94,16 @@ const usePerfumeState = () => {
 
     const handleAddButtonClick = () => {
         setSelectedPerfume({
-            name: '',
-            description: '',
+            nameEn: '',
+            nameKr: '',
+            content: '',
             brand: '',
             grade: '오 드 퍼퓸',
-            singleNote: '',
-            topNote: '',
-            middleNote: '',
-            baseNote: '',
-            imageUrl: '',
+            singleNoteList: [],
+            topNoteList: [],
+            middleNoteList: [],
+            baseNoteList: [],
+            imageUrlList: [],
         });
         setShowAddModal(true);
     };
@@ -144,7 +145,7 @@ const usePerfumeState = () => {
         setShowEditModal(false);
         setSelectedPerfume(null);
         setFormData({});
-        setImageUrls([]);
+        setImageUrlList([]);
     };
 
     const handleInputChange = (field, value) => {
@@ -155,19 +156,19 @@ const usePerfumeState = () => {
     };
 
     const handleImageUrlAdd = () => {
-        setImageUrls([...imageUrls, '']);
-        setImageUrlCount(prev => prev + 1);
+        setImageUrlList([...imageUrlList, '']);
+        setImageUrlListCount(prev => prev + 1);
     };
 
     const handleImageUrlChange = (index, value) => {
-        const newUrls = [...imageUrls];
+        const newUrls = [...imageUrlList];
         newUrls[index] = value;
-        setImageUrls(newUrls);
+        setImageUrlList(newUrls);
     };
 
     const handleImageUrlRemove = (index) => {
-        setImageUrls(imageUrls.filter((_, i) => i !== index));
-        setImageUrlCount(prev => prev - 1);
+        setImageUrlList(imageUrlList.filter((_, i) => i !== index));
+        setImageUrlListCount(prev => prev - 1);
     };
 
     const handleSubmit = async (e) => {
@@ -177,7 +178,7 @@ const usePerfumeState = () => {
         try {
             const updatedData = {
                 ...formData,
-                imageUrls: imageUrls.filter(url => url.trim() !== '')
+                imageUrlList: imageUrlList.filter(url => url.trim() !== '')
             };
 
             if (showEditModal) {
@@ -225,7 +226,7 @@ const usePerfumeState = () => {
         filteredPerfumes,
         itemsPerPage,
         formData,
-        imageUrls,
+        imageUrlList,
         isLoading,
         showUrlInput,
         setShowUrlInput,
