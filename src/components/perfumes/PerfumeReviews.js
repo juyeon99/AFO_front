@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../css/perfumes/PerfumeReviews.module.css';
 import ReviewSlider from '../../components/perfumes/ReviewSlider';
-import SimilarPerfumes from '../../components/perfumes/SimilarPerfumes';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectPerfumes } from '../../module/PerfumeModule';
 import { fetchReviews, selectReviews, createNewReview } from '../../module/ReviewModule';
@@ -24,16 +23,10 @@ const PerfumeReviews = ({ perfumeId }) => {
 
     // 리뷰 데이터 로드
     useEffect(() => {
-        if (perfumeId) {
+        if (perfumeId && (!reviews || reviews.length === 0)) {
             dispatch(fetchReviews(perfumeId));
-            console.log("리뷰 데이터 요청:", perfumeId);
         }
-    }, [dispatch, perfumeId]);
-
-    // 리뷰 데이터 변경 모니터링
-    useEffect(() => {
-        console.log("현재 리뷰 데이터:", reviews);
-    }, [reviews]);
+    }, [perfumeId]);
 
     // 마우스 이벤트 핸들링
     useEffect(() => {
@@ -88,11 +81,6 @@ const PerfumeReviews = ({ perfumeId }) => {
             setStartX(e.clientX);
         }
     };
-
-    // 리뷰 데이터 변경 시 로그
-    useEffect(() => {
-        console.log("현재 리뷰 데이터:", reviews); // 디버깅용
-    }, [reviews]);
 
     return (
         <div className={styles.reviewsContainer}>
@@ -153,12 +141,6 @@ const PerfumeReviews = ({ perfumeId }) => {
                     setSliderLeft={setSliderLeft}
                     setCardOffset={setCardOffset}
                 />
-            </div>
-
-
-            {/* 유사 향수 섹션 추가 */}
-            <div className={styles.similarPerfumesSection}>
-                <SimilarPerfumes perfumeId={perfumeId} />
             </div>
         </div>
     );

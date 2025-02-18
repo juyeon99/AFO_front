@@ -14,7 +14,6 @@ apis.interceptors.request.use((config) => {
     if (accessToken) {
         config.headers["Authorization"] = `Bearer ${accessToken}`; 
     }
-    console.log("Request Sent:", config); // 요청 로그
     return config;
 });
 

@@ -25,6 +25,11 @@
     z-index: 1000;
 } */
 
+.contentWrapper {
+    position: relative;
+    padding-bottom: 200px; /* 푸터를 위한 여백 */
+}
+
 .logo {
     position: absolute;
     width: 180px;
@@ -323,4 +328,11 @@
     padding: 8px 16px;
     border-radius: 5px;
     font-size: 14px;
+}
+
+.similarPerfumesSection {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 2000px;  /* 리뷰 섹션 아래로 위치 조정 */
 }

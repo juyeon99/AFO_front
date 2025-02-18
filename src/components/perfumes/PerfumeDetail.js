@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styles from '../../css/perfumes/PerfumeDetail.module.css';
 import PerfumeReviews from './PerfumeReviews';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectPerfumes, fetchPerfumeById } from '../../module/PerfumeModule';
+import SimilarPerfumes from '../perfumes/SimilarPerfumes';
 
 const PerfumeDetail = () => {
     const dispatch = useDispatch();
@@ -12,22 +13,19 @@ const PerfumeDetail = () => {
     const [isLongTitle, setIsLongTitle] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const location = useLocation();
-
     const perfumes = useSelector(selectPerfumes);
-    console.log("Redux perfumes 상태:", perfumes);
-    
-    const perfume = perfumes?.find(p => p.id === parseInt(id));
-    console.log("현재 선택된 향수:", perfume);
+    const perfume = useMemo(() =>
+        perfumes?.find(p => p.id === parseInt(id)),
+        [perfumes, id]
+    );
 
+    // 향수 데이터 로드 - 중복 요청 방지
     useEffect(() => {
-        console.log("Redux perfumes 상태:", perfumes);
-    }, [perfumes]);
-    
-    // 향수 데이터 로드
-    useEffect(() => {
-        // 새로고침을 대비해 무조건 데이터를 가져오도록 수정
-        dispatch(fetchPerfumeById(id));
-    }, [dispatch, id]);
+        const existingPerfume = perfumes?.find(p => p.id === parseInt(id));
+        if (!existingPerfume || !existingPerfume.reviews) {
+            dispatch(fetchPerfumeById(id));
+        }
+    }, [id]);
 
     // 이전 페이지 정보 확인용
     useEffect(() => {
@@ -194,18 +192,22 @@ const PerfumeDetail = () => {
                             {perfume.content}
                         </p>
                     </div>
-                </div>
+                    {/* 구분선 */}
+                    <div className={styles.divider}></div>
 
-                {/* 구분선 */}
-                <div className={styles.divider}></div>
+                    {/* 리뷰 섹션 */}
+                    <div style={{
+                        position: 'relative',
+                        marginTop: '50px',
+                        marginBottom: '100px'
+                    }}>
+                        <PerfumeReviews perfumeId={perfume.id} />
+                    </div>
 
-                {/* 리뷰 섹션 */}
-                <div style={{
-                    position: 'relative',
-                    marginTop: '50px',
-                    marginBottom: '100px'
-                }}>
-                    <PerfumeReviews perfumeId={perfume.id} />
+                    {/* 유사 향수 섹션 */}
+                    <div className={styles.similarPerfumesSection}>
+                        <SimilarPerfumes perfumeId={perfume.id} />
+                    </div>
                 </div>
             </div>
         </div>

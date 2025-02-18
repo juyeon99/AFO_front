@@ -10,7 +10,7 @@ const initialState = {
 
 // 액션 생성
 export const {
-    perfumes: {fetchPerfumeStart,
+    perfumes: { fetchPerfumeStart,
         fetchPerfumeSuccess,
         fetchPerfumeFail,
         modifyPerfumeStart,
@@ -25,23 +25,23 @@ export const {
         fetchPerfumeByIdStart,
         fetchPerfumeByIdSuccess,
         fetchPerfumeByIdFail,
-        
+
     },
 } = createActions({
     PERFUMES: {
-        FETCH_PERFUME_START: () => {},
+        FETCH_PERFUME_START: () => { },
         FETCH_PERFUME_SUCCESS: (perfumes) => perfumes,
         FETCH_PERFUME_FAIL: (error) => error,
-        MODIFY_PERFUME_START: () => {},
+        MODIFY_PERFUME_START: () => { },
         MODIFY_PERFUME_SUCCESS: (perfume) => perfume,
         MODIFY_PERFUME_FAIL: (error) => error,
-        DELETE_PERFUME_START: () => {},
+        DELETE_PERFUME_START: () => { },
         DELETE_PERFUME_SUCCESS: (perfumeId) => perfumeId,
         DELETE_PERFUME_FAIL: (error) => error,
-        CREATE_PERFUME_START: () => {},
+        CREATE_PERFUME_START: () => { },
         CREATE_PERFUME_SUCCESS: (perfume) => perfume,
         CREATE_PERFUME_FAIL: (error) => error,
-        FETCH_PERFUME_BY_ID_START: () => {},
+        FETCH_PERFUME_BY_ID_START: () => { },
         FETCH_PERFUME_BY_ID_SUCCESS: (perfume) => perfume,
         FETCH_PERFUME_BY_ID_FAIL: (error) => error,
     },
@@ -49,13 +49,13 @@ export const {
 
 // redux thunk
 export const fetchPerfumes = () => async (dispatch) => {
-    try{
+    try {
         dispatch(fetchPerfumeStart());
         const perfumes = await getAllPerfumes();
         dispatch(fetchPerfumeSuccess(perfumes));
     } catch (error) {
-        const errorMessage = 
-        error.response?.data?.message || error.message || "향수 목록 불러오기 실패";
+        const errorMessage =
+            error.response?.data?.message || error.message || "향수 목록 불러오기 실패";
         dispatch(fetchPerfumeFail(errorMessage));
     }
 };
@@ -90,11 +90,21 @@ export const createPerfume = (perfumeData) => async (dispatch) => {
     }
 };
 
-export const fetchPerfumeById = (productId) => async (dispatch) => {
+export const fetchPerfumeById = (productId) => async (dispatch, getState) => {
     try {
+        // 이미 해당 향수 데이터가 있는지 확인
+        const state = getState();
+        const existingPerfume = state.perfumes.perfumes.find(
+            p => p.id === parseInt(productId)
+        );
+
+        // 이미 데이터가 있고 필요한 모든 정보가 포함되어 있다면 새로운 요청을 하지 않음
+        if (existingPerfume && existingPerfume.reviews) {
+            return;
+        }
+
         dispatch(fetchPerfumeByIdStart());
         const perfume = await getProductDetail(productId);
-        console.log("가져온 향수 데이터:", perfume); // 🔍 여기서 `reviews`가 있는지 확인
         dispatch(fetchPerfumeByIdSuccess(perfume));
     } catch (error) {
         dispatch(fetchPerfumeByIdFail(error.message || "향수 상세 정보 불러오기 실패"));
@@ -193,8 +203,8 @@ const perfumeReducer = handleActions(
 );
 
 
-export const selectPerfumes = (state) => state.perfumes.perfumes;
-export const selectLoading = (state) => state.perfumes.loading;
-export const selectError = (state) => state.perfumes.error;
+export const selectPerfumes = (state) => state.perfumes?.perfumes || [];
+export const selectLoading = (state) => state.perfumes?.loading || false;
+export const selectError = (state) => state.perfumes?.error || null;
 
 export default perfumeReducer;
