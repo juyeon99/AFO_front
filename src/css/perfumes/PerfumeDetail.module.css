@@ -7,12 +7,11 @@
     min-width: 1200px;
     background: #EFEDED;
     margin: 0 auto;
-    padding: 0 20px 300px; /* 푸터를 위한 하단 패딩 추가 */
+    padding: 0 20px;
     box-sizing: border-box;
     overflow: visible;
-    min-height: calc(100vh + 1400px);
+    min-height: 3200px; /* 더 큰 값으로 설정 */
 }
-
 /* 디버깅을 위한 임시 스타일 */
 /* .container::before {
     content: '';
@@ -333,6 +332,8 @@
 .similarPerfumesSection {
     position: absolute;
     width: 100%;
-    left: 0;
-    top: 2000px;  /* 리뷰 섹션 아래로 위치 조정 */
+    left: 3%;
+    top: 2100px; /* 기존 2000px에서 증가 */
+    height: 600px; /* 충분한 높이 */
 }
+
