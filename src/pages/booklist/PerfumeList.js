@@ -25,6 +25,7 @@ const PerfumeList = () => {
         filteredPerfumes,
         itemsPerPage,
         formData,
+        setFormData,
         imageUrls,
         handleSearch,
         handleFilterClick,
@@ -49,7 +50,7 @@ const PerfumeList = () => {
         handlePageChange,
         totalPages,
         isLoading,
-    } = usePerfumeState();
+    } = usePerfumeState(); 
 
     if (isLoading) {
         return <LoadingScreen message="향수를 불러오는 중..." />;
@@ -129,6 +130,7 @@ const PerfumeList = () => {
                     successMessage={successMessage}
                     onSuccessClose={handleSuccessClose}
                     formData={formData}
+                    setFormData={setFormData}
                     imageUrls={imageUrls}
                     showUrlInput={showUrlInput}
                     setShowUrlInput={setShowUrlInput}

@@ -31,7 +31,20 @@ const usePerfumeState = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
     const [role, setRole] = useState(null);
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState({
+        nameEn: "",
+        nameKr: "",
+        brand: "",
+        grade: "",
+        singleNoteList: [],
+        topNoteList: [],
+        middleNoteList: [],
+        baseNoteList: [],
+        mainAccord: "",
+        ingredients: "",
+        sizeOption: "",
+        content: "",
+    });
     const [imageUrlList, setImageUrlList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showUrlInput, setShowUrlInput] = useState(false);
@@ -116,6 +129,9 @@ const usePerfumeState = () => {
             topNoteList: [],
             middleNoteList: [],
             baseNoteList: [],
+            mainAccord: '',
+            ingredients: '',
+            sizeOption: '',
             imageUrlList: [],
         });
         setShowAddModal(true);
@@ -239,6 +255,7 @@ const usePerfumeState = () => {
         filteredPerfumes,
         itemsPerPage,
         formData,
+        setFormData,
         imageUrlList,
         isLoading,
         showUrlInput,

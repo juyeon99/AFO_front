@@ -15,8 +15,12 @@ export const getAllPerfumes = async () => {
 // 향수 수정 
 export const modifyPerfumes = async (perfumeData) => {
     try {
+        // 🚀 API 요청 전 데이터 확인
+        console.log("📤 [modifyPerfumes] 요청 데이터:", JSON.stringify(perfumeData, null, 2));
         const response = await apis.put(`/products`, perfumeData);
         console.log("히하이ㅏ링라ㅣ아링", response)
+         // ✅ API 응답 데이터 확인
+        console.log("✅ [createPerfumes] 응답 데이터:", response.data);
         return response.data;
     } catch (error) {
         console.error("Error modifying perfume:", error);
