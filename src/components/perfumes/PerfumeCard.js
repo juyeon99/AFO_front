@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const PerfumeCard = ({
     perfume,
     showCheckboxes,
-    selectedCard,
+    selectedCard,  // selectedCard 값을 prop으로 받음
     role,
     onCheckboxChange,
     onEditClick,
@@ -21,19 +21,18 @@ const PerfumeCard = ({
         ? perfume.imageUrlList
         : ['https://sensient-beauty.com/wp-content/uploads/2023/11/Fragrance-Trends-Alcohol-Free.jpg'];
 
-    // 자동 슬라이드 효과 추가
     useEffect(() => {
         let slideInterval;
 
         if (imageUrls.length > 1) {
             slideInterval = setInterval(() => {
-                setIsTransitioning(true);  // 페이드 아웃 시작
+                setIsTransitioning(true);
                 setTimeout(() => {
                     setCurrentImageIndex(prevIndex =>
                         prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1
                     );
-                    setIsTransitioning(false);  // 페이드 인 시작
-                }, 300);  // transition 시간과 동일하게 설정
+                    setIsTransitioning(false);
+                }, 300);
             }, 3000);
         }
 
@@ -45,37 +44,32 @@ const PerfumeCard = ({
     }, [imageUrls.length]);
 
     const handleCardClick = (e) => {
-        // 체크박스나 편집 버튼 클릭 시에는 상세 페이지로 이동하지 않음
         if (e.target.type === 'checkbox' || e.target.closest(`.${styles.editButton}`)) {
             return;
         }
         
-        // 체크박스 모드일 때는 체크박스 토글
         if (showCheckboxes) {
-            onCheckboxChange(perfume.id);
+            onCheckboxChange(perfume.id);  // 카드 선택 상태 변경
             return;
         }
         
-        // 상세 페이지로 이동
-        navigate(`/perfumes/${perfume.id}`, { 
-            state: { previousPage: currentPage } 
-        });
+        navigate(`/perfumes/${perfume.id}`, { state: { previousPage: currentPage } });
     };
 
-    // 선택된 카드인지 확인
+    // selectedCard가 해당 카드의 ID와 일치하는지 확인
     const isSelected = selectedCard === perfume.id;
 
     return (
         <div
-            className={`${styles.card} ${isSelected ? styles.selected : ''}`}  // styles.selected로 클래스 적용
+            className={`${styles.card} ${isSelected ? styles.selected : ''}`} 
             onClick={handleCardClick}
         >
             {showCheckboxes && (
                 <input
                     type="checkbox"
-                    className={styles.checkbox}
+                    className={`${styles.checkbox} ${isSelected ? styles.checkboxChecked : ''}`}  // 동적 클래스 적용
                     checked={isSelected}
-                    onChange={() => onCheckboxChange(perfume.id)}
+                    onChange={() => onCheckboxChange(perfume.id)}  // 카드 선택 상태 변경
                     onClick={(e) => e.stopPropagation()}
                 />
             )}

@@ -31,7 +31,6 @@ const usePerfumeState = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
     const [role, setRole] = useState(null);
-    const [selectedCards, setSelectedCards] = useState([]);
     const [formData, setFormData] = useState({
         nameEn: "",
         nameKr: "",
@@ -119,19 +118,15 @@ const usePerfumeState = () => {
     };
 
     const handleCardCheckboxChange = (id) => {
-        console.log("체크박스 변경됨: ", id);  // 변경된 체크박스의 id 출력
-    
-        setSelectedCards(prevSelected => {
-            console.log("이전에 선택된 카드들: ", prevSelected);  // 이전에 선택된 카드들 출력
-            
-            if (prevSelected.includes(id)) {
-                console.log(`카드 ${id} 선택 해제됨`);  // 선택 해제 시 출력
-                // 이미 선택된 카드라면, 선택 해제
-                return prevSelected.filter(cardId => cardId !== id);
+        console.log('이전에 선택된 카드:', selectedCard);  // 이전에 선택된 카드 확인
+
+        setSelectedCard((prevSelected) => {
+            if (prevSelected === id) {
+                console.log(`카드 ${id} 선택 해제됨`);  // 카드 선택 해제
+                return null;  // 선택 해제 시 null로 설정
             } else {
                 console.log(`카드 ${id} 선택됨`);  // 새로 선택된 카드 출력
-                // 선택되지 않은 카드라면, 추가
-                return [...prevSelected, id];
+                return id;  // 새 카드 ID로 업데이트
             }
         });
     };
@@ -161,13 +156,13 @@ const usePerfumeState = () => {
     };
 
     const handleDeleteButtonClick = () => {
-        if (selectedCards.length === 0) {
+        if (selectedCard.length === 0) {
             alert("삭제할 향수를 선택하세요.");
             return;
         }
         // 선택된 향수들의 id를 사용하여 삭제
         setIsDeleting(true);  // 삭제 작업 시작
-        handleDeleteConfirm(selectedCards);  // 삭제 확인 함수 호출
+        handleDeleteConfirm(selectedCard);  // 삭제 확인 함수 호출
     };    
 
     const handleDeleteConfirm = async (cardsToDelete) => {
@@ -192,7 +187,7 @@ const usePerfumeState = () => {
             // 상태 업데이트
             setIsDeleting(false);
             setSelectedPerfume(null);
-            setSelectedCards([]);  // 삭제 후 선택된 카드들 초기화
+            setSelectedCard([]);  // 삭제 후 선택된 카드들 초기화
     
             // 향수 목록 다시 불러오기
             await dispatch(fetchPerfumes());

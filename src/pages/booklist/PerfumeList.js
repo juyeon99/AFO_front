@@ -16,7 +16,7 @@ const PerfumeList = () => {
         activeFilters,
         currentPage,
         showCheckboxes,
-        selectedCards,
+        selectedCard,
         showAddModal,
         showEditModal,
         successMessage,
@@ -109,7 +109,7 @@ const PerfumeList = () => {
                                 key={perfume.id}
                                 perfume={perfume}
                                 showCheckboxes={showCheckboxes}
-                                selectedCards={selectedCards}
+                                selectedCard={selectedCard}
                                 onCheckboxChange={handleCardCheckboxChange}
                                 role={role}
                                 onEditClick={handleEditButtonClick}
