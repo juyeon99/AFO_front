@@ -62,59 +62,62 @@ const PerfumeCard = ({
         });
     };
 
-return (
-    <div
-        className={styles.card}
-        onClick={handleCardClick}
-    >
-        {showCheckboxes && (
-            <input
-                type="checkbox"
-                className={styles.checkbox}
-                checked={selectedCard === perfume.id}
-                onChange={() => onCheckboxChange(perfume.id)}
-                onClick={(e) => e.stopPropagation()}
-            />
-        )}
+    // 선택된 카드인지 확인
+    const isSelected = selectedCard === perfume.id;
 
-        {role === 'ADMIN' && (
-            <button
-                className={styles.editButton}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onEditClick(perfume);
-                }}
-            >
-                <Edit size={16} color="#333" />
-            </button>
-        )}
+    return (
+        <div
+            className={`${styles.card} ${isSelected ? styles.selected : ''}`}  // styles.selected로 클래스 적용
+            onClick={handleCardClick}
+        >
+            {showCheckboxes && (
+                <input
+                    type="checkbox"
+                    className={styles.checkbox}
+                    checked={isSelected}
+                    onChange={() => onCheckboxChange(perfume.id)}
+                    onClick={(e) => e.stopPropagation()}
+                />
+            )}
 
-        <div className={styles.imageContainer}>
-            <img
-                src={imageUrls[currentImageIndex]}
-                alt={perfume.name}
-                className={styles.image}
-            />
-        </div>
+            {role === 'ADMIN' && (
+                <button
+                    className={styles.editButton}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onEditClick(perfume);
+                    }}
+                >
+                    <Edit size={16} color="#333" />
+                </button>
+            )}
 
-        <div className={styles.name}><strong>{perfume.nameKr}</strong></div>
-        <div className={styles.divider}></div>
-        <div className={styles.category}>{perfume.brand}</div>
-        <div className={styles.grade}>{perfume.grade}</div>
-        <div className={styles.description}>
-            <p>"{perfume.content}"</p>
-            <br />
-            <div className={styles.singleNote}>
-                {perfume.singleNote && <p><strong>싱글 노트 | </strong> {perfume.singleNote}</p>}
+            <div className={styles.imageContainer}>
+                <img
+                    src={imageUrls[currentImageIndex]}
+                    alt={perfume.name}
+                    className={styles.image}
+                />
             </div>
-            <div className={styles.multiNote}>
-                {perfume.topNote && <p><strong>탑 노트 | </strong> {perfume.topNote}</p>}
-                {perfume.middleNote && <p><strong>미들 노트 | </strong> {perfume.middleNote}</p>}
-                {perfume.baseNote && <p><strong>베이스 노트 | </strong> {perfume.baseNote}</p>}
+
+            <div className={styles.name}><strong>{perfume.nameKr}</strong></div>
+            <div className={styles.divider}></div>
+            <div className={styles.category}>{perfume.brand}</div>
+            <div className={styles.grade}>{perfume.grade}</div>
+            <div className={styles.description}>
+                <p>"{perfume.content}"</p>
+                <br />
+                <div className={styles.singleNote}>
+                    {perfume.singleNote && <p><strong>싱글 노트 | </strong> {perfume.singleNote}</p>}
+                </div>
+                <div className={styles.multiNote}>
+                    {perfume.topNote && <p><strong>탑 노트 | </strong> {perfume.topNote}</p>}
+                    {perfume.middleNote && <p><strong>미들 노트 | </strong> {perfume.middleNote}</p>}
+                    {perfume.baseNote && <p><strong>베이스 노트 | </strong> {perfume.baseNote}</p>}
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
 };
 
 export default PerfumeCard;
