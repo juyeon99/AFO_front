@@ -32,37 +32,36 @@ const detailCache = new Map();
 
 export const getProductDetail = async (productId) => {
     try {
-        // 캐시 확인
+        const now = Date.now();
+        
+        // 캐시 확인 (유효 시간 체크 추가)
         const cachedData = detailCache.get(productId);
-        if (cachedData) {
-            console.log('캐시된 데이터 사용:', cachedData);
-            return cachedData;
+        if (cachedData && (now - cachedData.timestamp < CACHE_DURATION)) {
+            console.log(`향수 ID ${productId}: 캐시된 데이터 사용`);
+            return cachedData.data;
         }
 
         console.log(`향수 ID ${productId}에 대한 상세 정보 요청 시작`);
 
-        const [productResponse, similarResponse, reviewsResponse] = await Promise.all([
-            apis.get(`/products/${productId}`),
-            apis.get(`/products/${productId}/similar`).catch(() => ({ data: [] })),
-            apis.get(`/reviews/product/${productId}`).catch(() => ({ data: [] }))
-        ]);
-
-        console.log('개별 응답 데이터:', {
-            product: productResponse.data,
-            similar: similarResponse.data,
-            reviews: reviewsResponse.data
-        });
-
+        // 통합 API 호출
+        const response = await apis.get(`/products/${productId}`);
+        const productDetail = response.data;
+        
+        // 통합 데이터 구성 (필요한 데이터가 없는 경우 기본값 제공)
         const combinedData = {
-            ...productResponse.data,
-            similarPerfumes: similarResponse.data,
-            reviews: reviewsResponse.data
+            ...productDetail,
+            // 응답에 similarPerfumes나 reviews가 없을 경우를 대비한 기본값 설정
+            similarPerfumes: productDetail.similarPerfumes || { note_based: [], design_based: [] },
+            reviews: productDetail.reviews || []
         };
 
-        console.log('통합된 데이터:', combinedData);
-
-        // 캐시에 저장
-        detailCache.set(productId, combinedData);
+        console.log('통합된 데이터 구조:', Object.keys(combinedData));
+        
+        // 캐시에 저장 (타임스탬프 포함)
+        detailCache.set(productId, {
+            data: combinedData,
+            timestamp: now
+        });
 
         return combinedData;
     } catch (error) {
@@ -71,6 +70,14 @@ export const getProductDetail = async (productId) => {
             error: error.message,
             stack: error.stack
         });
+        
+        // 에러 발생 시 캐시된 데이터가 있으면 반환 (그레이스풀 디그레이드)
+        const cachedData = detailCache.get(productId);
+        if (cachedData) {
+            console.warn(`API 오류로 인해 캐시된 데이터 사용 (ID: ${productId})`);
+            return cachedData.data;
+        }
+        
         throw error;
     }
 };
@@ -109,14 +116,14 @@ export const createPerfumes = async (perfumeData) => {
 }
 
 // 유사 향수 조회
-export const getSimilarPerfumes = async (productId) => {
-    try {
-        const response = await apis.get(`/products/${productId}/similar`);
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching similar perfumes:", error);
-        throw error;
-    }
-};
+// export const getSimilarPerfumes = async (productId) => {
+//     try {
+//         const response = await apis.get(`/products/${productId}/similar`);
+//         return response.data;
+//     } catch (error) {
+//         console.error("Error fetching similar perfumes:", error);
+//         throw error;
+//     }
+// };
 
 

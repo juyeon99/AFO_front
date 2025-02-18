@@ -1,25 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../css/perfumes/SimilarPerfumes.module.css';
-import { getSimilarPerfumes } from '../../api/PerfumeAPICalls';
+import { getProductDetail } from '../../api/PerfumeAPICalls';
 import { useNavigate } from 'react-router-dom';
 
-const SimilarPerfumes = ({ perfumeId }) => {
+const SimilarPerfumes = ({ perfumeId ,initialData = null }) => {
     const [noteSimilarPerfumes, setNoteSimilarPerfumes] = useState([]);
     const [designSimilarPerfumes, setDesignSimilarPerfumes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
+        // 초기 데이터가 이미 있으면 바로 사용
+        if (initialData) {
+            setNoteSimilarPerfumes(initialData.note_based || []);
+            setDesignSimilarPerfumes(initialData.design_based || []);
+            setIsLoading(false);
+            return;
+        }
+
         const loadSimilarPerfumes = async () => {
             if (!perfumeId) return;
 
             try {
                 setIsLoading(true);
-                const data = await getSimilarPerfumes(perfumeId);
-                setNoteSimilarPerfumes(data.note_based || []);
-                setDesignSimilarPerfumes(data.design_based || []);
+                const productDetail = await getProductDetail(perfumeId);
+                
+                // 통합 API 응답에서 similarPerfumes 추출
+                const similarData = productDetail.similarPerfumes || {};
+                
+                setNoteSimilarPerfumes(similarData.note_based || []);
+                setDesignSimilarPerfumes(similarData.design_based || []);
             } catch (err) {
-                console.error("유사 향수 불러오기 실패", err);
+                console.error("향수 상세 정보 불러오기 실패", err);
                 setNoteSimilarPerfumes([]);
                 setDesignSimilarPerfumes([]);
             } finally {
@@ -28,7 +40,7 @@ const SimilarPerfumes = ({ perfumeId }) => {
         };
 
         loadSimilarPerfumes();
-    }, [perfumeId]);
+    }, [perfumeId, initialData]);
 
     const handleCardClick = (id) => {
         navigate(`/perfumes/${id}`);
