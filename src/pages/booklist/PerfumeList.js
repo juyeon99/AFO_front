@@ -8,6 +8,7 @@ import PerfumeModal from '../../components/perfumes/PerfumeModal';
 import LoadingScreen from '../../components/loading/LoadingScreen';
 import usePerfumeState from './hooks/usePerfumeState';
 import styles from '../../css/perfumes/PerfumeList.module.css';
+import BookmarkPopover from '../../components/perfumes/BookmarkPopover';
 
 const PerfumeList = () => {
     const navigate = useNavigate();
@@ -49,6 +50,13 @@ const PerfumeList = () => {
         handlePageChange,
         totalPages,
         isLoading,
+        showBookmarkModal,
+        setShowBookmarkModal,
+        bookmarkedPerfumes,
+        recommendedPerfumes,
+        handleBookmarkDelete,
+        handleBookmarkClick,
+        isBookmarked
     } = usePerfumeState();
 
     if (isLoading) {
@@ -94,6 +102,7 @@ const PerfumeList = () => {
                     handleAddButtonClick={handleAddButtonClick}
                     handleCheckboxToggle={handleCheckboxToggle}
                     handleDeleteButtonClick={handleDeleteButtonClick}
+                    handleBookmarkClick={handleBookmarkClick}
                 />
 
                 <div className={styles.itemsContainer}>
@@ -109,6 +118,7 @@ const PerfumeList = () => {
                                 onCheckboxChange={handleCardCheckboxChange}
                                 onEditClick={handleEditButtonClick}
                                 currentPage={currentPage}
+                                isBookmarked={isBookmarked(perfume.id)}
                             />
                         ))}
                 </div>
@@ -139,6 +149,15 @@ const PerfumeList = () => {
                     onImageUrlChange={handleImageUrlChange}
                     onImageUrlRemove={handleImageUrlRemove}
                     onSubmit={handleSubmit}
+                />
+
+                {/* 북마크 모달 */}
+                <BookmarkPopover
+                    show={showBookmarkModal}
+                    onClose={() => setShowBookmarkModal(false)}
+                    bookmarkedPerfumes={bookmarkedPerfumes}
+                    recommendedPerfumes={recommendedPerfumes}
+                    handleBookmarkDelete={handleBookmarkDelete}
                 />
             </div>
         </>

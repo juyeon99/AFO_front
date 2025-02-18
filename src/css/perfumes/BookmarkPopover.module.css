@@ -1,0 +1,56 @@
+.popoverContainer {
+    position: absolute;
+    top: 340px;  /* 하트 버튼 아래로 */
+    right: 140px;  /* 오른쪽으로 이동 */
+    width: 300px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+
+.section {
+    padding: 16px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.perfumeGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);  /* 2열 그리드 */
+    gap: 12px;
+    padding: 12px;
+}
+
+.perfumeItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.perfumeImage {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
