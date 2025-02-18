@@ -27,7 +27,6 @@ export const getAllPerfumes = async () => {
 };
 
 // 향수 상세 조회 - 캐시 적용
-// 향수 상세 조회 - 캐시 적용
 const detailCache = new Map();
 
 export const getProductDetail = async (productId) => {
@@ -50,9 +49,8 @@ export const getProductDetail = async (productId) => {
         // 통합 데이터 구성 (필요한 데이터가 없는 경우 기본값 제공)
         const combinedData = {
             ...productDetail,
-            // 응답에 similarPerfumes나 reviews가 없을 경우를 대비한 기본값 설정
-            similarPerfumes: productDetail.similarPerfumes || { note_based: [], design_based: [] },
-            reviews: productDetail.reviews || []
+            // 응답에 similarPerfumes가 없을 경우를 대비한 기본값 설정
+            similarPerfumes: productDetail.similarPerfumes || { note_based: [], design_based: [] }
         };
 
         console.log('통합된 데이터 구조:', Object.keys(combinedData));

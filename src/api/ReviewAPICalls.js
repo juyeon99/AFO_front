@@ -3,7 +3,8 @@ import apis from "./Apis";
 // 특정 향수의 리뷰 목록 조회
 export const getReviewsByProductId = async (productId) => {
     try {
-        const response = await apis.get(`/products/${productId}`);
+        const response = await apis.get(`/reviews/product/${productId}`);
+        console.log("response.data:", response.data);
         return response.data;
     } catch (error) {
         console.error("Error fetching reviews:", error);

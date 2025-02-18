@@ -2,9 +2,9 @@ import { createActions, handleActions } from "redux-actions";
 import { 
     createReview, 
     updateReview, 
-    deleteReview 
+    deleteReview,
+    getReviewsByProductId
 } from "../api/ReviewAPICalls";
-import { getProductDetail } from "../api/PerfumeAPICalls";// 통합 API 호출 함수 import
 
 const initialState = {
     reviews: [],
@@ -45,17 +45,16 @@ export const {
     },
 });
 
-// 수정된 Thunk 액션 - 통합 API 사용
+//Thunk 액션
 export const fetchReviews = (productId) => async (dispatch) => {
     try {
         dispatch(fetchReviewsStart());
         console.log("리뷰 조회 요청 시작 (productId:", productId, ")");
         
-        // 통합 API 호출로 변경
-        const productDetail = await getProductDetail(productId);
-        const reviews = productDetail.reviews || [];
+        // 리뷰 조회 API 호출
+        const productDetail = await getReviewsByProductId(productId);
+        const reviews = productDetail || [];
         
-        console.log("통합 API에서 추출한 리뷰 데이터:", reviews);
         dispatch(fetchReviewsSuccess(reviews));
     } catch (error) {
         console.error("리뷰 조회 실패:", error);
@@ -63,14 +62,14 @@ export const fetchReviews = (productId) => async (dispatch) => {
     }
 };
 
-// 리뷰 생성 후 통합 API로 최신 리뷰 가져오기
+// 리뷰 생성 후 리뷰 조회 API로 최신 리뷰 가져오기
 export const createNewReview = (reviewData) => async (dispatch) => {
     try {
         dispatch(createReviewStart());
         await createReview(reviewData);
         
-        // 리뷰 생성 후 통합 API로 최신 데이터 조회
-        const productDetail = await getProductDetail(reviewData.productId);
+        // 리뷰 생성 후 리뷰 조회 API로 최신 데이터 조회
+        const productDetail = await getReviewsByProductId(reviewData.productId);
         const updatedReviews = productDetail.reviews || [];
         
         dispatch(createReviewSuccess(updatedReviews));
@@ -79,14 +78,14 @@ export const createNewReview = (reviewData) => async (dispatch) => {
     }
 };
 
-// 리뷰 수정 후 통합 API로 최신 리뷰 가져오기
+// 리뷰 수정 후 리뷰 조회 API로 최신 리뷰 가져오기
 export const updateExistingReview = (reviewData) => async (dispatch) => {
     try {
         dispatch(updateReviewStart());
         await updateReview(reviewData);
         
-        // 통합 API로 최신 데이터 조회
-        const productDetail = await getProductDetail(reviewData.productId);
+        // 리뷰 조회 API로 최신 데이터 조회
+        const productDetail = await getReviewsByProductId(reviewData.productId);
         const updatedReviews = productDetail.reviews || [];
         
         dispatch(updateReviewSuccess(updatedReviews));
@@ -95,14 +94,14 @@ export const updateExistingReview = (reviewData) => async (dispatch) => {
     }
 };
 
-// 리뷰 삭제 후 통합 API로 최신 리뷰 가져오기
+// 리뷰 삭제 후 리뷰 조회 API로 최신 리뷰 가져오기
 export const deleteExistingReview = (reviewId, productId) => async (dispatch) => {
     try {
         dispatch(deleteReviewStart());
         await deleteReview(reviewId);
         
-        // 통합 API로 최신 데이터 조회
-        const productDetail = await getProductDetail(productId);
+        // 리뷰 조회 API로 최신 데이터 조회
+        const productDetail = await getReviewsByProductId(productId);
         const updatedReviews = productDetail.reviews || [];
         
         dispatch(deleteReviewSuccess(updatedReviews));
