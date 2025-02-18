@@ -14,14 +14,20 @@ const PerfumeDetail = () => {
     const location = useLocation();
 
     const perfumes = useSelector(selectPerfumes);
+    console.log("Redux perfumes 상태:", perfumes);
+    
     const perfume = perfumes?.find(p => p.id === parseInt(id));
+    console.log("현재 선택된 향수:", perfume);
 
-    // 개별 향수 데이터 로드
     useEffect(() => {
-        if (!perfume) {
-            dispatch(fetchPerfumeById(id));
-        }
-    }, [dispatch, id, perfume]);
+        console.log("Redux perfumes 상태:", perfumes);
+    }, [perfumes]);
+    
+    // 향수 데이터 로드
+    useEffect(() => {
+        // 새로고침을 대비해 무조건 데이터를 가져오도록 수정
+        dispatch(fetchPerfumeById(id));
+    }, [dispatch, id]);
 
     // 이전 페이지 정보 확인용
     useEffect(() => {

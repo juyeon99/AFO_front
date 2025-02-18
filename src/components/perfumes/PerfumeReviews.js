@@ -124,7 +124,7 @@ const PerfumeReviews = ({ perfumeId }) => {
                                     onClick={() => setSelectedReview(index)}
                                 >
                                     <img
-                                        src={perfume?.imageUrls[0]}
+                                        src={perfume?.imageUrlList?.[0]}
                                         alt="향수 이미지"
                                         className={styles.perfumeThumb}
                                     />

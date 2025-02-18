@@ -94,6 +94,7 @@ export const fetchPerfumeById = (productId) => async (dispatch) => {
     try {
         dispatch(fetchPerfumeByIdStart());
         const perfume = await getProductDetail(productId);
+        console.log("가져온 향수 데이터:", perfume); // 🔍 여기서 `reviews`가 있는지 확인
         dispatch(fetchPerfumeByIdSuccess(perfume));
     } catch (error) {
         dispatch(fetchPerfumeByIdFail(error.message || "향수 상세 정보 불러오기 실패"));

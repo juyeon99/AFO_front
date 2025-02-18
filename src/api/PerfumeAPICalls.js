@@ -12,11 +12,32 @@ export const getAllPerfumes = async () => {
     }
 };
 
-// 향수 상세 조회
+// 향수 상세 조회 (유사 향수와 리뷰 포함)
 export const getProductDetail = async (productId) => {
     try {
-        const response = await apis.get(`/products/${productId}`);
-        return response.data;
+        // 병렬로 모든 요청을 실행
+        const [productResponse, similarResponse, reviewsResponse] = await Promise.all([
+            apis.get(`/products/${productId}`),
+            apis.get(`/products/${productId}/similar`).catch(error => {
+                console.warn("유사 향수 조회 실패:", error);
+                return { data: [] }; // 실패시 빈 배열 반환
+            }),
+            apis.get(`/reviews/product/${productId}`).catch(error => {
+                console.warn("리뷰 조회 실패:", error);
+                return { data: [] }; // 실패시 빈 배열 반환
+            })
+        ]);
+
+        // 응답 데이터 통합
+        const combinedData = {
+            ...productResponse.data,
+            similarPerfumes: similarResponse.data,
+            reviews: reviewsResponse.data
+        };
+
+        console.log("통합된 향수 데이터:", combinedData);
+        return combinedData;
+
     } catch (error) {
         console.error("Error fetching product detail:", error);
         throw error;
