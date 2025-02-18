@@ -31,6 +31,7 @@ const usePerfumeState = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
     const [role, setRole] = useState(null);
+    const [selectedCards, setSelectedCards] = useState([]);
     const [formData, setFormData] = useState({
         nameEn: "",
         nameKr: "",
@@ -112,10 +113,27 @@ const usePerfumeState = () => {
         setCurrentPage(1);
     };
 
-    const handleCheckboxToggle = () => setShowCheckboxes(!showCheckboxes);
+    const handleCheckboxToggle = () => {
+        setShowCheckboxes(!showCheckboxes);
+        console.log("버튼 클릭 후 showCheckboxes 상태:", !showCheckboxes);
+    };
 
     const handleCardCheckboxChange = (id) => {
-        setSelectedCard(selectedCard === id ? null : id);
+        console.log("체크박스 변경됨: ", id);  // 변경된 체크박스의 id 출력
+    
+        setSelectedCards(prevSelected => {
+            console.log("이전에 선택된 카드들: ", prevSelected);  // 이전에 선택된 카드들 출력
+            
+            if (prevSelected.includes(id)) {
+                console.log(`카드 ${id} 선택 해제됨`);  // 선택 해제 시 출력
+                // 이미 선택된 카드라면, 선택 해제
+                return prevSelected.filter(cardId => cardId !== id);
+            } else {
+                console.log(`카드 ${id} 선택됨`);  // 새로 선택된 카드 출력
+                // 선택되지 않은 카드라면, 추가
+                return [...prevSelected, id];
+            }
+        });
     };
 
     const handleAddButtonClick = () => {
@@ -143,32 +161,51 @@ const usePerfumeState = () => {
     };
 
     const handleDeleteButtonClick = () => {
-        if (!selectedCard) {
-            alert("삭제할 카드를 선택하세요.");
+        if (selectedCards.length === 0) {
+            alert("삭제할 향수를 선택하세요.");
             return;
         }
-        const perfumeToDelete = perfumes.find(p => p.id === selectedCard);
-        setSelectedPerfume(perfumeToDelete);
-        setIsDeleting(true);
-    };
+        // 선택된 향수들의 id를 사용하여 삭제
+        setIsDeleting(true);  // 삭제 작업 시작
+        handleDeleteConfirm(selectedCards);  // 삭제 확인 함수 호출
+    };    
 
-    const handleDeleteConfirm = async () => {
-        setIsLoading(true);
+    const handleDeleteConfirm = async (cardsToDelete) => {
+        if (isLoading || isDeleting) {
+            console.log('이미 삭제 작업이 진행 중입니다.');
+            return;  // 함수를 종료하여 무한 호출 방지
+        }
+    
+        console.log('삭제 시작');
+        setIsLoading(true);  // 로딩 상태 시작
+    
         try {
-            await dispatch(deletePerfume(selectedCard));
-            setSuccessMessage(`${selectedPerfume.name} 향수 카드가 삭제되었습니다!`);
+            console.log('삭제할 향수 ID들:', cardsToDelete);
+    
+            // 여러 개의 향수 삭제 처리 (배치 삭제)
+            await dispatch(deletePerfume(cardsToDelete));
+    
+            // 성공 메시지 설정
+            alert("선택된 향수들이 삭제되었습니다!");
+            console.log('삭제 성공:', cardsToDelete);
+    
+            // 상태 업데이트
             setIsDeleting(false);
             setSelectedPerfume(null);
-            setSelectedCard(null);
+            setSelectedCards([]);  // 삭제 후 선택된 카드들 초기화
+    
+            // 향수 목록 다시 불러오기
             await dispatch(fetchPerfumes());
+            console.log('향수 목록 다시 불러오기 완료');
         } catch (error) {
             console.error("향수 삭제 실패:", error);
             alert("향수 삭제에 실패했습니다. 다시 시도해주세요.");
         } finally {
-            setIsLoading(false);
+            setIsLoading(false);  // 로딩 상태 종료
+            console.log('isLoading:', false);
         }
     };
-
+    
     const handleModalClose = () => {
         setShowAddModal(false);
         setShowEditModal(false);
@@ -242,6 +279,8 @@ const usePerfumeState = () => {
 
     return {
         searchTerm,
+        selectedPerfume,
+        setSelectedPerfume,
         activeFilters,
         currentPage,
         showCheckboxes,

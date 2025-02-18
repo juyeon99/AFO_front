@@ -16,7 +16,7 @@ const PerfumeList = () => {
         activeFilters,
         currentPage,
         showCheckboxes,
-        selectedCard,
+        selectedCards,
         showAddModal,
         showEditModal,
         successMessage,
@@ -26,14 +26,16 @@ const PerfumeList = () => {
         itemsPerPage,
         formData,
         setFormData,
+        setSelectedPerfume,
+        selectedPerfume,
         imageUrls,
+        handleDeleteButtonClick,
         handleSearch,
         handleFilterClick,
         handleCheckboxToggle,
         handleCardCheckboxChange,
         handleAddButtonClick,
         handleEditButtonClick,
-        handleDeleteButtonClick,
         handleDeleteConfirm,
         handleSuccessClose,
         setIsDeleting,
@@ -89,12 +91,14 @@ const PerfumeList = () => {
                 <div className={styles.dividerLine} />
 
                 <PerfumeFilters
-                    activeFilters={activeFilters}
-                    handleFilterClick={handleFilterClick}
-                    role={role}
-                    handleAddButtonClick={handleAddButtonClick}
-                    handleCheckboxToggle={handleCheckboxToggle}
-                    handleDeleteButtonClick={handleDeleteButtonClick}
+                activeFilters={activeFilters}
+                handleFilterClick={handleFilterClick}
+                role={role}
+                handleAddButtonClick={handleAddButtonClick}
+                handleCheckboxToggle={handleCheckboxToggle}
+                handleDeleteButtonClick={handleDeleteButtonClick}
+                selectedPerfume={selectedPerfume}
+                setSelectedPerfume={setSelectedPerfume}  // setSelectedPerfume 전달
                 />
 
                 <div className={styles.itemsContainer}>
@@ -105,9 +109,9 @@ const PerfumeList = () => {
                                 key={perfume.id}
                                 perfume={perfume}
                                 showCheckboxes={showCheckboxes}
-                                selectedCard={selectedCard}
-                                role={role}
+                                selectedCards={selectedCards}
                                 onCheckboxChange={handleCardCheckboxChange}
+                                role={role}
                                 onEditClick={handleEditButtonClick}
                                 currentPage={currentPage}
                             />
