@@ -46,7 +46,7 @@ const PerfumeCard = ({
 
     const handleCardClick = (e) => {
         // 체크박스나 편집 버튼 클릭 시에는 상세 페이지로 이동하지 않음
-        if (e.target.type === 'checkbox' || e.target.closest(`.${styles.editButton}`)) {
+        if (e.target.type === 'checkbox' || e.target.closest('button')) {
             return;
         }
         
