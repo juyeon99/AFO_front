@@ -9,7 +9,7 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5분 캐시
 export const getAllPerfumes = async () => {
     try {
         const now = Date.now();
-        
+
         // 캐시가 있고 유효한 경우
         if (perfumesCache && (now - lastFetchTime < CACHE_DURATION)) {
             return perfumesCache;
@@ -18,7 +18,7 @@ export const getAllPerfumes = async () => {
         const response = await apis.get("/products");
         perfumesCache = response.data;
         lastFetchTime = now;
-        
+
         console.log('향수 목록 조회 완료:', response.data);
         return response.data;
     } catch (error) {
@@ -33,7 +33,7 @@ const detailCache = new Map();
 export const getProductDetail = async (productId) => {
     try {
         const now = Date.now();
-        
+
         // 캐시 확인 (유효 시간 체크 추가)
         const cachedData = detailCache.get(productId);
         if (cachedData && (now - cachedData.timestamp < CACHE_DURATION)) {
@@ -46,7 +46,7 @@ export const getProductDetail = async (productId) => {
         // 통합 API 호출
         const response = await apis.get(`/products/${productId}`);
         const productDetail = response.data;
-        
+
         // 통합 데이터 구성 (필요한 데이터가 없는 경우 기본값 제공)
         const combinedData = {
             ...productDetail,
@@ -55,7 +55,7 @@ export const getProductDetail = async (productId) => {
         };
 
         console.log('통합된 데이터 구조:', Object.keys(combinedData));
-        
+
         // 캐시에 저장 (타임스탬프 포함)
         detailCache.set(productId, {
             data: combinedData,
@@ -69,22 +69,44 @@ export const getProductDetail = async (productId) => {
             error: error.message,
             stack: error.stack
         });
-        
+
         // 에러 발생 시 캐시된 데이터가 있으면 반환 (그레이스풀 디그레이드)
         const cachedData = detailCache.get(productId);
         if (cachedData) {
             console.warn(`API 오류로 인해 캐시된 데이터 사용 (ID: ${productId})`);
             return cachedData.data;
         }
-        
+
         throw error;
     }
 };
 
+// 향수 추가
+export const createPerfumes = async (perfumeData) => {
+    try {
+        // 🚀 API 요청 전 데이터 확인
+        console.log("📤 [createPerfumes] 요청 데이터:", JSON.stringify(perfumeData, null, 2));
+
+        const response = await apis.post('/products', perfumeData);
+
+        // ✅ API 응답 데이터 확인
+        console.log("✅ [createPerfumes] 응답 데이터:", response.data);
+
+        return response.data;
+    } catch (error) {
+        console.error("❌ [createPerfumes] Error creating perfume:", error);
+        throw error;
+    }
+}
+
 // 향수 수정 
 export const modifyPerfumes = async (perfumeData) => {
     try {
+        // 🚀 API 요청 전 데이터 확인
+        console.log("📤 [modifyPerfumes] 요청 데이터:", JSON.stringify(perfumeData, null, 2));
         const response = await apis.put(`/products`, perfumeData);
+        // ✅ API 응답 데이터 확인
+        console.log("✅ [modifyPerfumes] 응답 데이터:", response.data);
         return response.data;
     } catch (error) {
         console.error("Error modifying perfume:", error);
@@ -102,27 +124,5 @@ export const deletePerfumes = async (productId) => {
         throw error;
     }
 };
-
-// 향수 추가
-export const createPerfumes = async (perfumeData) => {
-    try {
-        const response = await apis.post('/products', perfumeData); 
-        return response.data;
-    } catch (error) {
-        console.error("Error creating perfume:", error);
-        throw error;
-    }
-}
-
-// 유사 향수 조회
-// export const getSimilarPerfumes = async (productId) => {
-//     try {
-//         const response = await apis.get(`/products/${productId}/similar`);
-//         return response.data;
-//     } catch (error) {
-//         console.error("Error fetching similar perfumes:", error);
-//         throw error;
-//     }
-// };
 
 
