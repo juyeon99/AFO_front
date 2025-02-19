@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styles from '../../css/perfumes/PerfumeDetail.module.css';
 import PerfumeReviews from './PerfumeReviews';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectPerfumes, fetchPerfumeById } from '../../module/PerfumeModule';
+import { fetchPerfumes, selectPerfumes, fetchPerfumeById } from '../../module/PerfumeModule';
 import SimilarPerfumes from '../perfumes/SimilarPerfumes';
 import { resetReviews } from '../../module/ReviewModule';
 
@@ -15,31 +15,18 @@ const PerfumeDetail = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const location = useLocation();
     const perfumes = useSelector(selectPerfumes);
-
-
-    // 향수 데이터 로드 - id 변경시 무조건 새로운 데이터 fetch
+    
+    // 페이지 로드/새로고침 시 항상 전체 향수 목록 불러오기
     useEffect(() => {
-        const loadPerfumeData = async () => {
-            try {
-                await dispatch(fetchPerfumeById(id));
-                dispatch(resetReviews());
-                setCurrentImageIndex(0);
-            } catch (error) {
-                console.error("향수 데이터 로드 실패:", error);
-            }
-        };
-
-        if (id) {  // id가 있을 때만 데이터 로드
-            loadPerfumeData();
-        }
-    }, [id, dispatch]);
-
-    // perfume 데이터를 id 변경 시마다 새로 찾도록 수정
-    const perfume = useMemo(() =>
+        dispatch(fetchPerfumes());
+    }, [dispatch]);
+    
+    // ID 기반으로 현재 향수 찾기
+    const perfume = useMemo(() => 
         perfumes?.find(p => p.id === parseInt(id)),
         [perfumes, id]
     );
-
+    
     // 이전 페이지 정보 확인용
     useEffect(() => {
         console.log('Previous page:', location.state?.previousPage);
