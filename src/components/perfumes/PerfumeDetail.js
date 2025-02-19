@@ -1,36 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import styles from '../../css/perfumes/PerfumeDetail.module.css';
 import PerfumeReviews from './PerfumeReviews';
-import { useSelector } from 'react-redux';
-import { selectPerfumes } from '../../module/PerfumeModule';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchPerfumes, selectPerfumes, fetchPerfumeById } from '../../module/PerfumeModule';
+import SimilarPerfumes from '../perfumes/SimilarPerfumes';
+import { resetReviews, fetchReviews } from '../../module/ReviewModule';
 
 const PerfumeDetail = () => {
+    const dispatch = useDispatch();
     const { id } = useParams();
     const navigate = useNavigate();
     const [isLongTitle, setIsLongTitle] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const location = useLocation();
+    const perfumes = useSelector(selectPerfumes);
+
+    // 페이지 로드/새로고침 시 항상 전체 향수 목록과 현재 향수 데이터 불러오기
+    useEffect(() => {
+        dispatch(fetchPerfumes());
+        if (id) {
+            dispatch(fetchPerfumeById(id)); // 현재 향수 상세 정보 로드
+            dispatch(fetchReviews(id)); // 현재 향수의 리뷰 로드
+        }
+    }, [dispatch, id]);
+
+    // ID 기반으로 현재 향수 찾기
+    const perfume = useMemo(() =>
+        perfumes?.find(p => p.id === parseInt(id)),
+        [perfumes, id]
+    );
 
     // 이전 페이지 정보 확인용
     useEffect(() => {
         console.log('Previous page:', location.state?.previousPage);
     }, [location]);
 
-    const perfumes = useSelector(selectPerfumes);
-    const perfume = perfumes?.find(p => p.id === parseInt(id));
-
     // 제목 길이 체크 useEffect
     useEffect(() => {
-        // 초기화를 포함한 조건 체크
-        if (perfume.nameEn) {
+        if (perfume?.nameEn) {
             if (perfume.nameEn.length > 20) {
                 setIsLongTitle(true);
             } else {
-                setIsLongTitle(false); // 20글자 이하일 경우 false로 설정
+                setIsLongTitle(false);
             }
         }
-    }, [perfume.nameEn]);
+    }, [perfume?.nameEn]);
 
     // 이미지 자동 전환을 위한 useEffect
     useEffect(() => {
@@ -45,8 +60,31 @@ const PerfumeDetail = () => {
         }
     }, [perfume?.imageUrlList?.length]);
 
+    // 향수 변경 시 처리
+    const handlePerfumeChange = async (newPerfumeId) => {
+        // 기존 리뷰 초기화
+        dispatch(resetReviews());
+        // 새 향수의 리뷰 로드
+        dispatch(fetchReviews(newPerfumeId));
+        // 새 향수 데이터 로드
+        dispatch(fetchPerfumeById(newPerfumeId));
+        // 이미지 인덱스 초기화
+        setCurrentImageIndex(0);
+    };
+
     if (!perfume) {
-        return <div>향수를 찾을 수 없습니다.</div>;
+        return (
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+                fontSize: '1.2rem'
+            }}>
+                향수 정보를 불러오는데 실패했습니다. <br />
+                잠시 후 다시 시도해주세요.
+            </div>
+        );
     }
 
     return (
@@ -69,7 +107,7 @@ const PerfumeDetail = () => {
                 {/* 상단 향수 이름 */}
                 <div className={styles.topSection}>
                     <h1 className={`${styles.topNameEn} ${isLongTitle ? styles.longTitleCustom : ''}`}>
-                        {perfume.nameEn}
+                        {perfume?.nameEn}
                     </h1>
                 </div>
 
@@ -112,20 +150,31 @@ const PerfumeDetail = () => {
                         {/* 노트 정보 */}
                         <div className={styles.notes}>
                             <div className={styles.noteDivider}></div>
-                            <div className={styles.noteItem}>
-                                <span className={styles.noteType}>Top</span>
-                                <p className={styles.noteNames}>{perfume.topNote}</p>
-                            </div>
-                            <div className={styles.noteDivider}></div>
-                            <div className={styles.noteItem}>
-                                <span className={styles.noteType}>Middle</span>
-                                <p className={styles.noteNames}>{perfume.middleNote}</p>
-                            </div>
-                            <div className={styles.noteDivider}></div>
-                            <div className={styles.noteItem}>
-                                <span className={styles.noteType}>Base</span>
-                                <p className={styles.noteNames}>{perfume.baseNote}</p>
-                            </div>
+                            {perfume.singleNote ? (
+                                // 싱글노트인 경우
+                                <div className={styles.singleNoteItem}>
+                                    <span className={styles.noteType}>Single Note</span>
+                                    <p className={styles.noteNames}>{perfume.singleNote}</p>
+                                </div>
+                            ) : (
+                                // 일반 노트인 경우
+                                <>
+                                    <div className={styles.noteItem}>
+                                        <span className={styles.noteType}>Top</span>
+                                        <p className={styles.noteNames}>{perfume.topNote}</p>
+                                    </div>
+                                    <div className={styles.noteDivider}></div>
+                                    <div className={styles.noteItem}>
+                                        <span className={styles.noteType}>Middle</span>
+                                        <p className={styles.noteNames}>{perfume.middleNote}</p>
+                                    </div>
+                                    <div className={styles.noteDivider}></div>
+                                    <div className={styles.noteItem}>
+                                        <span className={styles.noteType}>Base</span>
+                                        <p className={styles.noteNames}>{perfume.baseNote}</p>
+                                    </div>
+                                </>
+                            )}
                             <div className={styles.noteDivider}></div>
                         </div>
 
@@ -176,22 +225,28 @@ const PerfumeDetail = () => {
                         </div>
 
                         {/* 향수 설명 */}
-                        <p className={styles.description}>
-                            {perfume.content}
-                        </p>
+                        <div className={styles.descriptionContainer}>
+                            <p className={styles.description}>
+                                {perfume.content}
+                            </p>
+                        </div>
                     </div>
-                </div>
+                    {/* 구분선 */}
+                    <div className={styles.divider}></div>
 
-                {/* 구분선 */}
-                <div className={styles.divider}></div>
+                    {/* 리뷰 섹션 */}
+                    <div style={{
+                        position: 'relative',
+                        marginTop: '50px',
+                        marginBottom: '100px'
+                    }}>
+                        <PerfumeReviews perfumeId={perfume.id} />
+                    </div>
 
-                {/* 리뷰 섹션 */}
-                <div style={{
-                    position: 'relative',
-                    marginTop: '50px',
-                    marginBottom: '100px'
-                }}>
-                    <PerfumeReviews perfumeId={perfume.id} />
+                    {/* 유사 향수 섹션 */}
+                    <div className={styles.similarPerfumesSection}>
+                        <SimilarPerfumes perfumeId={perfume.id} onPerfumeChange={handlePerfumeChange} />
+                    </div>
                 </div>
             </div>
         </div>

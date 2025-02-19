@@ -1,5 +1,6 @@
 import { createActions, handleActions } from "redux-actions";
-import { getAllPerfumes, modifyPerfumes, deletePerfumes, createPerfumes } from "../api/PerfumeAPICalls";
+import { getAllPerfumes, modifyPerfumes, deletePerfumes, createPerfumes, getProductDetail } from "../api/PerfumeAPICalls";
+import { resetReviews } from "./ReviewModule";
 
 // 초기 상태
 const initialState = {
@@ -10,7 +11,7 @@ const initialState = {
 
 // 액션 생성
 export const {
-    perfumes: {fetchPerfumeStart,
+    perfumes: { fetchPerfumeStart,
         fetchPerfumeSuccess,
         fetchPerfumeFail,
         modifyPerfumeStart,
@@ -22,34 +23,40 @@ export const {
         createPerfumeStart,
         createPerfumeSuccess,
         createPerfumeFail,
-        
+        fetchPerfumeByIdStart,
+        fetchPerfumeByIdSuccess,
+        fetchPerfumeByIdFail,
+
     },
 } = createActions({
     PERFUMES: {
-        FETCH_PERFUME_START: () => {},
+        FETCH_PERFUME_START: () => { },
         FETCH_PERFUME_SUCCESS: (perfumes) => perfumes,
         FETCH_PERFUME_FAIL: (error) => error,
-        MODIFY_PERFUME_START: () => {},
+        MODIFY_PERFUME_START: () => { },
         MODIFY_PERFUME_SUCCESS: (perfume) => perfume,
         MODIFY_PERFUME_FAIL: (error) => error,
-        DELETE_PERFUME_START: () => {},
+        DELETE_PERFUME_START: () => { },
         DELETE_PERFUME_SUCCESS: (perfumeId) => perfumeId,
         DELETE_PERFUME_FAIL: (error) => error,
-        CREATE_PERFUME_START: () => {},
+        CREATE_PERFUME_START: () => { },
         CREATE_PERFUME_SUCCESS: (perfume) => perfume,
         CREATE_PERFUME_FAIL: (error) => error,
+        FETCH_PERFUME_BY_ID_START: () => { },
+        FETCH_PERFUME_BY_ID_SUCCESS: (perfume) => perfume,
+        FETCH_PERFUME_BY_ID_FAIL: (error) => error,
     },
 });
 
 // redux thunk
 export const fetchPerfumes = () => async (dispatch) => {
-    try{
+    try {
         dispatch(fetchPerfumeStart());
         const perfumes = await getAllPerfumes();
         dispatch(fetchPerfumeSuccess(perfumes));
     } catch (error) {
-        const errorMessage = 
-        error.response?.data?.message || error.message || "향수 목록 불러오기 실패";
+        const errorMessage =
+            error.response?.data?.message || error.message || "향수 목록 불러오기 실패";
         dispatch(fetchPerfumeFail(errorMessage));
     }
 };
@@ -84,6 +91,52 @@ export const createPerfume = (perfumeData) => async (dispatch) => {
     }
 };
 
+export const fetchPerfumeById = (productId) => async (dispatch, getState) => {
+    try {
+        // 이미 해당 향수 데이터가 있는지 확인
+        const state = getState();
+        const existingPerfume = state.perfumes.perfumes.find(
+            p => p.id === parseInt(productId)
+        );
+
+        // 새로고침 상태 확인 (state.perfumes.perfumes가 비어있는 경우)
+        const isRefreshed = state.perfumes.perfumes.length === 0;
+
+        // 항상 새로운 데이터를 가져오도록 수정하되, 기존 데이터도 활용
+        dispatch(fetchPerfumeByIdStart());
+        
+        // 기존 데이터가 있으면 먼저 보여주기
+        if (existingPerfume && !isRefreshed) {
+            dispatch(fetchPerfumeByIdSuccess(existingPerfume));
+        }
+        
+        // 새로운 데이터 가져오기
+        const perfume = await getProductDetail(productId);
+        
+        if (perfume) {
+            dispatch(fetchPerfumeByIdSuccess(perfume));
+            dispatch(resetReviews());
+        } else {
+            throw new Error("향수 데이터를 찾을 수 없습니다.");
+        }
+        
+    } catch (error) {
+        console.error("향수 데이터 로드 실패:", error);
+        dispatch(fetchPerfumeByIdFail(error.message || "향수 상세 정보 불러오기 실패"));
+        
+        // 에러 발생 시 재시도 (기존 데이터가 없는 경우에만)
+        if (!getState().perfumes.perfumes.length) {
+            try {
+                const perfume = await getProductDetail(productId);
+                if (perfume) {
+                    dispatch(fetchPerfumeByIdSuccess(perfume));
+                }
+            } catch (retryError) {
+                console.error("재시도 실패:", retryError);
+            }
+        }
+    }
+};
 
 // 리듀서
 const perfumeReducer = handleActions(
@@ -154,13 +207,31 @@ const perfumeReducer = handleActions(
             loading: false,
             error: payload,
         }),
+        [fetchPerfumeByIdStart]: (state) => ({
+            ...state,
+            loading: true,
+            error: null,
+        }),
+        [fetchPerfumeByIdSuccess]: (state, { payload }) => ({
+            ...state,
+            perfumes: state.perfumes.some(p => p.id === payload.id)
+                ? state.perfumes.map(p => (p.id === payload.id ? payload : p))
+                : [...state.perfumes, payload],
+            loading: false,
+            error: null,
+        }),
+        [fetchPerfumeByIdFail]: (state, { payload }) => ({
+            ...state,
+            loading: false,
+            error: payload,
+        }),
     },
     initialState
 );
 
 
-export const selectPerfumes = (state) => state.perfumes.perfumes;
-export const selectLoading = (state) => state.perfumes.loading;
-export const selectError = (state) => state.perfumes.error;
+export const selectPerfumes = (state) => state.perfumes?.perfumes || [];
+export const selectLoading = (state) => state.perfumes?.loading || false;
+export const selectError = (state) => state.perfumes?.error || null;
 
 export default perfumeReducer;

@@ -27,7 +27,7 @@ import PerfumeDetail from './components/perfumes/PerfumeDetail';
 import LoginTest from "./pages/test/LoginTest";
 import KakaoRedirectPage from './pages/test/KakaoRedirectPage';
 import MemberTest from './pages/test/MemberTest';
-
+import PerfumeReviews from './components/perfumes/PerfumeReviews';
 function App() {
 
   const dispatch = useDispatch();
@@ -46,7 +46,12 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true
+        }}
+      >
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Main />} />
@@ -61,6 +66,7 @@ function App() {
             <Route path='/member' element={<AdminMembers />} />
             <Route path='/therapy' element={<Therapy />} />
             <Route path='/therapy/recommend' element={<TherapyDiffuserRecommend />} />
+            <Route path='/reviews/:id' element={<PerfumeReviews />} />
           </Route>
 
 
@@ -81,4 +87,4 @@ function App() {
   );
 }
 
-export default App;
+export default React.memo(App);

@@ -8,8 +8,22 @@ import PerfumeModal from '../../components/perfumes/PerfumeModal';
 import LoadingScreen from '../../components/loading/LoadingScreen';
 import usePerfumeState from './hooks/usePerfumeState';
 import styles from '../../css/perfumes/PerfumeList.module.css';
+import { useDispatch } from 'react-redux';
+import { fetchPerfumes } from '../../module/PerfumeModule';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { selectPerfumes } from '../../module/PerfumeModule';
 
 const PerfumeList = () => {
+    const dispatch = useDispatch();
+    const perfumes = useSelector(selectPerfumes);
+
+    useEffect(() => {
+        if (!perfumes || perfumes.length === 0) {
+            dispatch(fetchPerfumes());
+        }
+    }, []);  
+    
     const navigate = useNavigate();
     const {
         searchTerm,
