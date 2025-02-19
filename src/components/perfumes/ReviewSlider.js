@@ -9,10 +9,7 @@ const ReviewSlider = ({
     cardOffset,
     allReviews,
     CARDS_PER_PAGE,
-    onSliderClick,
     onMouseDown,
-    onMouseMove,
-    onPageChange,
     setCurrentPage,
     setSliderLeft,
     setCardOffset
@@ -21,11 +18,11 @@ const ReviewSlider = ({
     const [maxScroll, setMaxScroll] = useState(0);
 
     useEffect(() => {
-        if (sliderRef.current) {
+        if (allReviews.length > 0) {
             const cardWidth = 196 + 37;
-            const visibleWidth = CARDS_PER_PAGE * cardWidth;
             const totalWidth = allReviews.length * cardWidth;
-            setMaxScroll(Math.max(0, totalWidth - visibleWidth)); // 이동 가능한 최대 거리 계산
+            const visibleWidth = CARDS_PER_PAGE * cardWidth;
+            setMaxScroll(Math.max(0, totalWidth - visibleWidth));
         }
     }, [allReviews.length, CARDS_PER_PAGE]);
 
@@ -34,55 +31,41 @@ const ReviewSlider = ({
             const sliderLine = e.currentTarget;
             const rect = sliderLine.getBoundingClientRect();
             
-            // 전체 카드 너비와 보이는 영역 너비 계산
-            const cardWidth = 196 + 37;
-            const totalWidth = allReviews.length * cardWidth;
-            const visibleWidth = CARDS_PER_PAGE * cardWidth;
-            const maxScroll = Math.max(0, totalWidth - visibleWidth);
-
-            // 클릭 위치에 따른 비율 계산
+            // 클릭 위치 계산
             const clickPosition = e.clientX - rect.left;
             const sliderWidth = rect.width - 100; // 핸들 너비 고려
             
-            // 카드 수에 따른 이동 거리 조정
-            const moveRatio = visibleWidth / totalWidth;
-            const adjustedPosition = clickPosition / moveRatio;
-            const percentage = (adjustedPosition / sliderWidth) * 100;
+            // 백분율 계산 (0-100%)
+            const percentage = Math.max(0, Math.min(100, (clickPosition / sliderWidth) * 100));
             
-            const boundedPercentage = Math.max(0, Math.min(percentage, 100));
-            const newOffset = (boundedPercentage / 100) * maxScroll;
-
-            setSliderLeft(boundedPercentage);
+            // 오프셋 계산
+            const newOffset = (percentage / 100) * maxScroll;
+            
+            // 상태 업데이트
+            setSliderLeft(percentage);
             setCardOffset(Math.min(newOffset, maxScroll));
-
-            // 페이지 번호 업데이트
-            const approximatePage = Math.ceil((newOffset / maxScroll) * totalPages);
-            if (approximatePage !== currentPage && approximatePage > 0 && approximatePage <= totalPages) {
-                setCurrentPage(approximatePage);
+            
+            // 페이지 계산
+            if (totalPages > 1) {
+                const newPage = Math.ceil((percentage / 100) * totalPages);
+                setCurrentPage(Math.max(1, Math.min(newPage, totalPages)));
             }
         }
     };
 
     const handlePageChange = (pageNumber) => {
+        const percentage = totalPages > 1 ? ((pageNumber - 1) / (totalPages - 1)) * 100 : 0;
+        const newOffset = (percentage / 100) * maxScroll;
+        
         setCurrentPage(pageNumber);
-        
-        const cardWidth = 196 + 37;
-        const totalWidth = allReviews.length * cardWidth;
-        const visibleWidth = CARDS_PER_PAGE * cardWidth;
-        const maxScroll = Math.max(0, totalWidth - visibleWidth);
-        
-        // 카드 수에 따른 이동 거리 조정
-        const moveRatio = visibleWidth / totalWidth;
-        const percentage = ((pageNumber - 1) / (totalPages - 1)) * 100;
-        const adjustedPercentage = percentage * moveRatio;
-        
-        setSliderLeft(adjustedPercentage);
-        setCardOffset((percentage / 100) * maxScroll);
+        setSliderLeft(percentage);
+        setCardOffset(newOffset);
     };
 
     return (
         <div className={styles.sliderContainer}>
             <div
+                ref={sliderRef}
                 className={styles.sliderLine}
                 onClick={handleSliderClick}
                 onMouseDown={onMouseDown}

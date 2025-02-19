@@ -58,10 +58,12 @@
 
 .reviewCardsContainer {
     position: relative;
-    width: 1362px;
+    width: 100%; /* 변경: 부모 요소 너비에 맞춤 */
+    max-width: 1362px; /* 추가: 원래 고정 너비 유지를 위한 최대 너비 */
     overflow: hidden;
     padding: 0 20px;
     box-sizing: border-box;
+    margin: 0 auto; /* 추가: 중앙 정렬 */
 }
 
 .reviewCards {
@@ -71,12 +73,15 @@
     transition: transform 0.1s ease-out;
     justify-content: flex-start;
     margin: 0 auto;
-    width: fit-content;
+    width: max-content; /* 변경: fit-content에서 max-content로 변경 */
     will-change: transform;
+    flex-wrap: nowrap; /* 추가: 줄바꿈 방지 */
 }
 
 .reviewCard {
     min-width: 196px;
+    width: 196px; /* 추가: 명시적 너비 설정 */
+    flex: 0 0 196px; /* 추가: flex-grow, flex-shrink, flex-basis 설정 */
     height: 334px;
     background: #FFFFFF;
     border-radius: 20px;
@@ -84,8 +89,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 0 auto;
+    margin: 0; /* 변경: margin 0으로 설정 (gap이 이미 간격 제공) */
     transition: transform 0.3s ease-out;
+    box-sizing: border-box; /* 추가: 박스 사이징 명시 */
 }
 
 .reviewCard.selected {
@@ -123,35 +129,32 @@
 }
 
 .sliderContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    margin-top: 40px;
+    width: 100%;
+    max-width: 1362px; /* 리뷰 컨테이너와 동일한 최대 너비 */
+    padding: 0 20px;
+    margin: 20px auto 0;
+    box-sizing: border-box;
 }
 
 .sliderLine {
     width: 100%;
-    height: 2px;
-    background: #000000;
+    height: 6px;
+    background-color: #eee;
+    border-radius: 3px;
     position: relative;
     cursor: pointer;
-    user-select: none;
 }
 
 .sliderHandle {
-    position: absolute;
     width: 100px;
-    height: 20px;
-    background: #FFFFFF;
-    border: 1px solid #000000;
-    border-radius: 10px;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    height: 100%;
+    background-color: #8e44ad;
+    border-radius: 3px;
+    position: absolute;
+    top: 0;
+    left: 0; /* 초기 위치 */
     cursor: grab;
-    user-select: none;
-    transition: none;
-    will-change: left;
+    transition: left 0.1s ease-out; /* 트랜지션 시간을 카드와 맞춤 */
 }
 
 .sliderHandle:active {
