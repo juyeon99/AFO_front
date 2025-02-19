@@ -13,7 +13,7 @@
     min-height: 3200px; /* 더 큰 값으로 설정 */
 }
 /* 디버깅을 위한 임시 스타일 */
-/* .container::before {
+.container::before {
     content: '';
     position: absolute; 
     left: 50%;
@@ -22,7 +22,7 @@
     width: 1px;
     background-color: red;
     z-index: 1000;
-} */
+}
 
 .contentWrapper {
     position: relative;
@@ -242,22 +242,37 @@
     transform: translateY(-40px);
 }
 
+/* 향수 설명 스타일 수정 */
+/* 향수 설명 컨테이너 - 고정 위치 설정 */
+.descriptionContainer {
+    position: absolute;
+    width: 772px;
+    left: 931px;
+    top: 700px;  /* 고정된 top 값 */
+    min-height: 100px;
+    max-height: 200px;  /* 최대 높이 제한 */
+    overflow-y: auto;  /* 내용이 많으면 스크롤 */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;  /* 위쪽 정렬 */
+    background-color: #EFEDED;
+    padding: 20px 0;
+    margin-bottom: 40px;  /* 성분과의 간격 고정 */
+}
+
 /* 향수 설명 */
 .description {
-    position: absolute;
-    width: 529px;
-    left: 1052px;
-    top: 810px;
     font-family: 'Gowun Batang', serif;
     font-size: 24px;
     line-height: 36px;
     text-align: center;
-    max-height: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
+    padding: 20px;
+    margin: 0;
+    width: 100%;
+    height: auto;
+    word-break: keep-all; /* 단어 단위로 줄바꿈 */
+    overflow-wrap: break-word; /* 긴 단어 줄바꿈 */
 }
-
 
 /* 메인 구분선 */
 .divider {
@@ -269,11 +284,17 @@
     background: #000000;
 }
 
+/* 성분 정보 컨테이너 - 고정 위치 설정 */
 .ingredients {
     position: absolute;
     width: 772px;
     left: 931px;
-    top: 940px;
+    top: 820px;  /* description 아래 고정된 위치 */
+    min-height: 100px;
+    max-height: 150px;  /* 최대 높이 제한 */
+    background-color: #EFEDED;
+    padding: 20px 0;
+    margin-top: 40px;  /* 설명과의 간격 고정 */
 }
 
 .ingredientsList {
@@ -288,9 +309,11 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    position: relative;  /* 추가 */
+    position: relative;
     background-color: #EFEDED;
     width: 100%;
+    min-height: 40px; /* 최소 높이 설정 */
+    align-items: center;
 }
 
 .fullList {

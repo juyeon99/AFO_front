@@ -6,6 +6,7 @@ import {
     getReviewsByProductId
 } from "../api/ReviewAPICalls";
 
+
 const initialState = {
     reviews: [],
     loading: false,
@@ -26,6 +27,7 @@ export const {
         deleteReviewStart,
         deleteReviewSuccess,
         deleteReviewFail,
+        resetReviews,
     },
 } = createActions({
     REVIEWS: {
@@ -42,6 +44,7 @@ export const {
         DELETE_REVIEW_START: () => {},
         DELETE_REVIEW_SUCCESS: (reviewId) => reviewId,
         DELETE_REVIEW_FAIL: (error) => error,
+        RESET_REVIEWS: () => {},
     },
 });
 
@@ -49,29 +52,50 @@ export const {
 export const fetchReviews = (productId) => async (dispatch) => {
     try {
         dispatch(fetchReviewsStart());
-        console.log("리뷰 조회 요청 시작 (productId:", productId, ")");
         
-        // 리뷰 조회 API 호출
-        const productDetail = await getReviewsByProductId(productId);
-        const reviews = productDetail || [];
+        // 캐시 처리 추가
+        const cacheKey = `reviews_${productId}`;
+        const cachedData = sessionStorage.getItem(cacheKey);
         
-        dispatch(fetchReviewsSuccess(reviews));
+        if (cachedData) {
+            // 캐시된 데이터가 있으면 즉시 반환
+            dispatch(fetchReviewsSuccess(JSON.parse(cachedData)));
+            
+            // 백그라운드에서 최신 데이터 업데이트
+            const productDetail = await getReviewsByProductId(productId);
+            const reviews = productDetail || [];
+            sessionStorage.setItem(cacheKey, JSON.stringify(reviews));
+            dispatch(fetchReviewsSuccess(reviews));
+        } else {
+            // 캐시된 데이터가 없으면 API 호출
+            const productDetail = await getReviewsByProductId(productId);
+            const reviews = productDetail || [];
+            sessionStorage.setItem(cacheKey, JSON.stringify(reviews));
+            dispatch(fetchReviewsSuccess(reviews));
+        }
     } catch (error) {
         console.error("리뷰 조회 실패:", error);
         dispatch(fetchReviewsFail(error.message || "리뷰 조회 중 오류가 발생했습니다"));
     }
 };
 
-// 리뷰 생성 후 리뷰 조회 API로 최신 리뷰 가져오기
-export const createNewReview = (reviewData) => async (dispatch) => {
+export const createNewReview = (reviewData) => async (dispatch, getState) => {
     try {
         dispatch(createReviewStart());
+        
+        // 낙관적 업데이트: 먼저 UI 업데이트
+        const tempReview = { ...reviewData, id: 'temp_' + Date.now() };
+        dispatch(createReviewSuccess([...selectReviews(getState()), tempReview]));
+        
+        // API 호출
         await createReview(reviewData);
         
-        // 리뷰 생성 후 리뷰 조회 API로 최신 데이터 조회
+        // 실제 데이터로 업데이트
         const productDetail = await getReviewsByProductId(reviewData.productId);
-        const updatedReviews = productDetail.reviews || [];
+        const updatedReviews = productDetail || [];
         
+        // 캐시 업데이트
+        sessionStorage.setItem(`reviews_${reviewData.productId}`, JSON.stringify(updatedReviews));
         dispatch(createReviewSuccess(updatedReviews));
     } catch (error) {
         dispatch(createReviewFail(error.message || "리뷰 생성 실패"));
@@ -79,15 +103,26 @@ export const createNewReview = (reviewData) => async (dispatch) => {
 };
 
 // 리뷰 수정 후 리뷰 조회 API로 최신 리뷰 가져오기
-export const updateExistingReview = (reviewData) => async (dispatch) => {
+export const updateExistingReview = (reviewData) => async (dispatch, getState) => {
     try {
         dispatch(updateReviewStart());
+        
+        // 낙관적 업데이트
+        const currentReviews = selectReviews(getState());
+        const optimisticReviews = currentReviews.map(review => 
+            review.id === reviewData.id ? { ...review, ...reviewData } : review
+        );
+        dispatch(updateReviewSuccess(optimisticReviews));
+        
+        // API 호출
         await updateReview(reviewData);
         
-        // 리뷰 조회 API로 최신 데이터 조회
+        // 실제 데이터로 업데이트
         const productDetail = await getReviewsByProductId(reviewData.productId);
-        const updatedReviews = productDetail.reviews || [];
+        const updatedReviews = productDetail || [];
         
+        // 캐시 업데이트
+        sessionStorage.setItem(`reviews_${reviewData.productId}`, JSON.stringify(updatedReviews));
         dispatch(updateReviewSuccess(updatedReviews));
     } catch (error) {
         dispatch(updateReviewFail(error.message || "리뷰 수정 실패"));
@@ -95,15 +130,24 @@ export const updateExistingReview = (reviewData) => async (dispatch) => {
 };
 
 // 리뷰 삭제 후 리뷰 조회 API로 최신 리뷰 가져오기
-export const deleteExistingReview = (reviewId, productId) => async (dispatch) => {
+export const deleteExistingReview = (reviewId, productId) => async (dispatch, getState) => {
     try {
         dispatch(deleteReviewStart());
+        
+        // 낙관적 업데이트
+        const currentReviews = selectReviews(getState());
+        const optimisticReviews = currentReviews.filter(review => review.id !== reviewId);
+        dispatch(deleteReviewSuccess(optimisticReviews));
+        
+        // API 호출
         await deleteReview(reviewId);
         
-        // 리뷰 조회 API로 최신 데이터 조회
+        // 실제 데이터로 업데이트
         const productDetail = await getReviewsByProductId(productId);
-        const updatedReviews = productDetail.reviews || [];
+        const updatedReviews = productDetail || [];
         
+        // 캐시 업데이트
+        sessionStorage.setItem(`reviews_${productId}`, JSON.stringify(updatedReviews));
         dispatch(deleteReviewSuccess(updatedReviews));
     } catch (error) {
         dispatch(deleteReviewFail(error.message || "리뷰 삭제 실패"));
@@ -144,6 +188,12 @@ const reviewReducer = handleActions(
         [deleteReviewSuccess]: (state, { payload }) => ({
             ...state,
             reviews: payload,
+            loading: false,
+            error: null,
+        }),
+        [resetReviews]: (state) => ({
+            ...state,
+            reviews: [],
             loading: false,
             error: null,
         }),

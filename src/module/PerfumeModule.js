@@ -1,5 +1,6 @@
 import { createActions, handleActions } from "redux-actions";
 import { getAllPerfumes, modifyPerfumes, deletePerfumes, createPerfumes, getProductDetail } from "../api/PerfumeAPICalls";
+import { resetReviews } from "./ReviewModule";
 
 // 초기 상태
 const initialState = {
@@ -98,16 +99,42 @@ export const fetchPerfumeById = (productId) => async (dispatch, getState) => {
             p => p.id === parseInt(productId)
         );
 
-        // 이미 데이터가 있고 필요한 모든 정보가 포함되어 있다면 새로운 요청을 하지 않음
-        if (existingPerfume && existingPerfume.reviews) {
-            return;
-        }
+        // 새로고침 상태 확인 (state.perfumes.perfumes가 비어있는 경우)
+        const isRefreshed = state.perfumes.perfumes.length === 0;
 
+        // 항상 새로운 데이터를 가져오도록 수정하되, 기존 데이터도 활용
         dispatch(fetchPerfumeByIdStart());
+        
+        // 기존 데이터가 있으면 먼저 보여주기
+        if (existingPerfume && !isRefreshed) {
+            dispatch(fetchPerfumeByIdSuccess(existingPerfume));
+        }
+        
+        // 새로운 데이터 가져오기
         const perfume = await getProductDetail(productId);
-        dispatch(fetchPerfumeByIdSuccess(perfume));
+        
+        if (perfume) {
+            dispatch(fetchPerfumeByIdSuccess(perfume));
+            dispatch(resetReviews());
+        } else {
+            throw new Error("향수 데이터를 찾을 수 없습니다.");
+        }
+        
     } catch (error) {
+        console.error("향수 데이터 로드 실패:", error);
         dispatch(fetchPerfumeByIdFail(error.message || "향수 상세 정보 불러오기 실패"));
+        
+        // 에러 발생 시 재시도 (기존 데이터가 없는 경우에만)
+        if (!getState().perfumes.perfumes.length) {
+            try {
+                const perfume = await getProductDetail(productId);
+                if (perfume) {
+                    dispatch(fetchPerfumeByIdSuccess(perfume));
+                }
+            } catch (retryError) {
+                console.error("재시도 실패:", retryError);
+            }
+        }
     }
 };
 

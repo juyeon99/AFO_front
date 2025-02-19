@@ -6,7 +6,10 @@
 }
 
 .similarSection {
-    margin-bottom: 40px;
+    width: 1380px;  /* PerfumeDetail의 divider와 동일한 너비 */
+    margin: 40px auto;
+    position: relative;
+    left: calc(50% - 1380px/2 + -55px);  /* PerfumeDetail의 divider와 동일한 위치 */
 }
 
 .sectionTitle {
@@ -14,15 +17,17 @@
     margin-bottom: 30px;
     color: #333;
     text-align: center;
+    width: 100%;
 }
+
 
 .similarList {
     display: flex;
-    gap: 20px;
-    overflow-x: auto;
-    padding: 10px 0;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    justify-content: center;
+    gap: 40px;  /* 카드 사이 간격 */
+    flex-wrap: wrap;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 .similarList::-webkit-scrollbar {

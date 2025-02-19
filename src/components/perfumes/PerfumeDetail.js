@@ -5,6 +5,7 @@ import PerfumeReviews from './PerfumeReviews';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectPerfumes, fetchPerfumeById } from '../../module/PerfumeModule';
 import SimilarPerfumes from '../perfumes/SimilarPerfumes';
+import { resetReviews } from '../../module/ReviewModule';
 
 const PerfumeDetail = () => {
     const dispatch = useDispatch();
@@ -14,18 +15,30 @@ const PerfumeDetail = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const location = useLocation();
     const perfumes = useSelector(selectPerfumes);
+
+
+    // 향수 데이터 로드 - id 변경시 무조건 새로운 데이터 fetch
+    useEffect(() => {
+        const loadPerfumeData = async () => {
+            try {
+                await dispatch(fetchPerfumeById(id));
+                dispatch(resetReviews());
+                setCurrentImageIndex(0);
+            } catch (error) {
+                console.error("향수 데이터 로드 실패:", error);
+            }
+        };
+
+        if (id) {  // id가 있을 때만 데이터 로드
+            loadPerfumeData();
+        }
+    }, [id, dispatch]);
+
+    // perfume 데이터를 id 변경 시마다 새로 찾도록 수정
     const perfume = useMemo(() =>
         perfumes?.find(p => p.id === parseInt(id)),
         [perfumes, id]
     );
-
-    // 향수 데이터 로드 - 중복 요청 방지
-    useEffect(() => {
-        const existingPerfume = perfumes?.find(p => p.id === parseInt(id));
-        if (!existingPerfume || !existingPerfume.reviews) {
-            dispatch(fetchPerfumeById(id));
-        }
-    }, [id]);
 
     // 이전 페이지 정보 확인용
     useEffect(() => {
@@ -34,12 +47,11 @@ const PerfumeDetail = () => {
 
     // 제목 길이 체크 useEffect
     useEffect(() => {
-        // 초기화를 포함한 조건 체크
         if (perfume?.nameEn) {
             if (perfume.nameEn.length > 20) {
                 setIsLongTitle(true);
             } else {
-                setIsLongTitle(false); // 20글자 이하일 경우 false로 설정
+                setIsLongTitle(false);
             }
         }
     }, [perfume?.nameEn]);
@@ -58,7 +70,18 @@ const PerfumeDetail = () => {
     }, [perfume?.imageUrlList?.length]);
 
     if (!perfume) {
-        return <div>향수를 찾을 수 없습니다.</div>;
+        return (
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+                fontSize: '1.2rem'
+            }}>
+                향수 정보를 불러오는데 실패했습니다. <br />
+                잠시 후 다시 시도해주세요.
+            </div>
+        );
     }
 
     return (
@@ -188,9 +211,11 @@ const PerfumeDetail = () => {
                         </div>
 
                         {/* 향수 설명 */}
-                        <p className={styles.description}>
-                            {perfume.content}
-                        </p>
+                        <div className={styles.descriptionContainer}>
+                            <p className={styles.description}>
+                                {perfume.content}
+                            </p>
+                        </div>
                     </div>
                     {/* 구분선 */}
                     <div className={styles.divider}></div>
