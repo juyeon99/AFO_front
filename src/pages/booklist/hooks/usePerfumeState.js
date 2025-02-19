@@ -50,6 +50,7 @@ const usePerfumeState = () => {
     const [imageUrlCount, setImageUrlListCount] = useState(0);
     const [imageUrlList, setImageUrlList] = useState(['']);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isEditing, setIsEditing] = useState(false);
 
     const itemsPerPage = 12;
     
@@ -236,26 +237,26 @@ const usePerfumeState = () => {
         setCurrentImageIndex((prevIndex) => Math.max(prevIndex - 1, 0));  // ✅ 삭제 후 이전 이미지로 이동
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();  // ✅ 기본 제출 방지 (Enter 입력 시 폼 전송 방지)
+    
         setIsLoading(true);
-
         try {
             const updatedData = {
                 ...formData,
                 imageUrlList: imageUrlList.filter(url => url.trim() !== '')
             };
-
-            if (showEditModal) {
-                await dispatch(modifyPerfume({ id: selectedPerfume.id, ...updatedData }));
+    
+            if (isEditing) {
+                dispatch(modifyPerfume({ id: selectedPerfume.id, ...updatedData }));
                 setSuccessMessage('향수가 성공적으로 수정되었습니다!');
             } else {
-                await dispatch(createPerfume(updatedData));
+                dispatch(createPerfume(updatedData));
                 setSuccessMessage('향수가 성공적으로 추가되었습니다!');
             }
-
+    
             handleModalClose();
-            await dispatch(fetchPerfumes());
+            dispatch(fetchPerfumes());
         } catch (error) {
             console.error('향수 저장 실패:', error);
             alert('향수 저장에 실패했습니다. 다시 시도해주세요.');
@@ -321,7 +322,9 @@ const usePerfumeState = () => {
         handleSubmit,
         totalPages,
         handlePageChange,
-        setShowUrlInput
+        setShowUrlInput,
+        isEditing,
+        setIsEditing
     };
 };
 

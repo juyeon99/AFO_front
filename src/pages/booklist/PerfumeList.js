@@ -53,7 +53,9 @@ const PerfumeList = () => {
         handlePageChange,
         totalPages,
         isLoading,
-        imageUrlList
+        imageUrlList,
+        isEditing,
+        setIsEditing
     } = usePerfumeState(); 
 
     if (isLoading) {
@@ -136,7 +138,8 @@ const PerfumeList = () => {
                     successMessage={successMessage}
                     onSuccessClose={handleSuccessClose}
                     setShowUrlInput={setShowUrlInput}
-                    formData={formData}
+                    formData={formData} 
+                    setIsEditing={setIsEditing}  
                     setFormData={setFormData}
                     imageUrlList={imageUrlList}
                     imageUrlCount={imageUrlCount}
