@@ -49,9 +49,11 @@ const PerfumeList = () => {
         setShowUrlInput,
         imageUrlCount,
         currentImageIndex,
+        setCurrentImageIndex,
         handlePageChange,
         totalPages,
         isLoading,
+        imageUrlList
     } = usePerfumeState(); 
 
     if (isLoading) {
@@ -133,13 +135,13 @@ const PerfumeList = () => {
                     onDeleteClose={() => setIsDeleting(false)}
                     successMessage={successMessage}
                     onSuccessClose={handleSuccessClose}
+                    setShowUrlInput={setShowUrlInput}
                     formData={formData}
                     setFormData={setFormData}
-                    imageUrls={imageUrls}
-                    showUrlInput={showUrlInput}
-                    setShowUrlInput={setShowUrlInput}
+                    imageUrlList={imageUrlList}
                     imageUrlCount={imageUrlCount}
                     currentImageIndex={currentImageIndex}
+                    setCurrentImageIndex={setCurrentImageIndex}
                     onInputChange={handleInputChange}
                     onImageUrlAdd={handleImageUrlAdd}
                     onImageUrlChange={handleImageUrlChange}

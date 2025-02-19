@@ -45,13 +45,14 @@ const usePerfumeState = () => {
         sizeOption: "",
         content: "",
     });
-    const [imageUrlList, setImageUrlList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showUrlInput, setShowUrlInput] = useState(false);
     const [imageUrlCount, setImageUrlListCount] = useState(0);
+    const [imageUrlList, setImageUrlList] = useState(['']);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const itemsPerPage = 12;
+    
 
     // URL 변경 감지 및 페이지 상태 업데이트
     useEffect(() => {
@@ -82,6 +83,7 @@ const usePerfumeState = () => {
         if (selectedPerfume) {
             setFormData(selectedPerfume);
             setImageUrlList(selectedPerfume.imageUrlList || [selectedPerfume.imageUrl].filter(Boolean));
+            setCurrentImageIndex(0);
         }
     }, [selectedPerfume]);
 
@@ -101,6 +103,7 @@ const usePerfumeState = () => {
         setSearchTerm(e.target.value);
         setCurrentPage(1);
     };
+    
 
     const handleFilterClick = (filterId) => {
         setActiveFilters(prev => {
@@ -216,20 +219,21 @@ const usePerfumeState = () => {
         }));
     };
 
+    // URL 추가 시 자동으로 마지막 이미지로 이동
     const handleImageUrlAdd = () => {
-        setImageUrlList([...imageUrlList, '']);
-        setImageUrlListCount(prev => prev + 1);
+        setImageUrlList((prev) => [...prev, '']);
+        setCurrentImageIndex(imageUrlList.length);  // ✅ 새 URL 추가 시 해당 URL로 이동
     };
 
+    // URL 수정
     const handleImageUrlChange = (index, value) => {
-        const newUrls = [...imageUrlList];
-        newUrls[index] = value;
-        setImageUrlList(newUrls);
+        setImageUrlList((prev) => prev.map((url, i) => (i === index ? value : url)));
     };
 
+    // URL 삭제 시 자동으로 이전 이미지로 이동
     const handleImageUrlRemove = (index) => {
-        setImageUrlList(imageUrlList.filter((_, i) => i !== index));
-        setImageUrlListCount(prev => prev - 1);
+        setImageUrlList((prev) => prev.filter((_, i) => i !== index));
+        setCurrentImageIndex((prevIndex) => Math.max(prevIndex - 1, 0));  // ✅ 삭제 후 이전 이미지로 이동
     };
 
     const handleSubmit = async (e) => {
@@ -296,6 +300,7 @@ const usePerfumeState = () => {
         setShowUrlInput,
         imageUrlCount,
         currentImageIndex,
+        setCurrentImageIndex,
         setShowAddModal,
         setShowEditModal,
         setIsDeleting,
@@ -315,7 +320,8 @@ const usePerfumeState = () => {
         handleImageUrlRemove,
         handleSubmit,
         totalPages,
-        handlePageChange
+        handlePageChange,
+        setShowUrlInput
     };
 };
 

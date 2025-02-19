@@ -23,13 +23,13 @@ const PerfumeModal = ({
     onSubmit,
     setCurrentImageIndex
 }) => {
-    // 이미지 URL 리스트가 undefined일 경우를 대비한 안전한 접근
-    const safeImageUrlList = imageUrlList || [];
+    // ✅ safeImageUrlList 변수를 가장 먼저 선언
+    const safeImageUrlList = imageUrlList.length > 0 ? imageUrlList : [''];
 
-    // useState 초기값도 안전하게 설정
+    // ✅ imagePreview를 safeImageUrlList를 참조해서 초기화
     const [imagePreview, setImagePreview] = useState(safeImageUrlList[0] || '');
     const [imageError, setImageError] = useState(false);
-
+    
     // 이미지 URL 변경 핸들러 수정
     const handleImageUrlChange = (index, value) => {
         if (onImageUrlChange) {
@@ -61,165 +61,98 @@ const PerfumeModal = ({
     return (
         <div className={styles.modalBackdrop}>
             <div className={styles.modalContainer}>
-                <form onSubmit={onSubmit}>
+                <form onSubmit={onSubmit} 
+                onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                e.preventDefault(); 
+                    }
+                }}>
                     <h2 className={styles.modalTitle}>
                         {isEditing ? '향수 카드 수정하기' : '향수 카드 추가하기'}
                     </h2>
     
                     <div className={styles.inputRow}>
-                        <div className={styles.modalRow}>
-                            <label className={styles.formLabel}>향수영어명</label>
-                            <input
-                                type="text"
-                                className={styles.modalRowName}
-                                value={formData.nameEn || ""}
-                                onChange={(e) => onInputChange('nameEn', e.target.value)}
-                                placeholder="향수 이름을 입력하세요"
-                                required
-                            />
-                        </div>
-    
-                        <div className={styles.modalRow}>
-                            <label className={styles.formLabel}>향수한글명</label>
-                            <input
-                                type="text"
-                                className={styles.modalRowName}
-                                value={formData.nameKr || ""}
-                                onChange={(e) => onInputChange('nameKr', e.target.value)}
-                                placeholder="향수 이름을 입력하세요"
-                                required
-                            />
-                        </div>
-    
-                        <div className={styles.modalRow}>
-                            <label className={styles.formLabel}>브랜드명</label>
-                            <input
-                                type="text"
-                                className={styles.modalRowBrand}
-                                value={formData.brand || ""}
-                                onChange={(e) => onInputChange('brand', e.target.value)}
-                                placeholder="브랜드명을 입력하세요"
-                                required
-                            />
-                        </div>
+                        {[
+                            { label: '향수영어명', key: 'nameEn', placeholder: '향수 이름을 입력하세요' },
+                            { label: '향수한글명', key: 'nameKr', placeholder: '향수 이름을 입력하세요' },
+                            { label: '브랜드명', key: 'brand', placeholder: '브랜드명을 입력하세요' },
+                        ].map(({ label, key, placeholder }) => (
+                            <div key={key} className={styles.modalRow}>
+                                <label className={styles.formLabel}>{label}</label>
+                                <input
+                                    type="text"
+                                    className={styles.modalRowName}
+                                    value={formData[key] || ''}
+                                    onChange={(e) => onInputChange(key, e.target.value)}
+                                    placeholder={placeholder}
+                                    required
+                                />
+                            </div>
+                        ))}
     
                         <div className={styles.modalRow}>
                             <label className={styles.formLabel}>부향률</label>
                             <select
                                 className={styles.modalRowConcentration}
-                                value={formData.grade || ""}
+                                value={formData.grade || ''}
                                 onChange={(e) => onInputChange('grade', e.target.value)}
                                 required
                             >
-                                <option value="오 드 퍼퓸">Eau de perfume</option>
-                                <option value="오 드 뚜왈렛">Eau de Toilette</option>
-                                <option value="오 드 코롱">Eau de Cologne</option>
-                                <option value="퍼퓸">Perfume</option>
-                                <option value="솔리드 퍼퓸">Solid Perfume</option>
+                                {['오 드 퍼퓸', '오 드 뚜왈렛', '오 드 코롱', '퍼퓸', '솔리드 퍼퓸'].map((option) => (
+                                    <option key={option} value={option}>{option}</option>
+                                ))}
                             </select>
                         </div>
     
-                        <div className={styles.modalRow}>
-                            <label className={styles.formLabel}>싱글노트</label>
-                            <input
-                                type="text"
-                                className={styles.modalRowSingleNote}
-                                value={formData.singleNoteList ? formData.singleNoteList.join(", ") : ""}
-                                onChange={(e) => handleonInputChange("singleNoteList", e.target.value)}
-                                placeholder="싱글노트를 입력하세요 (예: 라벤더, 바닐라)"
-                            />
-                        </div>
+                        {[
+                            { label: '싱글노트', key: 'singleNoteList', placeholder: '싱글노트를 입력하세요 (예: 라벤더, 바닐라)' },
+                            { label: '탑노트', key: 'topNoteList', placeholder: '탑노트를 입력하세요 (예: 레몬, 베르가못)' },
+                            { label: '미들노트', key: 'middleNoteList', placeholder: '미들노트를 입력하세요 (예: 장미, 자스민)' },
+                            { label: '베이스노트', key: 'baseNoteList', placeholder: '베이스노트를 입력하세요 (예: 샌달우드, 머스크)' },
+                        ].map(({ label, key, placeholder }) => (
+                            <div key={key} className={styles.modalRow}>
+                                <label className={styles.formLabel}>{label}</label>
+                                <input
+                                    type="text"
+                                    className={styles.modalRowName}
+                                    value={formData[key] ? formData[key].join(', ') : ''}
+                                    onChange={(e) => handleonInputChange(key, e.target.value)}
+                                    placeholder={placeholder}
+                                />
+                            </div>
+                        ))}
     
-                        <div className={styles.modalRow}>
-                            <label className={styles.formLabel}>탑노트</label>
-                            <input
-                                type="text"
-                                className={styles.modalRowTopNote}
-                                value={formData.topNoteList ? formData.topNoteList.join(", ") : ""}
-                                onChange={(e) => handleonInputChange("topNoteList", e.target.value)}
-                                placeholder="탑노트를 입력하세요 (예: 레몬, 베르가못)"
-                            />
-                        </div>
+                        {[
+                            { label: '메인어코드', key: 'mainAccord', placeholder: '계열 설명을 입력하세요' },
+                            { label: '성분', key: 'ingredients', placeholder: '성분 설명을 입력하세요' },
+                            { label: 'size', key: 'sizeOption', placeholder: 'size 설명을 입력하세요' },
+                            { label: '향수 설명', key: 'content', placeholder: '향수 설명을 입력하세요' },
+                        ].map(({ label, key, placeholder }) => (
+                            <div key={key} className={styles.modalRow}>
+                                <label className={styles.formLabel}>{label}</label>
+                                <textarea
+                                    className={styles.modalRowDescription}
+                                    value={formData[key] || ''}
+                                    onChange={(e) => onInputChange(key, e.target.value)}
+                                    placeholder={placeholder}
+                                    required
+                                />
+                            </div>
+                        ))}
     
-                        <div className={styles.modalRow}>
-                            <label className={styles.formLabel}>미들노트</label>
-                            <input
-                                type="text"
-                                className={styles.modalRowMiddleNote}
-                                value={formData.middleNoteList ? formData.middleNoteList.join(", ") : ""}
-                                onChange={(e) => handleonInputChange("middleNoteList", e.target.value)}
-                                placeholder="미들노트를 입력하세요 (예: 장미, 자스민)"
-                            />
-                        </div>
-    
-                        <div className={styles.modalRow}>
-                            <label className={styles.formLabel}>베이스노트</label>
-                            <input
-                                type="text"
-                                className={styles.modalRowBaseNote}
-                                value={formData.baseNoteList ? formData.baseNoteList.join(", ") : ""}
-                                onChange={(e) => handleonInputChange("baseNoteList", e.target.value)}
-                                placeholder="베이스노트를 입력하세요 (예: 샌달우드, 머스크)"
-                            />
-                        </div>
-    
-                        <div className={styles.modalRow}>
-                            <label className={styles.formLabel}>메인어코드</label>
-                            <textarea
-                                className={styles.modalRowDescription}
-                                value={formData.mainAccord || ""}
-                                onChange={(e) => onInputChange('mainAccord', e.target.value)}
-                                placeholder="계열 설명을 입력하세요"
-                                required
-                            />
-                        </div>
-    
-                        <div className={styles.modalRow}>
-                            <label className={styles.formLabel}>성분</label>
-                            <textarea
-                                className={styles.modalRowDescription}
-                                value={formData.ingredients || ""}
-                                onChange={(e) => onInputChange('ingredients', e.target.value)}
-                                placeholder="성분 설명을 입력하세요"
-                                required
-                            />
-                        </div>
-    
-                        <div className={styles.modalRow}>
-                            <label className={styles.formLabel}>size</label>
-                            <textarea
-                                className={styles.modalRowDescription}
-                                value={formData.sizeOption || ""}
-                                onChange={(e) => onInputChange('sizeOption', e.target.value)}
-                                placeholder="size 설명을 입력하세요"
-                                required
-                            />
-                        </div>
-    
-                        <div className={styles.modalRow}>
-                            <label className={styles.formLabel}>향수 설명</label>
-                            <textarea
-                                className={styles.modalRowDescription}
-                                value={formData.content || ""}
-                                onChange={(e) => onInputChange('content', e.target.value)}
-                                placeholder="향수 설명을 입력하세요"
-                                required
-                            />
-                        </div>
-    
+                        {/* ✅ 이미지 URL 입력 및 미리보기 */}
                         <div className={styles.modalRow}>
                             <label className={styles.formLabel}>이미지</label>
                             <div className={styles.imageInputContainer}>
-                                {/* 이미지 미리보기 영역 */}
+                                {/* ✅ 이미지 미리보기 */}
                                 <div className={styles.imagePreviewBox} onClick={() => setShowUrlInput(true)}>
-                                    {safeImageUrlList.length > 0 ? (
+                                    {imageUrlList.length > 0 ? (
                                         <img
-                                            src={safeImageUrlList[currentImageIndex] || ''}
+                                            src={imageUrlList[currentImageIndex] || ''}
                                             alt="미리보기"
                                             className={styles.previewImage}
                                             onError={(e) => {
                                                 e.target.src = 'https://mblogthumb-phinf.pstatic.net/MjAyMDA1MDZfMTk3/MDAxNTg4Nzc1MjcwMTQ2.l8lHrUz8ZfSDCShKbMs8RzQj37B3jxpwRnQK7byS9k4g.OORSv5IlMThMSNj20nz7_OYBzSTkxwnV9QGGV8a3tVkg.JPEG.herbsecret/essential-oils-2738555_1920.jpg?type=w800';
-                                                setImageError(true);
                                             }}
                                         />
                                     ) : (
@@ -227,61 +160,79 @@ const PerfumeModal = ({
                                     )}
                                 </div>
     
-                                {/* URL 입력 필드 */}
-                                {showUrlInput && (
-                                    <input
-                                        type="text"
-                                        value={imageUrlList[0]}
-                                        onChange={(e) => handleImageUrlChange(0, e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') {
-                                                e.preventDefault();
-                                            }
-                                        }}
-                                        placeholder="이미지 URL을 입력하세요"
-                                        className={styles.modalRowImageUrl}
-                                    />
-                                )}
+                                {/* ✅ URL 입력 필드 */}
+                                <input
+                                    type="text"
+                                    value={imageUrlList[currentImageIndex] || ''}
+                                    onChange={(e) => handleImageUrlChange(currentImageIndex, e.target.value)}
+                                    placeholder="이미지 URL을 입력하세요"
+                                    className={styles.modalRowImageUrl}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault(); // ✅ 기본 폼 제출 방지
+                                            setShowUrlInput(false); // ✅ 입력창 닫기
+                                        }
+                                    }}
+                                />
     
-                                {/* 추가 버튼 */}
-                                <button
-                                    type="button"
-                                    onClick={onImageUrlAdd}
-                                    className={styles.addImageButton}
-                                >
+                                {/* ✅ URL 추가 버튼 */}
+                                <button type="button" onClick={onImageUrlAdd} className={styles.addImageButton}>
                                     +
                                 </button>
                             </div>
                         </div>
     
-                        {/* 이미지 페이징 */}
+                        {/* ✅ 이미지 페이징 (이전/다음 버튼 추가) */}
                         <div className={styles.imagePagination}>
-                            {Array(imageUrlCount).fill(null).map((_, index) => (
+                            <button
+                                type="button"
+                                disabled={currentImageIndex === 0}
+                                onClick={() => setCurrentImageIndex((prev) => Math.max(prev - 1, 0))}
+                                className={styles.paginationArrow}
+                            >
+                                ◀
+                            </button>
+    
+                            {imageUrlList.map((_, index) => (
                                 <span
                                     key={index}
                                     className={`${styles.paginationDot} ${index === currentImageIndex ? styles.activeDot : ''}`}
-                                    onClick={() => setCurrentImageIndex(index)} // 클릭 시 이미지 인덱스 변경
+                                    onClick={() => {
+                                        if (typeof setCurrentImageIndex === 'function') {
+                                            setCurrentImageIndex(index);
+                                        } else {
+                                            console.error('❌ setCurrentImageIndex is not a function:', setCurrentImageIndex);
+                                        }
+                                    }}
+                                    tabIndex={0} 
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault(); 
+                                            setShowUrlInput(false);  
+                                        }
+                                    }}
                                 />
                             ))}
+    
+                            <button
+                                type="button"
+                                disabled={currentImageIndex === imageUrlList.length - 1}
+                                onClick={() => setCurrentImageIndex((prev) => Math.min(prev + 1, imageUrlList.length - 1))}
+                                className={styles.paginationArrow}
+                            >
+                                ▶
+                            </button>
                         </div>
                     </div>
     
                     <div className={styles.modalActions}>
-                        <button type="submit" className={styles.saveButton}>
-                            저장
-                        </button>
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className={styles.cancelButton}
-                        >
-                            취소
-                        </button>
+                        <button type="submit" className={styles.saveButton}>저장</button>
+                        <button type="button" onClick={onClose} className={styles.cancelButton}>취소</button>
                     </div>
                 </form>
             </div>
         </div>
-    );
-};
+    );    
+};    
 
 export default PerfumeModal;
