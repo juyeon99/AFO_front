@@ -3,7 +3,7 @@ import styles from '../../css/perfumes/SimilarPerfumes.module.css';
 import { getProductDetail } from '../../api/PerfumeAPICalls';
 import { useNavigate } from 'react-router-dom';
 
-const SimilarPerfumes = ({ perfumeId ,initialData = null }) => {
+const SimilarPerfumes = ({ perfumeId ,initialData = null, onPerfumeChange }) => {
     const [noteSimilarPerfumes, setNoteSimilarPerfumes] = useState([]);
     const [designSimilarPerfumes, setDesignSimilarPerfumes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -43,6 +43,10 @@ const SimilarPerfumes = ({ perfumeId ,initialData = null }) => {
     }, [perfumeId, initialData]);
 
     const handleCardClick = (id) => {
+        // 향수 변경 시 부모 컴포넌트에 알림
+        if (onPerfumeChange) {
+            onPerfumeChange(id);
+        }
         navigate(`/perfumes/${id}`);
     };
 

@@ -5,7 +5,7 @@ import PerfumeReviews from './PerfumeReviews';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchPerfumes, selectPerfumes, fetchPerfumeById } from '../../module/PerfumeModule';
 import SimilarPerfumes from '../perfumes/SimilarPerfumes';
-import { resetReviews } from '../../module/ReviewModule';
+import { resetReviews, fetchReviews } from '../../module/ReviewModule';
 
 const PerfumeDetail = () => {
     const dispatch = useDispatch();
@@ -15,18 +15,22 @@ const PerfumeDetail = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const location = useLocation();
     const perfumes = useSelector(selectPerfumes);
-    
-    // 페이지 로드/새로고침 시 항상 전체 향수 목록 불러오기
+
+    // 페이지 로드/새로고침 시 항상 전체 향수 목록과 현재 향수 데이터 불러오기
     useEffect(() => {
         dispatch(fetchPerfumes());
-    }, [dispatch]);
-    
+        if (id) {
+            dispatch(fetchPerfumeById(id)); // 현재 향수 상세 정보 로드
+            dispatch(fetchReviews(id)); // 현재 향수의 리뷰 로드
+        }
+    }, [dispatch, id]);
+
     // ID 기반으로 현재 향수 찾기
-    const perfume = useMemo(() => 
+    const perfume = useMemo(() =>
         perfumes?.find(p => p.id === parseInt(id)),
         [perfumes, id]
     );
-    
+
     // 이전 페이지 정보 확인용
     useEffect(() => {
         console.log('Previous page:', location.state?.previousPage);
@@ -55,6 +59,18 @@ const PerfumeDetail = () => {
             return () => clearInterval(interval);
         }
     }, [perfume?.imageUrlList?.length]);
+
+    // 향수 변경 시 처리
+    const handlePerfumeChange = async (newPerfumeId) => {
+        // 기존 리뷰 초기화
+        dispatch(resetReviews());
+        // 새 향수의 리뷰 로드
+        dispatch(fetchReviews(newPerfumeId));
+        // 새 향수 데이터 로드
+        dispatch(fetchPerfumeById(newPerfumeId));
+        // 이미지 인덱스 초기화
+        setCurrentImageIndex(0);
+    };
 
     if (!perfume) {
         return (
@@ -229,7 +245,7 @@ const PerfumeDetail = () => {
 
                     {/* 유사 향수 섹션 */}
                     <div className={styles.similarPerfumesSection}>
-                        <SimilarPerfumes perfumeId={perfume.id} />
+                        <SimilarPerfumes perfumeId={perfume.id} onPerfumeChange={handlePerfumeChange} />
                     </div>
                 </div>
             </div>

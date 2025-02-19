@@ -19,17 +19,8 @@
     padding: 0 16px;
     display: flex;
     align-items: center;
-}
-
-.topReviewCard h4 {
-    width: 180px;
-    height: 80px;
-    font-family: 'Inter';
-    font-size: 20px;
-    line-height: 30px;
-    display: flex;
-    align-items: center;
-    color: #000000;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .reviewListSection {
@@ -52,36 +43,42 @@
     line-height: 30px;
     color: #000000;
     border: none;
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
     cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.writeReviewBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
 }
 
 .reviewCardsContainer {
     position: relative;
-    width: 100%; /* 변경: 부모 요소 너비에 맞춤 */
-    max-width: 1362px; /* 추가: 원래 고정 너비 유지를 위한 최대 너비 */
+    width: 100%;
+    max-width: 1362px;
     overflow: hidden;
     padding: 0 20px;
     box-sizing: border-box;
-    margin: 0 auto; /* 추가: 중앙 정렬 */
+    margin: 0 auto;
 }
 
 .reviewCards {
     display: flex;
     gap: 37px;
     margin-bottom: 40px;
-    transition: transform 0.1s ease-out;
+    transition: transform 0.3s ease-out;
     justify-content: flex-start;
     margin: 0 auto;
-    width: max-content; /* 변경: fit-content에서 max-content로 변경 */
+    width: max-content;
     will-change: transform;
-    flex-wrap: nowrap; /* 추가: 줄바꿈 방지 */
+    flex-wrap: nowrap;
+    padding: 10px 0; /* 그림자가 잘리지 않도록 패딩 추가 */
 }
 
 .reviewCard {
     min-width: 196px;
-    width: 196px; /* 추가: 명시적 너비 설정 */
-    flex: 0 0 196px; /* 추가: flex-grow, flex-shrink, flex-basis 설정 */
+    width: 196px;
     height: 334px;
     background: #FFFFFF;
     border-radius: 20px;
@@ -89,48 +86,60 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 0; /* 변경: margin 0으로 설정 (gap이 이미 간격 제공) */
-    transition: transform 0.3s ease-out;
-    box-sizing: border-box; /* 추가: 박스 사이징 명시 */
+    margin: 0;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    position: relative; /* divider 위치 기준점 */
 }
 
-.reviewCard.selected {
-    border: 3px solid #FF0000;
+.reviewCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .perfumeThumb {
     width: 108px;
     height: 95px;
     object-fit: contain;
-    display: block; /* block 요소로 변경 */
-    margin: 0 auto; /* 좌우 마진 auto로 설정하여 가운데 정렬 */
+    display: block;
+    margin: 0 auto 15px;
 }
 
 .divider {
     width: 136px;
     height: 1px;
     background: #000000;
-    margin: 10px 0;
+    margin: 15px 0;
+    opacity: 0.2; /* divider를 좀 더 섬세하게 */
 }
 
 .reviewContent {
     flex: 1;
+    width: 100%;
     font-size: 14px;
     line-height: 1.5;
     color: #494949;
     text-align: center;
-    margin: 40px 0;
+    margin: 15px 0;
+    overflow-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .reviewerName {
     font-size: 12px;
     color: #666;
     text-align: center;
+    margin-top: auto;
+    font-weight: 500;
 }
 
 .sliderContainer {
     width: 100%;
-    max-width: 1362px; /* 리뷰 컨테이너와 동일한 최대 너비 */
+    max-width: 1362px;
     padding: 0 20px;
     margin: 20px auto 0;
     box-sizing: border-box;
@@ -139,7 +148,7 @@
 .sliderLine {
     width: 100%;
     height: 6px;
-    background-color: #eee;
+    background-color: rgba(0, 0, 0, 0.1);
     border-radius: 3px;
     position: relative;
     cursor: pointer;
@@ -148,13 +157,13 @@
 .sliderHandle {
     width: 100px;
     height: 100%;
-    background-color: #8e44ad;
+    background-color: #000000;
     border-radius: 3px;
     position: absolute;
     top: 0;
-    left: 0; /* 초기 위치 */
+    left: 0;
     cursor: grab;
-    transition: left 0.1s ease-out; /* 트랜지션 시간을 카드와 맞춤 */
+    transition: left 0.1s ease-out;
 }
 
 .sliderHandle:active {
@@ -164,7 +173,8 @@
 .pagination {
     display: flex;
     gap: 25px;
-    margin-top: 20px;
+    margin-top: 40px;
+    justify-content: center;
 }
 
 .paginationDot {
@@ -173,7 +183,11 @@
     background: #A4A4A4;
     border-radius: 50%;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+}
+
+.paginationDot:hover {
+    transform: scale(1.1);
 }
 
 .paginationDot.active {

@@ -16,7 +16,6 @@ const PerfumeReviews = ({ perfumeId }) => {
     const [cardOffset, setCardOffset] = useState(0);
     const [reviewContent, setReviewContent] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const reviewContainerRef = useRef(null);
 
     const perfumes = useSelector(selectPerfumes);
     const perfume = perfumes?.find(p => p.id === perfumeId);
