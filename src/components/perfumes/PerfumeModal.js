@@ -19,9 +19,12 @@ const PerfumeModal = ({
     onInputChange,
     onImageUrlAdd,
     onImageUrlChange,
-    onImageUrlRemove,
     onSubmit,
-    setCurrentImageIndex
+    setCurrentImageIndex,
+    setImageUrlList,
+    handleImageUrlAdd,
+    editingImage,
+    setEditingImage
 }) => {
     // ✅ safeImageUrlList 변수를 가장 먼저 선언
     const safeImageUrlList = imageUrlList.length > 0 ? imageUrlList : [''];
@@ -37,6 +40,17 @@ const PerfumeModal = ({
         }
         setImagePreview(value);
         setImageError(false);
+    };
+
+    const handlePreviewClick = () => {
+        setEditingImage(true);
+        setImageUrlList((prev) => {
+            const updatedList = [...prev];
+            if (!updatedList[currentImageIndex]) {  // ✅ 빈 URL이 없으면 추가
+                updatedList[currentImageIndex] = "";
+            }
+            return updatedList;
+        });
     };
 
     if (!show) return null;
@@ -61,12 +75,7 @@ const PerfumeModal = ({
     return (
         <div className={styles.modalBackdrop}>
             <div className={styles.modalContainer}>
-                <form onSubmit={onSubmit} 
-                onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                e.preventDefault(); 
-                    }
-                }}>
+                <form onSubmit={onSubmit} onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); }}>
                     <h2 className={styles.modalTitle}>
                         {isEditing ? '향수 카드 수정하기' : '향수 카드 추가하기'}
                     </h2>
@@ -144,45 +153,45 @@ const PerfumeModal = ({
                         <div className={styles.modalRow}>
                             <label className={styles.formLabel}>이미지</label>
                             <div className={styles.imageInputContainer}>
-                                {/* ✅ 이미지 미리보기 */}
-                                <div className={styles.imagePreviewBox} onClick={() => setShowUrlInput(true)}>
-                                    {imageUrlList.length > 0 ? (
-                                        <img
-                                            src={imageUrlList[currentImageIndex] || ''}
-                                            alt="미리보기"
-                                            className={styles.previewImage}
-                                            onError={(e) => {
-                                                e.target.src = 'https://mblogthumb-phinf.pstatic.net/MjAyMDA1MDZfMTk3/MDAxNTg4Nzc1MjcwMTQ2.l8lHrUz8ZfSDCShKbMs8RzQj37B3jxpwRnQK7byS9k4g.OORSv5IlMThMSNj20nz7_OYBzSTkxwnV9QGGV8a3tVkg.JPEG.herbsecret/essential-oils-2738555_1920.jpg?type=w800';
-                                            }}
-                                        />
-                                    ) : (
-                                        <span>+</span>
-                                    )}
-                                </div>
-    
-                                {/* ✅ URL 입력 필드 */}
-                                <input
-                                    type="text"
-                                    value={imageUrlList[currentImageIndex] || ''}
-                                    onChange={(e) => handleImageUrlChange(currentImageIndex, e.target.value)}
-                                    placeholder="이미지 URL을 입력하세요"
-                                    className={styles.modalRowImageUrl}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            e.preventDefault(); // ✅ 기본 폼 제출 방지
-                                            setShowUrlInput(false); // ✅ 입력창 닫기
-                                        }
+                                {/* ✅ 이미지 미리보기 클릭 시 입력창 표시 */}
+                                {/* ✅ 미리보기를 클릭하면 입력창 활성화 */}
+                            <div className={styles.imagePreviewBox} onClick={handlePreviewClick}>
+                                <img
+                                    src={imageUrlList[currentImageIndex] || ''}
+                                    alt="미리보기"
+                                    className={styles.previewImage}
+                                    onError={(e) => {
+                                        e.target.src = 'https://mblogthumb-phinf.pstatic.net/MjAyMDA1MDZfMTk3/MDAxNTg4Nzc1MjcwMTQ2.l8lHrUz8ZfSDCShKbMs8RzQj37B3jxpwRnQK7byS9k4g.OORSv5IlMThMSNj20nz7_OYBzSTkxwnV9QGGV8a3tVkg.JPEG.herbsecret/essential-oils-2738555_1920.jpg?type=w800';
                                     }}
                                 />
-    
-                                {/* ✅ URL 추가 버튼 */}
-                                <button type="button" onClick={onImageUrlAdd} className={styles.addImageButton}>
-                                    +
-                                </button>
                             </div>
+    
+                                {/* ✅ URL 입력 필드 */}
+                                {editingImage && (
+                                    <input
+                                        type="text"
+                                        className={styles.modalRowImageUrl}
+                                        placeholder="이미지 URL을 입력하세요"
+                                        value={imageUrlList[currentImageIndex] || ''}
+                                        onChange={(e) => handleImageUrlChange(currentImageIndex, e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                e.preventDefault(); // ✅ 기본 폼 제출 방지
+                                                setEditingImage(false); // ✅ 입력창 닫기
+                                            }
+                                        }}
+                                        autoFocus
+                                    />
+                                )}
+                            </div>
+    
+                            {/* ✅ URL 추가 버튼 */}
+                            <button type="button" onClick={onImageUrlAdd} className={styles.addImageButton}>
+                                +
+                            </button>
                         </div>
     
-                        {/* ✅ 이미지 페이징 (이전/다음 버튼 추가) */}
+                        {/* ✅ 이미지 페이징 */}
                         <div className={styles.imagePagination}>
                             <button
                                 type="button"
@@ -197,18 +206,12 @@ const PerfumeModal = ({
                                 <span
                                     key={index}
                                     className={`${styles.paginationDot} ${index === currentImageIndex ? styles.activeDot : ''}`}
-                                    onClick={() => {
-                                        if (typeof setCurrentImageIndex === 'function') {
-                                            setCurrentImageIndex(index);
-                                        } else {
-                                            console.error('❌ setCurrentImageIndex is not a function:', setCurrentImageIndex);
-                                        }
-                                    }}
-                                    tabIndex={0} 
+                                    onClick={() => setCurrentImageIndex(index)}
+                                    tabIndex={0}
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter") {
-                                            e.preventDefault(); 
-                                            setShowUrlInput(false);  
+                                            e.preventDefault();
+                                            setEditingImage(false);
                                         }
                                     }}
                                 />
@@ -232,7 +235,8 @@ const PerfumeModal = ({
                 </form>
             </div>
         </div>
-    );    
+    );
+    
 };    
 
 export default PerfumeModal;

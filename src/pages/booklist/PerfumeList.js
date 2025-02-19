@@ -55,7 +55,11 @@ const PerfumeList = () => {
         isLoading,
         imageUrlList,
         isEditing,
-        setIsEditing
+        setIsEditing,
+        setImageUrlList,
+        editingImage, 
+        setEditingImage,
+        handlePreviewClick
     } = usePerfumeState(); 
 
     if (isLoading) {
@@ -150,7 +154,10 @@ const PerfumeList = () => {
                     onImageUrlChange={handleImageUrlChange}
                     onImageUrlRemove={handleImageUrlRemove}
                     onSubmit={handleSubmit}
-                />
+                    setImageUrlList={setImageUrlList}
+                    editingImage={editingImage}
+                    setEditingImage={setEditingImage}
+                    />
             </div>
         </>
     );

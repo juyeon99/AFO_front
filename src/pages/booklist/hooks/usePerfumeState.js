@@ -51,6 +51,7 @@ const usePerfumeState = () => {
     const [imageUrlList, setImageUrlList] = useState(['']);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
+    const [editingImage, setEditingImage] = useState(false);
 
     const itemsPerPage = 12;
     
@@ -229,10 +230,11 @@ const usePerfumeState = () => {
 
     // URL 추가 시 자동으로 마지막 이미지로 이동
     const handleImageUrlAdd = () => {
-        setImageUrlList((prev) => [...prev, '']);
-        setCurrentImageIndex(imageUrlList.length);  // ✅ 새 URL 추가 시 해당 URL로 이동
-    };
-
+        setImageUrlList((prev) => [...prev, '']);  // ✅ 새 URL 추가
+        setCurrentImageIndex((prev) => prev + 1);  // ✅ 새 URL이 추가되면 해당 인덱스로 이동
+        setEditingImage(true);  // ✅ 자동으로 입력창이 열리도록 설정
+    };    
+    
     // URL 수정
     const handleImageUrlChange = (index, value) => {
         setImageUrlList((prev) =>
@@ -337,7 +339,10 @@ const usePerfumeState = () => {
         handlePageChange,
         setShowUrlInput,
         isEditing,
-        setIsEditing
+        setIsEditing,
+        setImageUrlList,
+        editingImage, 
+        setEditingImage
     };
 };
 
