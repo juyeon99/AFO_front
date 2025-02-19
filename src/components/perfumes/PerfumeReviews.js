@@ -4,6 +4,7 @@ import ReviewSlider from '../../components/perfumes/ReviewSlider';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectPerfumes } from '../../module/PerfumeModule';
 import { fetchReviews, selectReviews, createNewReview } from '../../module/ReviewModule';
+import ReviewModal from './ReviewModal';
 
 const PerfumeReviews = ({ perfumeId }) => {
     const dispatch = useDispatch();
@@ -14,6 +15,7 @@ const PerfumeReviews = ({ perfumeId }) => {
     const [sliderLeft, setSliderLeft] = useState(0);
     const [cardOffset, setCardOffset] = useState(0);
     const [reviewContent, setReviewContent] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const perfumes = useSelector(selectPerfumes);
     const perfume = perfumes?.find(p => p.id === perfumeId);
@@ -28,12 +30,38 @@ const PerfumeReviews = ({ perfumeId }) => {
         }
     }, [perfumeId]);
 
-    // 마우스 이벤트 핸들링
+    // 리뷰 데이터가 변경될 때마다 슬라이더 상태 초기화
+    useEffect(() => {
+        setCurrentPage(1);
+        setSliderLeft(0);
+        setCardOffset(0);
+    }, [reviews.length]);
+
+    // 슬라이더 마우스 이벤트 핸들링 추가
     useEffect(() => {
         const handleGlobalMouseMove = (e) => {
             if (isDragging) {
-                e.preventDefault();
-                // ... 기존 마우스 이벤트 로직 유지 ...
+                const sliderLine = document.querySelector(`.${styles.sliderLine}`);
+                if (!sliderLine) return;
+
+                const rect = sliderLine.getBoundingClientRect();
+                const newPosition = e.clientX - rect.left;
+                const maxPosition = rect.width - 100;
+
+                const boundedPosition = Math.max(0, Math.min(newPosition, maxPosition));
+                const percentage = (boundedPosition / maxPosition) * 100;
+
+                const cardWidth = 196 + 37;
+                const maxScroll = (reviews.length - CARDS_PER_PAGE) * cardWidth;
+                const newOffset = Math.min((percentage / 100) * maxScroll, maxScroll);
+
+                setSliderLeft(percentage);
+                setCardOffset(newOffset);
+
+                const approximatePage = Math.floor((newOffset / maxScroll) * totalPages) + 1;
+                if (approximatePage !== currentPage && approximatePage > 0 && approximatePage <= totalPages) {
+                    setCurrentPage(approximatePage);
+                }
             }
         };
 
@@ -43,14 +71,14 @@ const PerfumeReviews = ({ perfumeId }) => {
             }
         };
 
-        window.addEventListener('mousemove', handleGlobalMouseMove, { passive: false });
+        window.addEventListener('mousemove', handleGlobalMouseMove);
         window.addEventListener('mouseup', handleGlobalMouseUp);
 
         return () => {
             window.removeEventListener('mousemove', handleGlobalMouseMove);
             window.removeEventListener('mouseup', handleGlobalMouseUp);
         };
-    }, [isDragging, reviews.length]);
+    }, [isDragging, currentPage, reviews.length]);
 
     const CARDS_PER_PAGE = 5;
     const totalPages = Math.ceil(reviews.length / CARDS_PER_PAGE);
@@ -62,18 +90,16 @@ const PerfumeReviews = ({ perfumeId }) => {
             alert('리뷰를 작성하려면 로그인이 필요합니다.');
             return;
         }
-    
+
         const reviewData = {
             productId: perfumeId,
             memberId: auth.user.oauthId,
             content: reviewContent
         };
-    
+
         dispatch(createNewReview(reviewData));
         setReviewContent('');  // 입력 필드 초기화
     };
-    
-
 
     const handleMouseDown = (e) => {
         if (e.target.className.includes(styles.sliderHandle)) {
@@ -81,6 +107,13 @@ const PerfumeReviews = ({ perfumeId }) => {
             setStartX(e.clientX);
         }
     };
+
+    // 모달 닫힐 때 리뷰 목록 새로고침
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        dispatch(fetchReviews(perfumeId));
+    };
+
 
     return (
         <div className={styles.reviewsContainer}>
@@ -95,8 +128,23 @@ const PerfumeReviews = ({ perfumeId }) => {
 
             <div className={styles.reviewListSection}>
                 <div className={styles.reviewsHeader}>
-                    <button className={styles.writeReviewBtn}>리뷰 작성하기</button>
+                    <button
+                        className={styles.writeReviewBtn}
+                        onClick={() => setIsModalOpen(true)}
+                    >
+                        리뷰 작성하기
+                    </button>
                 </div>
+
+                <ReviewModal
+                    isOpen={isModalOpen}
+                    onClose={() => {
+                        setIsModalOpen(false);
+                        dispatch(fetchReviews(perfumeId)); // 모달 닫힐 때 리뷰 목록 새로고침
+                    }}
+                    perfume={perfume}
+                    onSubmit={handleReviewSubmit}
+                />
 
                 {/* 리뷰 목록 표시 */}
                 <div className={styles.reviewCardsContainer}>

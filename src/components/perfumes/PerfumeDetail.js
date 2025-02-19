@@ -147,20 +147,31 @@ const PerfumeDetail = () => {
                         {/* 노트 정보 */}
                         <div className={styles.notes}>
                             <div className={styles.noteDivider}></div>
-                            <div className={styles.noteItem}>
-                                <span className={styles.noteType}>Top</span>
-                                <p className={styles.noteNames}>{perfume.topNote}</p>
-                            </div>
-                            <div className={styles.noteDivider}></div>
-                            <div className={styles.noteItem}>
-                                <span className={styles.noteType}>Middle</span>
-                                <p className={styles.noteNames}>{perfume.middleNote}</p>
-                            </div>
-                            <div className={styles.noteDivider}></div>
-                            <div className={styles.noteItem}>
-                                <span className={styles.noteType}>Base</span>
-                                <p className={styles.noteNames}>{perfume.baseNote}</p>
-                            </div>
+                            {perfume.singleNote ? (
+                                // 싱글노트인 경우
+                                <div className={styles.singleNoteItem}>
+                                    <span className={styles.noteType}>Single Note</span>
+                                    <p className={styles.noteNames}>{perfume.singleNote}</p>
+                                </div>
+                            ) : (
+                                // 일반 노트인 경우
+                                <>
+                                    <div className={styles.noteItem}>
+                                        <span className={styles.noteType}>Top</span>
+                                        <p className={styles.noteNames}>{perfume.topNote}</p>
+                                    </div>
+                                    <div className={styles.noteDivider}></div>
+                                    <div className={styles.noteItem}>
+                                        <span className={styles.noteType}>Middle</span>
+                                        <p className={styles.noteNames}>{perfume.middleNote}</p>
+                                    </div>
+                                    <div className={styles.noteDivider}></div>
+                                    <div className={styles.noteItem}>
+                                        <span className={styles.noteType}>Base</span>
+                                        <p className={styles.noteNames}>{perfume.baseNote}</p>
+                                    </div>
+                                </>
+                            )}
                             <div className={styles.noteDivider}></div>
                         </div>
 

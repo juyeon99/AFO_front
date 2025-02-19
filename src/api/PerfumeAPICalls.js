@@ -19,6 +19,7 @@ export const getAllPerfumes = async () => {
         perfumesCache = response.data;
         lastFetchTime = now;
         
+        console.log('향수 목록 조회 완료:', response.data);
         return response.data;
     } catch (error) {
         console.error("Error fetching perfumes:", error);

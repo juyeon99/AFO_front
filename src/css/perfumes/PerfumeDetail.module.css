@@ -223,6 +223,29 @@
     line-height: 20px;
 }
 
+/* 싱글노트 스타일 */
+.singleNoteItem {
+    position: relative;
+    margin: 80px 0;  /* 위아래 여백 조정 */
+    text-align: center;
+    font-family: 'Gowun Batang', serif;
+    line-height: 20px;
+    top: -30px;
+}
+
+.singleNoteItem .noteType {
+    font-size: 30px;  /* 싱글노트 타입 텍스트 크기 증가 */
+    font-weight: 600;
+    color: #000;
+    display: block;
+    margin-bottom: 40px;
+}
+
+.singleNoteItem .noteNames {
+    font-size: 20px;  /* 싱글노트 이름 텍스트 크기 증가 */
+    color: #494949;
+}
+
 .noteType {
     font-size: 25px;
     font-weight: 600;
