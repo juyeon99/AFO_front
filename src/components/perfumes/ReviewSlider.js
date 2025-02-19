@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import styles from '../../css/perfumes/PerfumeReviews.module.css';
 
 const ReviewSlider = ({
@@ -9,79 +9,63 @@ const ReviewSlider = ({
     cardOffset,
     allReviews,
     CARDS_PER_PAGE,
-    onSliderClick,
     onMouseDown,
-    onMouseMove,
-    onPageChange,
     setCurrentPage,
     setSliderLeft,
     setCardOffset
 }) => {
+    const sliderRef = useRef(null);
+    const [maxScroll, setMaxScroll] = useState(0);
+
+    useEffect(() => {
+        if (allReviews.length > 0) {
+            const cardWidth = 196 + 37;
+            const totalWidth = allReviews.length * cardWidth;
+            const visibleWidth = CARDS_PER_PAGE * cardWidth;
+            setMaxScroll(Math.max(0, totalWidth - visibleWidth));
+        }
+    }, [allReviews.length, CARDS_PER_PAGE]);
+
     const handleSliderClick = (e) => {
         if (!e.target.className.includes(styles.sliderHandle)) {
             const sliderLine = e.currentTarget;
             const rect = sliderLine.getBoundingClientRect();
+            
+            // 클릭 위치 계산
             const clickPosition = e.clientX - rect.left;
-            const maxPosition = rect.width - 100;
-
-            const percentage = (clickPosition / maxPosition) * 100;
-            const boundedPercentage = Math.max(0, Math.min(percentage, 100));
-
-            const cardWidth = 196 + 37;
-            const maxScroll = (allReviews.length - CARDS_PER_PAGE) * cardWidth;
-            const newOffset = Math.min((boundedPercentage / 100) * maxScroll, maxScroll);
-
-            setSliderLeft(boundedPercentage);
-            setCardOffset(newOffset);
-
-            const approximatePage = Math.floor((newOffset / maxScroll) * totalPages) + 1;
-            if (approximatePage !== currentPage && approximatePage > 0 && approximatePage <= totalPages) {
-                setCurrentPage(approximatePage);
+            const sliderWidth = rect.width - 100; // 핸들 너비 고려
+            
+            // 백분율 계산 (0-100%)
+            const percentage = Math.max(0, Math.min(100, (clickPosition / sliderWidth) * 100));
+            
+            // 오프셋 계산
+            const newOffset = (percentage / 100) * maxScroll;
+            
+            // 상태 업데이트
+            setSliderLeft(percentage);
+            setCardOffset(Math.min(newOffset, maxScroll));
+            
+            // 페이지 계산
+            if (totalPages > 1) {
+                const newPage = Math.ceil((percentage / 100) * totalPages);
+                setCurrentPage(Math.max(1, Math.min(newPage, totalPages)));
             }
         }
     };
 
-    const handleMouseMove = (e) => {
-        if (!isDragging) return;
-
-        e.preventDefault();
-
-        const sliderLine = document.querySelector(`.${styles.sliderLine}`);
-        const rect = sliderLine.getBoundingClientRect();
-
-        const newPosition = e.clientX - rect.left;
-        const maxPosition = rect.width - 100;
-
-        const boundedPosition = Math.max(0, Math.min(newPosition, maxPosition));
-        const percentage = (boundedPosition / maxPosition) * 100;
-
-        const cardWidth = 196 + 37;
-        const maxScroll = (allReviews.length - CARDS_PER_PAGE) * cardWidth;
-        const newOffset = Math.min((percentage / 100) * maxScroll, maxScroll);
-
+    const handlePageChange = (pageNumber) => {
+        const percentage = totalPages > 1 ? ((pageNumber - 1) / (totalPages - 1)) * 100 : 0;
+        const newOffset = (percentage / 100) * maxScroll;
+        
+        setCurrentPage(pageNumber);
         setSliderLeft(percentage);
         setCardOffset(newOffset);
-
-        const approximatePage = Math.floor((newOffset / maxScroll) * totalPages) + 1;
-        if (approximatePage !== currentPage && approximatePage > 0 && approximatePage <= totalPages) {
-            setCurrentPage(approximatePage);
-        }
-    };
-
-    const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber);
-
-        const cardWidth = 196 + 37;
-        const maxScroll = (allReviews.length - CARDS_PER_PAGE) * cardWidth;
-        const newOffset = ((pageNumber - 1) / (totalPages - 1)) * maxScroll;
-
-        setCardOffset(Math.min(newOffset, maxScroll));
-        setSliderLeft(((pageNumber - 1) / (totalPages - 1)) * 100);
     };
 
     return (
         <div className={styles.sliderContainer}>
             <div
+                ref={sliderRef}
                 className={styles.sliderLine}
                 onClick={handleSliderClick}
                 onMouseDown={onMouseDown}

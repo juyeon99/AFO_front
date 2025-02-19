@@ -1,79 +1,78 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from '../../css/perfumes/PerfumeReviews.module.css';
 import ReviewSlider from '../../components/perfumes/ReviewSlider';
-import SimilarPerfumes from '../../components/perfumes/SimilarPerfumes';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectPerfumes } from '../../module/PerfumeModule';
+import { fetchReviews, selectReviews, createNewReview } from '../../module/ReviewModule';
+import ReviewModal from './ReviewModal';
 
 const PerfumeReviews = ({ perfumeId }) => {
+    const dispatch = useDispatch();
     const [selectedReview, setSelectedReview] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
     const [sliderLeft, setSliderLeft] = useState(0);
     const [cardOffset, setCardOffset] = useState(0);
+    const [reviewContent, setReviewContent] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const perfumes = useSelector(selectPerfumes);
     const perfume = perfumes?.find(p => p.id === perfumeId);
-    const reviews = perfume?.reviews || { expert: [], user: [] };
+    // 리뷰 데이터를 Redux에서 가져오기
+    const reviews = useSelector(selectReviews) || [];
+    const auth = useSelector(state => state.auth.auth);
 
-    const userTopReview = reviews.user?.[0] || { content: "사용자 리뷰가 없습니다.", reviewer: "" };
-
-    const allReviews = Array.from(
-        new Set(
-            [...(reviews.expert || []), ...(reviews.user || [])].map(review => JSON.stringify({
-                content: review.content,
-                reviewer: review.reviewer,
-                type: review.type
-            }))
-        )
-    ).map(str => JSON.parse(str));
-
-    const CARDS_PER_PAGE = 5;
-    const totalPages = Math.ceil(allReviews.length / CARDS_PER_PAGE);
-
-    const getCurrentPageReviews = () => {
-        // 전체 리뷰를 반환
-        return allReviews;
-    };
-
-    const handleMouseDown = (e) => {
-        if (e.target.className.includes(styles.sliderHandle)) {
-            setIsDragging(true);
-            setStartX(e.clientX);
+    // 리뷰 데이터 로드
+    useEffect(() => {
+        if (perfumeId && (!reviews || reviews.length === 0)) {
+            dispatch(fetchReviews(perfumeId));
         }
-    };
+    }, [perfumeId]);
 
+    // 리뷰 데이터가 변경될 때마다 슬라이더 상태 업데이트
+    useEffect(() => {
+        if (reviews.length > 0) {
+            const totalPages = Math.ceil(reviews.length / CARDS_PER_PAGE);
+            const cardWidth = 196 + 37;
+            const maxScroll = (reviews.length - CARDS_PER_PAGE) * cardWidth;
+
+            // 새 리뷰가 추가되면 마지막 페이지로 이동
+            setCurrentPage(totalPages);
+            setSliderLeft(100);
+            setCardOffset(maxScroll);
+        } else {
+            setCurrentPage(1);
+            setSliderLeft(0);
+            setCardOffset(0);
+        }
+    }, [reviews.length]);
+
+    // 슬라이더 마우스 이벤트 핸들링 추가
     useEffect(() => {
         const handleGlobalMouseMove = (e) => {
             if (isDragging) {
-                e.preventDefault();
-
                 const sliderLine = document.querySelector(`.${styles.sliderLine}`);
+                if (!sliderLine) return;
+
                 const rect = sliderLine.getBoundingClientRect();
+                const newPosition = e.clientX - rect.left;
+                const maxPosition = rect.width - 100;
 
-                const cardWidth = 196 + 37; // 카드 너비 + gap
-                const containerWidth = 1362 - 40; // 컨테이너 너비
+                const boundedPosition = Math.max(0, Math.min(newPosition, maxPosition));
+                const percentage = (boundedPosition / maxPosition) * 100;
 
-                // 전체 스크롤 가능한 너비 계산
-                const totalWidth = cardWidth * (allReviews.length - 1); // 전체 카드의 스크롤 가능한 너비
-                const maxScrollable = Math.max(0, totalWidth); // 음수 방지
+                const cardWidth = 196 + 37;
+                const maxScroll = (reviews.length - CARDS_PER_PAGE) * cardWidth;
+                const newOffset = Math.min((percentage / 100) * maxScroll, maxScroll);
 
-                const mouseX = e.clientX;
-                const sliderStart = rect.left;
-                const sliderWidth = rect.width - 100;
+                setSliderLeft(percentage);
+                setCardOffset(newOffset);
 
-                const relativeX = mouseX - sliderStart;
-                const percentage = Math.max(0, Math.min(100, (relativeX / sliderWidth) * 100));
-
-                requestAnimationFrame(() => {
-                    // 스크롤 위치 계산 및 경계값 처리
-                    const newOffset = Math.min((percentage / 100) * maxScrollable, maxScrollable);
-
-                    // 슬라이더와 카드 위치 업데이트
-                    setSliderLeft(percentage);
-                    setCardOffset(newOffset);
-                });
+                const approximatePage = Math.floor((newOffset / maxScroll) * totalPages) + 1;
+                if (approximatePage !== currentPage && approximatePage > 0 && approximatePage <= totalPages) {
+                    setCurrentPage(approximatePage);
+                }
             }
         };
 
@@ -83,15 +82,48 @@ const PerfumeReviews = ({ perfumeId }) => {
             }
         };
 
-        // 성능 최적화를 위한 passive 이벤트 리스너
-        window.addEventListener('mousemove', handleGlobalMouseMove, { passive: false });
+        window.addEventListener('mousemove', handleGlobalMouseMove);
         window.addEventListener('mouseup', handleGlobalMouseUp);
 
         return () => {
             window.removeEventListener('mousemove', handleGlobalMouseMove);
             window.removeEventListener('mouseup', handleGlobalMouseUp);
         };
-    }, [isDragging, allReviews.length]);
+    }, [isDragging, currentPage, reviews.length]);
+
+    const CARDS_PER_PAGE = 5;
+    const totalPages = Math.ceil(reviews.length / CARDS_PER_PAGE);
+    const userTopReview = reviews?.[0] || { content: "사용자 리뷰가 없습니다.", reviewer: "" };
+
+    // 리뷰 작성 처리 함수 추가
+    const handleReviewSubmit = () => {
+        if (!auth) {
+            alert('리뷰를 작성하려면 로그인이 필요합니다.');
+            return;
+        }
+
+        const reviewData = {
+            productId: perfumeId,
+            memberId: auth.user.oauthId,
+            content: reviewContent
+        };
+
+        dispatch(createNewReview(reviewData));
+        setReviewContent('');  // 입력 필드 초기화
+    };
+
+    // 모달 닫힐 때 리뷰 목록 새로고침
+    const handleModalClose = async () => {
+        setIsModalOpen(false);
+        await dispatch(fetchReviews(perfumeId));
+    };
+
+    const handleMouseDown = (e) => {
+        if (e.target.className.includes(styles.sliderHandle)) {
+            setIsDragging(true);
+            setStartX(e.clientX);
+        }
+    };
 
     return (
         <div className={styles.reviewsContainer}>
@@ -106,32 +138,54 @@ const PerfumeReviews = ({ perfumeId }) => {
 
             <div className={styles.reviewListSection}>
                 <div className={styles.reviewsHeader}>
-                    <button className={styles.writeReviewBtn}>리뷰 작성하기</button>
+                    <button
+                        className={styles.writeReviewBtn}
+                        onClick={() => setIsModalOpen(true)}
+                    >
+                        리뷰 작성하기
+                    </button>
                 </div>
 
+                <ReviewModal
+                    isOpen={isModalOpen}
+                    onClose={() => {
+                        setIsModalOpen(false);
+                        dispatch(fetchReviews(perfumeId));
+                        handleModalClose(); // 모달 닫힐 때 리뷰 목록 새로고침
+                    }}
+                    perfume={perfume}
+                    onSubmit={handleReviewSubmit}
+                />
+
+                {/* 리뷰 목록 표시 */}
                 <div className={styles.reviewCardsContainer}>
-                    <div
-                        className={styles.reviewCards}
-                        style={{ transform: `translateX(-${cardOffset}px)` }}
-                    >
-                        {getCurrentPageReviews().map((review, index) => (
-                            <div
-                                key={`review-${index}`}
-                                className={`${styles.reviewCard} ${selectedReview === index ? styles.selected : ''}`}
-                                onClick={() => setSelectedReview(index)}
-                            >
-                                <img
-                                    src={perfume.imageUrls[0]}
-                                    alt="향수 이미지"
-                                    className={styles.perfumeThumb}
-                                />
-                                <div className={styles.divider} />
-                                <p className={styles.reviewContent}>{review.content}</p>
-                                <p className={styles.reviewerName}>{review.reviewer}</p>
-                            </div>
-                        ))}
-                    </div>
+                    {reviews && reviews.length > 0 ? (
+                        <div
+                            className={styles.reviewCards}
+                            style={{ transform: `translateX(-${cardOffset}px)` }}
+                        >
+                            {reviews.map((review, index) => (
+                                <div
+                                    key={review.id}
+                                    className={`${styles.reviewCard} ${selectedReview === index ? styles.selected : ''}`}
+                                    onClick={() => setSelectedReview(index)}
+                                >
+                                    <img
+                                        src={perfume?.imageUrlList?.[0]}
+                                        alt="향수 이미지"
+                                        className={styles.perfumeThumb}
+                                    />
+                                    <div className={styles.divider} />
+                                    <p className={styles.reviewContent}>{review.content}</p>
+                                    <p className={styles.reviewerName}>{review.name}</p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className={styles.noReviews}>아직 작성된 리뷰가 없습니다.</div>
+                    )}
                 </div>
+
 
                 <ReviewSlider
                     currentPage={currentPage}
@@ -139,19 +193,13 @@ const PerfumeReviews = ({ perfumeId }) => {
                     isDragging={isDragging}
                     sliderLeft={sliderLeft}
                     cardOffset={cardOffset}
-                    allReviews={allReviews}
+                    allReviews={reviews}
                     CARDS_PER_PAGE={CARDS_PER_PAGE}
                     onMouseDown={handleMouseDown}
                     setCurrentPage={setCurrentPage}
                     setSliderLeft={setSliderLeft}
                     setCardOffset={setCardOffset}
                 />
-            </div>
-
-
-            {/* 유사 향수 섹션 추가 */}
-            <div className={styles.similarPerfumesSection}>
-                <SimilarPerfumes perfumeId={perfumeId} />
             </div>
         </div>
     );

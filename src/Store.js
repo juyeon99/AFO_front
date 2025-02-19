@@ -8,6 +8,7 @@ import chatReducer from "./module/ChatModule";
 import historyReducer from "./module/HistoryModule";
 import therapyReducer from "./module/TherapyModule";
 import bookmarkReducer from "./module/BookmarkModule";
+import reviewReducer from "./module/ReviewModule";
 
 // 여러 리듀서를 합치는 경우
 const rootReducer = combineReducers({
@@ -18,7 +19,8 @@ const rootReducer = combineReducers({
     chat: chatReducer,
     history: historyReducer,
     therapy: therapyReducer,
-    bookmark: bookmarkReducer
+    bookmark: bookmarkReducer,
+    reviews: reviewReducer
 
 });
 

@@ -8,9 +8,23 @@ import PerfumeModal from '../../components/perfumes/PerfumeModal';
 import LoadingScreen from '../../components/loading/LoadingScreen';
 import usePerfumeState from './hooks/usePerfumeState';
 import styles from '../../css/perfumes/PerfumeList.module.css';
+import { useDispatch } from 'react-redux';
+import { fetchPerfumes } from '../../module/PerfumeModule';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { selectPerfumes } from '../../module/PerfumeModule';
 import BookmarkPopover from '../../components/perfumes/BookmarkPopover';
 
 const PerfumeList = () => {
+    const dispatch = useDispatch();
+    const perfumes = useSelector(selectPerfumes);
+
+    useEffect(() => {
+        if (!perfumes || perfumes.length === 0) {
+            dispatch(fetchPerfumes());
+        }
+    }, []);
+
     const navigate = useNavigate();
     const {
         searchTerm,
@@ -26,14 +40,17 @@ const PerfumeList = () => {
         filteredPerfumes,
         itemsPerPage,
         formData,
+        setFormData,
+        setSelectedPerfume,
+        selectedPerfume,
         imageUrls,
+        handleDeleteButtonClick,
         handleSearch,
         handleFilterClick,
         handleCheckboxToggle,
         handleCardCheckboxChange,
         handleAddButtonClick,
         handleEditButtonClick,
-        handleDeleteButtonClick,
         handleDeleteConfirm,
         handleSuccessClose,
         setIsDeleting,
@@ -47,9 +64,17 @@ const PerfumeList = () => {
         setShowUrlInput,
         imageUrlCount,
         currentImageIndex,
+        setCurrentImageIndex,
         handlePageChange,
         totalPages,
         isLoading,
+        imageUrlList,
+        isEditing,
+        setIsEditing,
+        setImageUrlList,
+        editingImage,
+        setEditingImage,
+        handlePreviewClick,
         showBookmarkModal,
         setShowBookmarkModal,
         bookmarkedPerfumes,
@@ -102,6 +127,8 @@ const PerfumeList = () => {
                     handleAddButtonClick={handleAddButtonClick}
                     handleCheckboxToggle={handleCheckboxToggle}
                     handleDeleteButtonClick={handleDeleteButtonClick}
+                    selectedPerfume={selectedPerfume}
+                    setSelectedPerfume={setSelectedPerfume}  // setSelectedPerfume 전달
                     handleBookmarkClick={handleBookmarkClick}
                 />
 
@@ -114,8 +141,8 @@ const PerfumeList = () => {
                                 perfume={perfume}
                                 showCheckboxes={showCheckboxes}
                                 selectedCard={selectedCard}
-                                role={role}
                                 onCheckboxChange={handleCardCheckboxChange}
+                                role={role}
                                 onEditClick={handleEditButtonClick}
                                 currentPage={currentPage}
                                 isBookmarked={isBookmarked(perfume.id)}
@@ -138,17 +165,22 @@ const PerfumeList = () => {
                     onDeleteClose={() => setIsDeleting(false)}
                     successMessage={successMessage}
                     onSuccessClose={handleSuccessClose}
-                    formData={formData}
-                    imageUrls={imageUrls}
-                    showUrlInput={showUrlInput}
                     setShowUrlInput={setShowUrlInput}
+                    formData={formData}
+                    setIsEditing={setIsEditing}
+                    setFormData={setFormData}
+                    imageUrlList={imageUrlList}
                     imageUrlCount={imageUrlCount}
                     currentImageIndex={currentImageIndex}
+                    setCurrentImageIndex={setCurrentImageIndex}
                     onInputChange={handleInputChange}
                     onImageUrlAdd={handleImageUrlAdd}
                     onImageUrlChange={handleImageUrlChange}
                     onImageUrlRemove={handleImageUrlRemove}
                     onSubmit={handleSubmit}
+                    setImageUrlList={setImageUrlList}
+                    editingImage={editingImage}
+                    setEditingImage={setEditingImage}
                 />
 
                 {/* 북마크 모달 */}
