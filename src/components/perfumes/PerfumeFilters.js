@@ -8,7 +8,9 @@ const PerfumeFilters = ({
     role,
     handleAddButtonClick,
     handleCheckboxToggle,
-    handleDeleteButtonClick
+    selectedPerfume,      // selectedPerfume을 prop으로 받음
+    setSelectedPerfume,   // setSelectedPerfume을 prop으로 받음
+    handleDeleteButtonClick  // handleDeleteButtonClick을 prop으로 받음
 }) => {
     const filterButtons = [
         { id: '오 드 퍼퓸', label: 'Eau de Perfume' },
@@ -33,7 +35,10 @@ const PerfumeFilters = ({
                 <div className={styles.adminControls}>
                     <button className={styles.addButton} onClick={handleAddButtonClick}>+</button>
                     <button className={styles.checkboxButton} onClick={handleCheckboxToggle}>✓</button>
-                    <button onClick={handleDeleteButtonClick} className={styles.deleteButton}>
+                    <button
+                        onClick={() => handleDeleteButtonClick(selectedPerfume)}
+                        className={styles.deleteButton}
+                    >
                         <Trash2 size={20} />
                     </button>
                 </div>

@@ -31,14 +31,30 @@ const usePerfumeState = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
     const [role, setRole] = useState(null);
-    const [formData, setFormData] = useState({});
-    const [imageUrls, setImageUrls] = useState([]);
+    const [formData, setFormData] = useState({
+        nameEn: "",
+        nameKr: "",
+        brand: "",
+        grade: "",
+        singleNoteList: [],
+        topNoteList: [],
+        middleNoteList: [],
+        baseNoteList: [],
+        mainAccord: "",
+        ingredients: "",
+        sizeOption: "",
+        content: "",
+    });
     const [isLoading, setIsLoading] = useState(true);
     const [showUrlInput, setShowUrlInput] = useState(false);
-    const [imageUrlCount, setImageUrlCount] = useState(0);
+    const [imageUrlCount, setImageUrlListCount] = useState(0);
+    const [imageUrlList, setImageUrlList] = useState(['']);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingImage, setEditingImage] = useState(false);
 
     const itemsPerPage = 12;
+    
 
     // URL 변경 감지 및 페이지 상태 업데이트
     useEffect(() => {
@@ -68,7 +84,8 @@ const usePerfumeState = () => {
     useEffect(() => {
         if (selectedPerfume) {
             setFormData(selectedPerfume);
-            setImageUrls(selectedPerfume.imageUrls || [selectedPerfume.imageUrl].filter(Boolean));
+            setImageUrlList(selectedPerfume.imageUrlList || [selectedPerfume.imageUrl].filter(Boolean));
+            setCurrentImageIndex(0);
         }
     }, [selectedPerfume]);
 
@@ -88,6 +105,7 @@ const usePerfumeState = () => {
         setSearchTerm(e.target.value);
         setCurrentPage(1);
     };
+    
 
     const handleFilterClick = (filterId) => {
         setActiveFilters(prev => {
@@ -99,23 +117,40 @@ const usePerfumeState = () => {
         setCurrentPage(1);
     };
 
-    const handleCheckboxToggle = () => setShowCheckboxes(!showCheckboxes);
+    const handleCheckboxToggle = () => {
+        setShowCheckboxes(!showCheckboxes);
+        console.log("버튼 클릭 후 showCheckboxes 상태:", !showCheckboxes);
+    };
 
     const handleCardCheckboxChange = (id) => {
-        setSelectedCard(selectedCard === id ? null : id);
+        console.log('이전에 선택된 카드:', selectedCard);  // 이전에 선택된 카드 확인
+
+        setSelectedCard((prevSelected) => {
+            if (prevSelected === id) {
+                console.log(`카드 ${id} 선택 해제됨`);  // 카드 선택 해제
+                return null;  // 선택 해제 시 null로 설정
+            } else {
+                console.log(`카드 ${id} 선택됨`);  // 새로 선택된 카드 출력
+                return id;  // 새 카드 ID로 업데이트
+            }
+        });
     };
 
     const handleAddButtonClick = () => {
         setSelectedPerfume({
-            name: '',
-            description: '',
+            nameEn: '',
+            nameKr: '',
+            content: '',
             brand: '',
             grade: '오 드 퍼퓸',
-            singleNote: '',
-            topNote: '',
-            middleNote: '',
-            baseNote: '',
-            imageUrl: '',
+            singleNoteList: [],
+            topNoteList: [],
+            middleNoteList: [],
+            baseNoteList: [],
+            mainAccord: '',
+            ingredients: '',
+            sizeOption: '',
+            imageUrlList: [],
         });
         setShowAddModal(true);
     };
@@ -123,41 +158,67 @@ const usePerfumeState = () => {
     const handleEditButtonClick = (perfume) => {
         setSelectedPerfume(perfume);
         setShowEditModal(true);
+        setSelectedPerfume(perfume);
+        setFormData(perfume);
+        setImageUrlList(perfume.imageUrlList || []);
+        setCurrentImageIndex(0);
+        setIsEditing(true); 
+        setShowEditModal(true);
     };
+    
 
     const handleDeleteButtonClick = () => {
-        if (!selectedCard) {
-            alert("삭제할 카드를 선택하세요.");
+        if (selectedCard.length === 0) {
+            alert("삭제할 향수를 선택하세요.");
             return;
         }
-        const perfumeToDelete = perfumes.find(p => p.id === selectedCard);
-        setSelectedPerfume(perfumeToDelete);
-        setIsDeleting(true);
-    };
+        // 선택된 향수들의 id를 사용하여 삭제
+        setIsDeleting(true);  // 삭제 작업 시작
+        handleDeleteConfirm(selectedCard);  // 삭제 확인 함수 호출
+    };    
 
-    const handleDeleteConfirm = async () => {
-        setIsLoading(true);
+    const handleDeleteConfirm = async (cardsToDelete) => {
+        if (isLoading || isDeleting) {
+            console.log('이미 삭제 작업이 진행 중입니다.');
+            return;  // 함수를 종료하여 무한 호출 방지
+        }
+    
+        console.log('삭제 시작');
+        setIsLoading(true);  // 로딩 상태 시작
+    
         try {
-            await dispatch(deletePerfume(selectedCard));
-            setSuccessMessage(`${selectedPerfume.name} 향수 카드가 삭제되었습니다!`);
+            console.log('삭제할 향수 ID들:', cardsToDelete);
+    
+            // 여러 개의 향수 삭제 처리 (배치 삭제)
+            await dispatch(deletePerfume(cardsToDelete));
+    
+            // 성공 메시지 설정
+            alert("선택된 향수들이 삭제되었습니다!");
+            console.log('삭제 성공:', cardsToDelete);
+    
+            // 상태 업데이트
             setIsDeleting(false);
             setSelectedPerfume(null);
-            setSelectedCard(null);
+            setSelectedCard([]);  // 삭제 후 선택된 카드들 초기화
+    
+            // 향수 목록 다시 불러오기
             await dispatch(fetchPerfumes());
+            console.log('향수 목록 다시 불러오기 완료');
         } catch (error) {
             console.error("향수 삭제 실패:", error);
             alert("향수 삭제에 실패했습니다. 다시 시도해주세요.");
         } finally {
-            setIsLoading(false);
+            setIsLoading(false);  // 로딩 상태 종료
+            console.log('isLoading:', false);
         }
     };
-
+    
     const handleModalClose = () => {
         setShowAddModal(false);
         setShowEditModal(false);
         setSelectedPerfume(null);
         setFormData({});
-        setImageUrls([]);
+        setImageUrlList([]);
     };
 
     const handleInputChange = (field, value) => {
@@ -167,40 +228,48 @@ const usePerfumeState = () => {
         }));
     };
 
+    // URL 추가 시 자동으로 마지막 이미지로 이동
     const handleImageUrlAdd = () => {
-        setImageUrls([...imageUrls, '']);
-        setImageUrlCount(prev => prev + 1);
-    };
-
+        setImageUrlList((prev) => [...prev, '']);  // ✅ 새 URL 추가
+        setCurrentImageIndex((prev) => prev + 1);  // ✅ 새 URL이 추가되면 해당 인덱스로 이동
+        setEditingImage(true);  // ✅ 자동으로 입력창이 열리도록 설정
+    };    
+    
+    // URL 수정
     const handleImageUrlChange = (index, value) => {
-        const newUrls = [...imageUrls];
-        newUrls[index] = value;
-        setImageUrls(newUrls);
-    };
+        setImageUrlList((prev) =>
+            prev.map((url, i) =>
+                i === index ? (value.trim() !== '' ? value : prev[i]) : url // ✅ 빈 값이면 기존 값 유지
+            )
+        );
+    };    
 
+    // URL 삭제 시 자동으로 이전 이미지로 이동
     const handleImageUrlRemove = (index) => {
-        setImageUrls(imageUrls.filter((_, i) => i !== index));
-        setImageUrlCount(prev => prev - 1);
+        setImageUrlList((prev) => prev.filter((_, i) => i !== index));
+        setCurrentImageIndex((prevIndex) => Math.max(prevIndex - 1, 0));  // ✅ 삭제 후 이전 이미지로 이동
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-
+    
         try {
             const updatedData = {
                 ...formData,
-                imageUrls: imageUrls.filter(url => url.trim() !== '')
+                imageUrlList: imageUrlList.length > 0
+                    ? imageUrlList.filter(url => url.trim() !== '')  // ✅ 빈 값이 아니라면 유지
+                    : selectedPerfume.imageUrlList || []  // ✅ 기존 값 유지
             };
-
-            if (showEditModal) {
+    
+            if (isEditing) {
                 await dispatch(modifyPerfume({ id: selectedPerfume.id, ...updatedData }));
                 setSuccessMessage('향수가 성공적으로 수정되었습니다!');
             } else {
                 await dispatch(createPerfume(updatedData));
                 setSuccessMessage('향수가 성공적으로 추가되었습니다!');
             }
-
+    
             handleModalClose();
             await dispatch(fetchPerfumes());
         } catch (error) {
@@ -225,6 +294,8 @@ const usePerfumeState = () => {
 
     return {
         searchTerm,
+        selectedPerfume,
+        setSelectedPerfume,
         activeFilters,
         currentPage,
         showCheckboxes,
@@ -238,12 +309,14 @@ const usePerfumeState = () => {
         filteredPerfumes,
         itemsPerPage,
         formData,
-        imageUrls,
+        setFormData,
+        imageUrlList,
         isLoading,
         showUrlInput,
         setShowUrlInput,
         imageUrlCount,
         currentImageIndex,
+        setCurrentImageIndex,
         setShowAddModal,
         setShowEditModal,
         setIsDeleting,
@@ -263,7 +336,13 @@ const usePerfumeState = () => {
         handleImageUrlRemove,
         handleSubmit,
         totalPages,
-        handlePageChange
+        handlePageChange,
+        setShowUrlInput,
+        isEditing,
+        setIsEditing,
+        setImageUrlList,
+        editingImage, 
+        setEditingImage
     };
 };
 

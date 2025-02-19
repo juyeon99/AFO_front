@@ -25,14 +25,17 @@ const PerfumeList = () => {
         filteredPerfumes,
         itemsPerPage,
         formData,
+        setFormData,
+        setSelectedPerfume,
+        selectedPerfume,
         imageUrls,
+        handleDeleteButtonClick,
         handleSearch,
         handleFilterClick,
         handleCheckboxToggle,
         handleCardCheckboxChange,
         handleAddButtonClick,
         handleEditButtonClick,
-        handleDeleteButtonClick,
         handleDeleteConfirm,
         handleSuccessClose,
         setIsDeleting,
@@ -46,10 +49,18 @@ const PerfumeList = () => {
         setShowUrlInput,
         imageUrlCount,
         currentImageIndex,
+        setCurrentImageIndex,
         handlePageChange,
         totalPages,
         isLoading,
-    } = usePerfumeState();
+        imageUrlList,
+        isEditing,
+        setIsEditing,
+        setImageUrlList,
+        editingImage, 
+        setEditingImage,
+        handlePreviewClick
+    } = usePerfumeState(); 
 
     if (isLoading) {
         return <LoadingScreen message="향수를 불러오는 중..." />;
@@ -88,12 +99,14 @@ const PerfumeList = () => {
                 <div className={styles.dividerLine} />
 
                 <PerfumeFilters
-                    activeFilters={activeFilters}
-                    handleFilterClick={handleFilterClick}
-                    role={role}
-                    handleAddButtonClick={handleAddButtonClick}
-                    handleCheckboxToggle={handleCheckboxToggle}
-                    handleDeleteButtonClick={handleDeleteButtonClick}
+                activeFilters={activeFilters}
+                handleFilterClick={handleFilterClick}
+                role={role}
+                handleAddButtonClick={handleAddButtonClick}
+                handleCheckboxToggle={handleCheckboxToggle}
+                handleDeleteButtonClick={handleDeleteButtonClick}
+                selectedPerfume={selectedPerfume}
+                setSelectedPerfume={setSelectedPerfume}  // setSelectedPerfume 전달
                 />
 
                 <div className={styles.itemsContainer}>
@@ -105,8 +118,8 @@ const PerfumeList = () => {
                                 perfume={perfume}
                                 showCheckboxes={showCheckboxes}
                                 selectedCard={selectedCard}
-                                role={role}
                                 onCheckboxChange={handleCardCheckboxChange}
+                                role={role}
                                 onEditClick={handleEditButtonClick}
                                 currentPage={currentPage}
                             />
@@ -128,18 +141,23 @@ const PerfumeList = () => {
                     onDeleteClose={() => setIsDeleting(false)}
                     successMessage={successMessage}
                     onSuccessClose={handleSuccessClose}
-                    formData={formData}
-                    imageUrls={imageUrls}
-                    showUrlInput={showUrlInput}
                     setShowUrlInput={setShowUrlInput}
+                    formData={formData} 
+                    setIsEditing={setIsEditing}  
+                    setFormData={setFormData}
+                    imageUrlList={imageUrlList}
                     imageUrlCount={imageUrlCount}
                     currentImageIndex={currentImageIndex}
+                    setCurrentImageIndex={setCurrentImageIndex}
                     onInputChange={handleInputChange}
                     onImageUrlAdd={handleImageUrlAdd}
                     onImageUrlChange={handleImageUrlChange}
                     onImageUrlRemove={handleImageUrlRemove}
                     onSubmit={handleSubmit}
-                />
+                    setImageUrlList={setImageUrlList}
+                    editingImage={editingImage}
+                    setEditingImage={setEditingImage}
+                    />
             </div>
         </>
     );
