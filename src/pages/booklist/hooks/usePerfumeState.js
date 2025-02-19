@@ -157,7 +157,14 @@ const usePerfumeState = () => {
     const handleEditButtonClick = (perfume) => {
         setSelectedPerfume(perfume);
         setShowEditModal(true);
+        setSelectedPerfume(perfume);
+        setFormData(perfume);
+        setImageUrlList(perfume.imageUrlList || []);
+        setCurrentImageIndex(0);
+        setIsEditing(true); 
+        setShowEditModal(true);
     };
+    
 
     const handleDeleteButtonClick = () => {
         if (selectedCard.length === 0) {
@@ -228,8 +235,12 @@ const usePerfumeState = () => {
 
     // URL 수정
     const handleImageUrlChange = (index, value) => {
-        setImageUrlList((prev) => prev.map((url, i) => (i === index ? value : url)));
-    };
+        setImageUrlList((prev) =>
+            prev.map((url, i) =>
+                i === index ? (value.trim() !== '' ? value : prev[i]) : url // ✅ 빈 값이면 기존 값 유지
+            )
+        );
+    };    
 
     // URL 삭제 시 자동으로 이전 이미지로 이동
     const handleImageUrlRemove = (index) => {
@@ -237,26 +248,28 @@ const usePerfumeState = () => {
         setCurrentImageIndex((prevIndex) => Math.max(prevIndex - 1, 0));  // ✅ 삭제 후 이전 이미지로 이동
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();  // ✅ 기본 제출 방지 (Enter 입력 시 폼 전송 방지)
-    
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         setIsLoading(true);
+    
         try {
             const updatedData = {
                 ...formData,
-                imageUrlList: imageUrlList.filter(url => url.trim() !== '')
+                imageUrlList: imageUrlList.length > 0
+                    ? imageUrlList.filter(url => url.trim() !== '')  // ✅ 빈 값이 아니라면 유지
+                    : selectedPerfume.imageUrlList || []  // ✅ 기존 값 유지
             };
     
             if (isEditing) {
-                dispatch(modifyPerfume({ id: selectedPerfume.id, ...updatedData }));
+                await dispatch(modifyPerfume({ id: selectedPerfume.id, ...updatedData }));
                 setSuccessMessage('향수가 성공적으로 수정되었습니다!');
             } else {
-                dispatch(createPerfume(updatedData));
+                await dispatch(createPerfume(updatedData));
                 setSuccessMessage('향수가 성공적으로 추가되었습니다!');
             }
     
             handleModalClose();
-            dispatch(fetchPerfumes());
+            await dispatch(fetchPerfumes());
         } catch (error) {
             console.error('향수 저장 실패:', error);
             alert('향수 저장에 실패했습니다. 다시 시도해주세요.');

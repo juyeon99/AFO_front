@@ -20,7 +20,7 @@ export const modifyPerfumes = async (perfumeData) => {
         const response = await apis.put(`/products`, perfumeData);
         console.log("히하이ㅏ링라ㅣ아링", response)
          // ✅ API 응답 데이터 확인
-        console.log("✅ [createPerfumes] 응답 데이터:", response.data);
+        console.log("✅ [modifyPerfumes] 응답 데이터:", response.data);
         return response.data;
     } catch (error) {
         console.error("Error modifying perfume:", error);
