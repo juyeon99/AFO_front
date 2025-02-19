@@ -6,12 +6,13 @@ import { createNewReview } from '../../module/ReviewModule';
 const ReviewModal = ({ isOpen, onClose, perfume }) => {
     const [reviewContent, setReviewContent] = useState('');
     const dispatch = useDispatch();
-    const auth = useSelector(state => state.auth);
-    const perfumes = useSelector(state => state.perfumes);
+    const auth = JSON.parse(localStorage.getItem('auth'));
 
     if (!isOpen) return null;
 
     const handleSubmit = async () => {
+        // 로컬 스토리지에서 최신 auth 정보 가져오기
+        const currentAuth = JSON.parse(localStorage.getItem('auth'));
         if (!auth) {
             return;
         }
@@ -23,36 +24,35 @@ const ReviewModal = ({ isOpen, onClose, perfume }) => {
 
         try {
             // 데이터 유효성 검사
-            if (!perfume?.id || !auth?.id) {
-                console.error('Required data missing:', { 
-                    productId: perfume?.id, 
-                    memberId: auth?.id 
+            if (!perfume?.id || !currentAuth?.id) {
+                console.error('Required data missing:', {
+                    productId: perfume?.id,
+                    memberId: currentAuth?.id
                 });
                 alert('필요한 정보가 누락되었습니다. 다시 시도해주세요.');
                 return;
             }
-    
+
             const reviewData = {
-                memberId: auth.id,       
-                productId: perfume.id, 
+                memberId: currentAuth.id,
+                productId: perfume.id,
                 content: reviewContent.trim()
             };
-    
+
             console.log('Sending review data:', reviewData);
-    
+
             // 리뷰 생성 액션 디스패치
             await dispatch(createNewReview(reviewData));
-            
+
             // 입력 필드 초기화 및 모달 닫기
             setReviewContent('');
             onClose();
-            
+
         } catch (error) {
             console.error('리뷰 작성 실패:', error);
             alert('리뷰 작성에 실패했습니다. 다시 시도해주세요.');
         }
     };
-
 
     return (
         <div className={styles.modalOverlay}>
@@ -65,10 +65,10 @@ const ReviewModal = ({ isOpen, onClose, perfume }) => {
 
                 {/* 향수 정보 */}
                 <div className={styles.perfumeInfo}>
-                    <img 
-                        src={perfume?.imageUrlList?.[0]} 
-                        alt={perfume?.nameKr} 
-                        className={styles.perfumeImage} 
+                    <img
+                        src={perfume?.imageUrlList?.[0]}
+                        alt={perfume?.nameKr}
+                        className={styles.perfumeImage}
                     />
                     <h2 className={styles.perfumeName}>{perfume?.nameEn}</h2>
                 </div>

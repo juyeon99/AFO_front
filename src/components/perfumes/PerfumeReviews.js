@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from '../../css/perfumes/PerfumeReviews.module.css';
 import ReviewSlider from '../../components/perfumes/ReviewSlider';
 import { useSelector, useDispatch } from 'react-redux';
@@ -16,6 +16,7 @@ const PerfumeReviews = ({ perfumeId }) => {
     const [cardOffset, setCardOffset] = useState(0);
     const [reviewContent, setReviewContent] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const reviewContainerRef = useRef(null);
 
     const perfumes = useSelector(selectPerfumes);
     const perfume = perfumes?.find(p => p.id === perfumeId);
@@ -30,11 +31,22 @@ const PerfumeReviews = ({ perfumeId }) => {
         }
     }, [perfumeId]);
 
-    // 리뷰 데이터가 변경될 때마다 슬라이더 상태 초기화
+    // 리뷰 데이터가 변경될 때마다 슬라이더 상태 업데이트
     useEffect(() => {
-        setCurrentPage(1);
-        setSliderLeft(0);
-        setCardOffset(0);
+        if (reviews.length > 0) {
+            const totalPages = Math.ceil(reviews.length / CARDS_PER_PAGE);
+            const cardWidth = 196 + 37;
+            const maxScroll = (reviews.length - CARDS_PER_PAGE) * cardWidth;
+
+            // 새 리뷰가 추가되면 마지막 페이지로 이동
+            setCurrentPage(totalPages);
+            setSliderLeft(100);
+            setCardOffset(maxScroll);
+        } else {
+            setCurrentPage(1);
+            setSliderLeft(0);
+            setCardOffset(0);
+        }
     }, [reviews.length]);
 
     // 슬라이더 마우스 이벤트 핸들링 추가
@@ -101,19 +113,18 @@ const PerfumeReviews = ({ perfumeId }) => {
         setReviewContent('');  // 입력 필드 초기화
     };
 
+    // 모달 닫힐 때 리뷰 목록 새로고침
+    const handleModalClose = async () => {
+        setIsModalOpen(false);
+        await dispatch(fetchReviews(perfumeId));
+    };
+
     const handleMouseDown = (e) => {
         if (e.target.className.includes(styles.sliderHandle)) {
             setIsDragging(true);
             setStartX(e.clientX);
         }
     };
-
-    // 모달 닫힐 때 리뷰 목록 새로고침
-    const handleModalClose = () => {
-        setIsModalOpen(false);
-        dispatch(fetchReviews(perfumeId));
-    };
-
 
     return (
         <div className={styles.reviewsContainer}>
@@ -140,7 +151,8 @@ const PerfumeReviews = ({ perfumeId }) => {
                     isOpen={isModalOpen}
                     onClose={() => {
                         setIsModalOpen(false);
-                        dispatch(fetchReviews(perfumeId)); // 모달 닫힐 때 리뷰 목록 새로고침
+                        dispatch(fetchReviews(perfumeId));
+                        handleModalClose(); // 모달 닫힐 때 리뷰 목록 새로고침
                     }}
                     perfume={perfume}
                     onSubmit={handleReviewSubmit}

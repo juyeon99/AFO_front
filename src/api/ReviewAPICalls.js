@@ -14,12 +14,11 @@ export const getReviewsByProductId = async (productId) => {
 
 
 // 리뷰 생성
-// 리뷰 생성
 export const createReview = async (reviewData) => {
     try {
         console.log('Creating review with data:', reviewData);
         const response = await apis.post("/reviews", {
-            memberId: reviewData.id,
+            memberId: reviewData.memberId,
             productId: reviewData.productId,
             content: reviewData.content
         });
