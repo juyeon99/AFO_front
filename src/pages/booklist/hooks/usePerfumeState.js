@@ -342,7 +342,7 @@ const usePerfumeState = () => {
         setIsEditing,
         setImageUrlList,
         editingImage, 
-        setEditingImage
+        setEditingImage,
     };
 };
 

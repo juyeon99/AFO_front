@@ -125,4 +125,50 @@ export const deletePerfumes = async (productId) => {
     }
 };
 
+export const createHeart = async (userId, reviewId) => {
+    if (!userId || !reviewId) {
+        console.error("❌ userId 또는 reviewId가 undefined입니다!", { userId, reviewId });
+        return;
+    }
+
+    try {
+        const response = await apis.post(`/likes`, { userId, reviewId });
+        return response.data;
+    } catch (error) {
+        console.error("Error creating heart:", error);
+        throw error;
+    }
+};
+
+
+export const deleteHeart = async (reviewId) => {
+    try {
+        const response = await apis.delete(`/likes/${reviewId}`);  
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting heart:", error);
+        throw error;
+    }
+};
+
+export const fetchUserLikedReviews = async (userId) => {
+    if (!userId) {
+        console.error("❌ fetchUserLikedReviews: userId가 undefined 또는 null입니다!", userId);
+        return [];
+    }
+
+    try {
+        console.log(`🔍 [좋아요 조회 요청] userId=${userId}`);
+        const response = await apis.get(`/likes/${userId}`);
+        return response.data; // ✅ 좋아요한 리뷰 목록 반환
+    } catch (error) {
+        console.error("❌ Error fetching liked reviews:", error);
+        throw error;
+    }
+};
+
+
+
+
+
 
