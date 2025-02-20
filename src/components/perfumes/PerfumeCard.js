@@ -3,6 +3,8 @@ import { Edit } from 'lucide-react';
 import styles from '../../css/perfumes/PerfumeCard.module.css';
 import { useNavigate } from 'react-router-dom';
 import { toggleBookmark } from '../../api/BookmarkAPICalls';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBookmarks } from '../../module/BookmarkModule';
 
 const PerfumeCard = ({
     perfume,
@@ -15,12 +17,14 @@ const PerfumeCard = ({
     isBookmarked,
 }) => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const [isMarked, setIsMarked] = useState(isBookmarked);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [isMarked, setIsMarked] = useState(isBookmarked);
     const [clickCount, setClickCount] = useState(0);
     const [clickTimer, setClickTimer] = useState(null);
     const [lastClickTime, setLastClickTime] = useState(0);
+    const { bookmarkedPerfumes } = useSelector(state => state.bookmark);
 
     // 로컬 스토리지에서 auth 정보 가져오기
     const auth = JSON.parse(localStorage.getItem('auth'));
@@ -59,28 +63,52 @@ const PerfumeCard = ({
         };
     }, [clickTimer]);
 
+    // 컴포넌트 마운트 시 북마크 상태 확인
+    useEffect(() => {
+        const checkBookmarkStatus = async () => {
+            if (auth?.id) {
+                try {
+                    // 초기 로드 시에만 fetchBookmarks 호출
+                    if (!bookmarkedPerfumes.length) {
+                        await dispatch(fetchBookmarks(auth.id));
+                    }
+                    
+                    // 북마크 상태 확인
+                    const isBookmarked = bookmarkedPerfumes.some(
+                        bookmark => bookmark.productId === perfume.id
+                    );
+                    setIsMarked(isBookmarked);
+                } catch (error) {
+                    console.error('북마크 상태 확인 실패:', error);
+                }
+            }
+        };
+
+        checkBookmarkStatus();
+    }, [perfume.id, auth?.id, dispatch, bookmarkedPerfumes]);
+
     const handleCardClick = async (e) => {
         // 체크박스나 편집 버튼 클릭 시 무시
         if (e.target.type === 'checkbox' || e.target.closest('button')) {
             return;
         }
-    
+
         // 체크박스 모드일 때는 바로 체크박스 토글
         if (showCheckboxes) {
             onCheckboxChange(perfume.id);
             return;
         }
-    
+
         // 이전 타이머가 있다면 제거
         if (clickTimer) {
             clearTimeout(clickTimer);
             setClickTimer(null);
         }
-    
+
         if (clickCount === 0) {
             // 첫 번째 클릭
             setClickCount(1);
-            
+
             // 싱글클릭 타이머 설정
             const timer = setTimeout(() => {
                 // 타이머 만료 시 싱글 클릭으로 처리
@@ -91,23 +119,24 @@ const PerfumeCard = ({
                 setClickCount(0);
                 setClickTimer(null);
             }, 300);
-            
+
             setClickTimer(timer);
-            
+
         } else {
             // 두 번째 클릭 (더블클릭)
             setClickCount(0);
-            
+
             // 더블클릭: 북마크 토글
             const auth = JSON.parse(localStorage.getItem('auth'));
             if (!auth?.id) {
-                alert('북마크 기능은 로그인이 필요합니다.');
                 return;
             }
-    
+
             try {
-                await toggleBookmark(perfume.id, auth.id);
+                await dispatch(toggleBookmark(perfume.id, auth.id));
                 setIsMarked(prev => !prev);
+                // BookmarkPopover 업데이트를 위한 북마크 목록 새로고침
+                dispatch(fetchBookmarks(auth.id));
             } catch (error) {
                 console.error('북마크 토글 실패:', error);
             }

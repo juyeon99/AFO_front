@@ -1,9 +1,69 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from '../../css/perfumes/BookmarkPopover.module.css';
 import { X } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBookmarks, handleDeleteBookmark } from '../../module/BookmarkModule';
 
-const BookmarkPopover = ({ show, onClose, bookmarkedPerfumes, recommendedPerfumes, handleBookmarkDelete }) => {
-    if (!Boolean(show)) return null;
+const BookmarkPopover = ({ show, onClose }) => {
+    const dispatch = useDispatch();
+    const { bookmarkedPerfumes, recommendedPerfumes, loading, error } = useSelector(state => state.bookmark);
+    const [activeTab, setActiveTab] = useState('bookmarked');
+    const [recommendedLoading, setRecommendedLoading] = useState(true);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+    useEffect(() => {
+        const loadBookmarks = async () => {
+            if (!show) return;
+
+            const auth = JSON.parse(localStorage.getItem('auth'));
+            if (!auth?.id) return;
+
+            if (isInitialLoad && activeTab === 'recommended') {
+                setRecommendedLoading(true);
+                try {
+                    await dispatch(fetchBookmarks(auth.id));
+                } finally {
+                    setRecommendedLoading(false);
+                    setIsInitialLoad(false);
+                }
+            } else if (isInitialLoad) {
+                await dispatch(fetchBookmarks(auth.id));
+                setIsInitialLoad(false);
+            }
+        };
+
+        loadBookmarks();
+    }, [show, dispatch, activeTab, isInitialLoad]);
+
+    // 북마크 목록 변경 감지를 위한 useEffect 추가
+    useEffect(() => {
+        if (show) {
+            const auth = JSON.parse(localStorage.getItem('auth'));
+            if (auth?.id) {
+                dispatch(fetchBookmarks(auth.id));
+            }
+        }
+    }, [show, dispatch]);
+
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+        if (tab === 'recommended' && isInitialLoad) {
+            setRecommendedLoading(true);
+        }
+    };
+
+    const handleDelete = async (productId) => {
+        const auth = JSON.parse(localStorage.getItem('auth'));
+        if (!auth?.id) return;
+
+        try {
+            await dispatch(handleDeleteBookmark(productId, auth.id));
+        } catch (error) {
+            console.error('북마크 삭제 실패:', error);
+        }
+    };
+
+    if (!show) return null;
 
     return (
         <div className={styles.popoverContainer}>
@@ -13,44 +73,84 @@ const BookmarkPopover = ({ show, onClose, bookmarkedPerfumes, recommendedPerfume
                     <X size={16} />
                 </button>
             </div>
-            
-            <div className={styles.section}>
-                <h4>내가 찜한 향수</h4>
-                {bookmarkedPerfumes?.length > 0 ? (
-                    <div className={styles.perfumeGrid}>
-                        {bookmarkedPerfumes.map((perfume) => (
-                            <div key={perfume.id} className={styles.perfumeItem}>
-                                <img 
-                                    src={perfume.imageUrl} 
-                                    alt={perfume.name} 
-                                    className={styles.perfumeImage}
-                                />
-                                <span>{perfume.name}</span>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p>북마크한 향수가 없습니다.</p>
-                )}
+
+            <div className={styles.tabs}>
+                <button
+                    className={`${styles.tabButton} ${activeTab === 'bookmarked' ? styles.active : ''}`}
+                    onClick={() => setActiveTab('bookmarked')}
+                >
+                    내가 찜한 향수
+                </button>
+                <button
+                    className={`${styles.tabButton} ${activeTab === 'recommended' ? styles.active : ''}`}
+                    onClick={() => handleTabChange('recommended')}
+                >
+                    유사 취향 선호 향수
+                </button>
             </div>
 
-            <div className={styles.section}>
-                <h4>유사 취향 선호 향수</h4>
-                {recommendedPerfumes?.length > 0 ? (
-                    <div className={styles.perfumeGrid}>
-                        {recommendedPerfumes.map((perfume) => (
-                            <div key={perfume.id} className={styles.perfumeItem}>
-                                <img 
-                                    src={perfume.imageUrl} 
-                                    alt={perfume.name} 
-                                    className={styles.perfumeImage}
-                                />
-                                <span>{perfume.name}</span>
-                            </div>
-                        ))}
+            <div className={styles.contentContainer}>
+                {activeTab === 'bookmarked' && (
+                    <div className={styles.section}>
+                        <div className={styles.perfumeGrid}>
+                            {bookmarkedPerfumes?.length > 0 ? (
+                                bookmarkedPerfumes.map((perfume, index) => (
+                                    <div key={`bookmarked-${perfume.productId || index}`} className={styles.perfumeItem}>
+                                        <div className={styles.perfumeItemHeader}>
+                                            <button
+                                                className={styles.deleteButton}
+                                                onClick={() => handleDelete(perfume.productId)}
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                        <img
+                                            src={perfume.imageUrls?.[0]}
+                                            alt={perfume.nameKr}
+                                            className={styles.perfumeImage}
+                                        />
+                                        <div className={styles.perfumeInfo}>
+                                            <span className={styles.perfumeName}>{perfume.nameKr}</span>
+                                            <span className={styles.perfumeBrand}>{perfume.brand}</span>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>북마크한 향수가 없습니다.</p>
+                            )}
+                        </div>
                     </div>
-                ) : (
-                    <p>추천 향수가 없습니다.</p>
+                )}
+
+                {activeTab === 'recommended' && (
+                    <div className={styles.section}>
+                        {isInitialLoad && recommendedLoading ? (
+                            <div className={styles.loading}>로딩 중...</div>
+                        ) : (
+                            <div className={styles.perfumeGrid}>
+                                {recommendedPerfumes?.length > 0 ? (
+                                    recommendedPerfumes.map((perfume, index) => (
+                                        <div key={`recommended-${perfume.product_id || index}`} className={styles.perfumeItem}>
+                                            <img
+                                                src={perfume.image_url}
+                                                alt={perfume.name}
+                                                className={styles.perfumeImage}
+                                            />
+                                            <div className={styles.perfumeInfo}>
+                                                <span className={styles.perfumeName}>{perfume.name}</span>
+                                                <span className={styles.perfumeBrand}>{perfume.brand}</span>
+                                                {perfume.mainAccord && (
+                                                    <span className={styles.mainAccord}>{perfume.mainAccord}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>추천 향수가 없습니다.</p>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
         </div>

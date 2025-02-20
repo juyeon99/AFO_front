@@ -19,6 +19,7 @@ export const {
         deleteBookmarkStart,
         deleteBookmarkSuccess,
         deleteBookmarkFail,
+        initializeBookmarks,
     },
 } = createActions({
     BOOKMARK: {
@@ -31,6 +32,7 @@ export const {
         DELETE_BOOKMARK_START: () => ({}),
         DELETE_BOOKMARK_SUCCESS: (productId) => (productId),
         DELETE_BOOKMARK_FAIL: (error) => (error),
+        INITIALIZE_BOOKMARKS: () => ([]),
     },
 });
 
@@ -83,7 +85,33 @@ const bookmarkReducer = handleActions(
             loading: false,
             error: payload,
         }),
-        // ... 다른 리듀서들
+        [deleteBookmarkStart]: (state) => ({
+            ...state,
+            loading: true,
+            error: null,
+        }),
+        [deleteBookmarkSuccess]: (state, { payload: deletedProductId }) => ({
+            ...state,
+            bookmarkedPerfumes: state.bookmarkedPerfumes.filter(
+                perfume => perfume.productId !== deletedProductId
+            ),
+            loading: false,
+        }),
+        [deleteBookmarkFail]: (state, { payload }) => ({
+            ...state,
+            loading: false,
+            error: payload,
+        }),
+        [toggleBookmarkSuccess]: (state, { payload }) => ({
+            ...state,
+            bookmarkedPerfumes: payload.bookmarkedPerfumes,
+            loading: false,
+        }),
+        [initializeBookmarks]: (state) => ({
+            ...state,
+            bookmarkedPerfumes: [],
+            loading: false,
+        }),
     },
     initialState
 );

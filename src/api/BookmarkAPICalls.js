@@ -4,6 +4,7 @@ import apis from "./Apis";
 export const toggleBookmark = async (productId, memberId) => {
     try {
         const response = await apis.post(`/bookmarks/${productId}/${memberId}`);
+        console.log("response.data : " , response.data);
         return response.data;
     } catch (error) {
         console.error("Error toggling bookmark:", error);
@@ -15,6 +16,7 @@ export const toggleBookmark = async (productId, memberId) => {
 export const getBookmarkedPerfumes = async (memberId) => {
     try {
         const response = await apis.get(`/bookmarks/${memberId}`);
+        console.log("response.data : " , response.data);
         return response.data;
     } catch (error) {
         console.error("Error fetching bookmarked perfumes:", error);

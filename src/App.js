@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loginSuccess, logout } from './module/AuthModule';
+import { fetchBookmarks, initializeBookmarks } from './module/BookmarkModule';
 import './App.css'
 
 import Main from "./pages/Main";
@@ -35,12 +36,14 @@ function App() {
   useEffect(() => {
     // 로그인 상태를 localStorage에서 가져오기
     const storedUser = JSON.parse(localStorage.getItem('auth'));
-    const isLogin = !!storedUser; // 사용자가 로컬 스토리지에 존재하는지 확인
+    const isLogin = !!storedUser;
 
     if (isLogin && storedUser.role) {
       dispatch(loginSuccess(storedUser)); // Redux에 로그인 정보 업데이트
+      dispatch(fetchBookmarks(storedUser.id)); // 북마크 정보 가져오기
     } else {
       dispatch(logout()); // Redux 상태 초기화
+      dispatch(initializeBookmarks()); // 북마크 상태 초기화
     }
   }, [dispatch]);
 
