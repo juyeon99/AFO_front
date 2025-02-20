@@ -325,13 +325,13 @@
     color: #666;
 }
 
-.imagePagination {
+/* .imagePagination {
     display: flex;
     justify-content: center;
     gap: 8px;
     margin-top: -10px;
     margin-bottom: 20px;
-}
+} */
 
 .paginationDot {
     width: 8px;
@@ -343,3 +343,41 @@
 .activeDot {
     background-color: #666;
 }
+
+.imagePagination {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* ✅ 중앙 정렬 */
+    gap: 8px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.paginationArrow {
+    width: 45px;  /* ✅ 미리보기 이미지 크기와 동일하게 */
+    height: 45px; /* ✅ 미리보기 이미지 크기와 동일하게 */
+    background-color: #ddd;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 20px;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+/* ✅ 버튼 hover 효과 */
+.paginationArrow:hover {
+    background-color: #bbb;
+    color: #333;
+}
+
+/* ✅ 비활성화 (첫 페이지 또는 마지막 페이지에서) */
+.paginationArrow:disabled {
+    background-color: #f0f0f0;
+    color: #aaa;
+    cursor: default;
+}
+

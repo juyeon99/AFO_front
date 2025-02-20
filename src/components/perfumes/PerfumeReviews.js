@@ -163,7 +163,7 @@ const PerfumeReviews = ({ perfumeId }) => {
                                 <p className={styles.reviewerName}>{review.name}</p>
                                 <button className={likedReviews.includes(review.id) ? styles.heartActive : styles.heart}
                                         onClick={() => handleToggleHeart(review.id)}>
-                                    ❤️
+                                    🙂
                                 </button>
                             </div>
                         ))}
