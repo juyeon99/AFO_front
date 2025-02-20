@@ -26,6 +26,77 @@
     color: #333;
 }
 
+.editButton {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px 8px;
+    margin-right: 8px;
+}
+
+.editButton:hover {
+    color: #333;
+}
+
+.editContainer {
+    margin-top: 10px;
+}
+
+.editInput {
+    width: 320px;
+    height: 100px; /* 고정 높이 설정 */
+    padding: 12px;
+    border: 1px solid #E5E5E5;
+    border-radius: 8px;
+    resize: none; /* 크기 조절 비활성화 */
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+    font-family: inherit; /* 기본 폰트 유지 */
+}
+
+.editActions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.saveButton, .cancelButton {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 20px; /* 더 부드러운 모서리 */
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.saveButton {
+    background-color: #8B7E74; /* 세련된 브라운 톤 */
+    color: white;
+}
+
+.saveButton:hover {
+    background-color: #7C6F65; /* 더 진한 브라운 */
+    transform: translateY(-1px);
+}
+
+.cancelButton {
+    background-color: #A7A7A7; /* 중립적인 그레이 톤 */
+    color: white;
+}
+
+.cancelButton:hover {
+    background-color: #919191; /* 더 진한 그레이 */
+    transform: translateY(-1px);
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+}
+
 .closeButton {
     background: none;
     border: none;
@@ -104,4 +175,23 @@
 
 .deleteButton:hover {
     text-decoration: underline;
+}
+
+/* 팝업창 스크롤바 스타일링 */
+.content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb {
+    background: #BDBDBD;
+    border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+    background: #A7A7A7;
 }

@@ -120,29 +120,24 @@ export const createNewReview = (reviewData) => async (dispatch, getState) => {
 };
 
 // 리뷰 수정 후 리뷰 조회 API로 최신 리뷰 가져오기
-export const updateExistingReview = (reviewData) => async (dispatch, getState) => {
+export const updateExistingReview = (reviewData) => async (dispatch) => {
     try {
         dispatch(updateReviewStart());
         
-        // 낙관적 업데이트
-        const currentReviews = selectReviews(getState());
-        const optimisticReviews = currentReviews.map(review => 
-            review.id === reviewData.id ? { ...review, ...reviewData } : review
-        );
-        dispatch(updateReviewSuccess(optimisticReviews));
+        console.log('ReviewModule: Updating review with data:', reviewData); // 데이터 확인용 로그
         
         // API 호출
         await updateReview(reviewData);
         
-        // 실제 데이터로 업데이트
-        const productDetail = await getReviewsByProductId(reviewData.productId);
-        const updatedReviews = productDetail || [];
-        
-        // 캐시 업데이트
-        sessionStorage.setItem(`reviews_${reviewData.productId}`, JSON.stringify(updatedReviews));
+        // 성공 시 리뷰 목록 업데이트
+        const updatedReviews = await getReviewsByMemberId(reviewData.memberId);
         dispatch(updateReviewSuccess(updatedReviews));
+        
+        return true; // 성공 시 true 반환
     } catch (error) {
+        console.error('ReviewModule: Error updating review:', error);
         dispatch(updateReviewFail(error.message || "리뷰 수정 실패"));
+        throw error;
     }
 };
 
