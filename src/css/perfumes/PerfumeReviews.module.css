@@ -195,7 +195,21 @@
 }
 
 .likedBorder {
-    border: 3px solid yellow; /* ✅ 좋아요한 리뷰의 테두리를 노란색으로 설정 */
+    position: relative; /* ✅ 가상 요소 배치를 위해 필요 */
+}
+
+/* ✅ 왼쪽 상단에 붉은색 삼각형 추가 */
+.likedBorder::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 15px solid red;  /* ✅ 삼각형 색상 */
+    border-top: 15px solid red;   /* ✅ 삼각형 색상 */
+    border-right: 15px solid transparent;
+    border-bottom: 15px solid transparent;
 }
 
 .heartActive {
