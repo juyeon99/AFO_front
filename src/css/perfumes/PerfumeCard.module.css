@@ -78,6 +78,8 @@
     font-size: 18px;
     text-align: center;
     margin-bottom: 10px;
+    pointer-events: none;
+    user-select: none;
 }
 
 .divider {
@@ -94,6 +96,8 @@
     color: #000000;
     margin-top: 10px;
     font-family: 'Nanum Gothic';
+    pointer-events: none;
+    user-select: none;
 }
 
 .description {
@@ -114,11 +118,13 @@
     border-radius: 10px;
     box-sizing: border-box;
     pointer-events: none;
+    user-select: none;
 }
 
 .card:hover .description {
     bottom: 0;
     pointer-events: none;
+    user-select: none;
 }
 
 /* 카드 상단의 체크박스 및 버튼 컨트롤 */
@@ -187,4 +193,6 @@
 .singleNote,
 .multiNote {
     font-size: 12px;
+    pointer-events: none;
+    user-select: none;
 }

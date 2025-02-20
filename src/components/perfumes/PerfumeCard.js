@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toggleBookmark } from '../../api/BookmarkAPICalls';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBookmarks } from '../../module/BookmarkModule';
+import { addBookmarkDirect, deleteBookmarkDirect } from '../../module/BookmarkModule';
 
 const PerfumeCard = ({
     perfume,
@@ -92,54 +93,78 @@ const PerfumeCard = ({
         if (e.target.type === 'checkbox' || e.target.closest('button')) {
             return;
         }
-
+    
         // 체크박스 모드일 때는 바로 체크박스 토글
         if (showCheckboxes) {
             onCheckboxChange(perfume.id);
             return;
         }
-
-        // 이전 타이머가 있다면 제거
-        if (clickTimer) {
-            clearTimeout(clickTimer);
-            setClickTimer(null);
-        }
-
-        if (clickCount === 0) {
-            // 첫 번째 클릭
-            setClickCount(1);
-
-            // 싱글클릭 타이머 설정
-            const timer = setTimeout(() => {
-                // 타이머 만료 시 싱글 클릭으로 처리
-                navigate(`/perfumes/${perfume.id}`, {
-                    state: { previousPage: currentPage }
-                });
-                // 상태 초기화
-                setClickCount(0);
-                setClickTimer(null);
-            }, 300);
-
-            setClickTimer(timer);
-
-        } else {
-            // 두 번째 클릭 (더블클릭)
-            setClickCount(0);
-
+    
+        const currentTime = new Date().getTime();
+        const timeDiff = currentTime - lastClickTime;
+    
+        if (timeDiff < 300) {
             // 더블클릭: 북마크 토글
+            if (clickTimer) {
+                clearTimeout(clickTimer); // 싱글클릭 타이머 취소
+                setClickTimer(null);
+            }
+            
             const auth = JSON.parse(localStorage.getItem('auth'));
             if (!auth?.id) {
                 return;
             }
-
+        
             try {
-                await dispatch(toggleBookmark(perfume.id, auth.id));
-                setIsMarked(prev => !prev);
-                // BookmarkPopover 업데이트를 위한 북마크 목록 새로고침
-                dispatch(fetchBookmarks(auth.id));
+                // 현재 북마크 상태 토글
+                const newIsMarked = !isMarked;
+                
+                // UI 상태 즉시 업데이트
+                setIsMarked(newIsMarked);
+                
+                // 북마크 상태 업데이트
+                if (newIsMarked) {
+                    dispatch(addBookmarkDirect({
+                        productId: perfume.id,
+                        nameKr: perfume.nameKr,
+                        brand: perfume.brand,
+                        imageUrls: [imageUrls[currentImageIndex]]
+                    }));
+                } else {
+                    dispatch(deleteBookmarkDirect(perfume.id));
+                }
+                
+                // API 호출은 별도 스레드에서 비동기적으로
+                setTimeout(() => {
+                    toggleBookmark(perfume.id, auth.id)
+                        .catch(error => console.error('북마크 API 호출 실패:', error));
+                }, 0);
+                
             } catch (error) {
+                setIsMarked(prev => !prev);
                 console.error('북마크 토글 실패:', error);
             }
+            
+            setLastClickTime(0);
+        } else {
+            // 첫 번째 클릭 - 타이머 설정
+            setLastClickTime(currentTime);
+            
+            // 이전 타이머가 있으면 정리
+            if (clickTimer) {
+                clearTimeout(clickTimer);
+            }
+            
+            // 새 타이머 설정 및 저장
+            const newTimer = setTimeout(() => {
+                // 더블클릭이 발생하지 않았을 경우에만 페이지 이동
+                navigate(`/perfumes/${perfume.id}`, {
+                    state: { previousPage: currentPage }
+                });
+                setClickTimer(null);
+            }, 300);
+            
+            setClickTimer(newTimer);
         }
     };
 

@@ -35,6 +35,13 @@ const BookmarkPopover = ({ show, onClose }) => {
         loadBookmarks();
     }, [show, dispatch, activeTab, isInitialLoad]);
 
+    // 북마크 목록 변경 감지를 위한 useEffect 추가 (기존 useEffect 유지)
+    useEffect(() => {
+        // 이 useEffect는 bookmarkedPerfumes의 변경만 감지하므로
+        // 초기 로딩/탭 변경과 관련 없이 실시간 업데이트만 처리
+        // 아무 작업도 필요 없음 - Redux 상태가 변경되면 자동으로 리렌더링됨
+    }, [bookmarkedPerfumes]);
+
     // 북마크 목록 변경 감지를 위한 useEffect 추가
     useEffect(() => {
         if (show) {
@@ -130,14 +137,14 @@ const BookmarkPopover = ({ show, onClose }) => {
                             <div className={styles.perfumeGrid}>
                                 {recommendedPerfumes?.length > 0 ? (
                                     recommendedPerfumes.map((perfume, index) => (
-                                        <div key={`recommended-${perfume.product_id || index}`} className={styles.perfumeItem}>
+                                        <div key={`recommended-${perfume.productId || index}`} className={styles.perfumeItem}>
                                             <img
-                                                src={perfume.image_url}
-                                                alt={perfume.name}
+                                                src={perfume.imageUrls}
+                                                alt={perfume.nameKr}
                                                 className={styles.perfumeImage}
                                             />
                                             <div className={styles.perfumeInfo}>
-                                                <span className={styles.perfumeName}>{perfume.name}</span>
+                                                <span className={styles.perfumeName}>{perfume.nameKr}</span>
                                                 <span className={styles.perfumeBrand}>{perfume.brand}</span>
                                                 {perfume.mainAccord && (
                                                     <span className={styles.mainAccord}>{perfume.mainAccord}</span>

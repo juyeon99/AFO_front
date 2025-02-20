@@ -20,6 +20,8 @@ export const {
         deleteBookmarkSuccess,
         deleteBookmarkFail,
         initializeBookmarks,
+        addBookmarkDirect,     // 추가
+        deleteBookmarkDirect, 
     },
 } = createActions({
     BOOKMARK: {
@@ -33,19 +35,28 @@ export const {
         DELETE_BOOKMARK_SUCCESS: (productId) => (productId),
         DELETE_BOOKMARK_FAIL: (error) => (error),
         INITIALIZE_BOOKMARKS: () => ([]),
+        ADD_BOOKMARK_DIRECT: (perfume) => (perfume), // 추가
+        DELETE_BOOKMARK_DIRECT: (productId) => (productId), // 추가
     },
 });
 
 // Thunk 액션 생성자
 export const fetchBookmarks = (memberId) => async (dispatch) => {
     try {
-        dispatch(fetchBookmarkStart());
-        const data = await getBookmarkedPerfumes(memberId);
-        dispatch(fetchBookmarkSuccess(data));
+      dispatch(fetchBookmarkStart());
+      
+      // 캐시 사용 설정 - 네트워크 성능 향상
+      const data = await getBookmarkedPerfumes(memberId);
+      
+      // 불필요한 지연 없이 즉시 상태 업데이트
+      dispatch(fetchBookmarkSuccess(data));
+      
+      return data; // 데이터 반환 (필요시 사용)
     } catch (error) {
-        dispatch(fetchBookmarkFail(error.message));
+      dispatch(fetchBookmarkFail(error.message));
+      throw error; // 에러 전파
     }
-};
+  };
 
 export const handleToggleBookmark = (productId, memberId) => async (dispatch) => {
     try {
@@ -111,6 +122,19 @@ const bookmarkReducer = handleActions(
             ...state,
             bookmarkedPerfumes: [],
             loading: false,
+        }),
+        [addBookmarkDirect]: (state, { payload }) => ({
+            ...state,
+            bookmarkedPerfumes: [
+                ...state.bookmarkedPerfumes,
+                payload
+            ],
+        }),
+        [deleteBookmarkDirect]: (state, { payload: productId }) => ({
+            ...state,
+            bookmarkedPerfumes: state.bookmarkedPerfumes.filter(
+                perfume => perfume.productId !== productId
+            ),
         }),
     },
     initialState
