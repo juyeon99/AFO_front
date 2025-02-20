@@ -12,45 +12,19 @@ const BookmarkPopover = ({ show, onClose }) => {
     const [isInitialLoad, setIsInitialLoad] = useState(true);
 
     useEffect(() => {
-        const loadBookmarks = async () => {
-            if (!show) return;
-
-            const auth = JSON.parse(localStorage.getItem('auth'));
-            if (!auth?.id) return;
-
-            if (isInitialLoad && activeTab === 'recommended') {
-                setRecommendedLoading(true);
-                try {
-                    await dispatch(fetchBookmarks(auth.id));
-                } finally {
-                    setRecommendedLoading(false);
-                    setIsInitialLoad(false);
-                }
-            } else if (isInitialLoad) {
-                await dispatch(fetchBookmarks(auth.id));
+        // 팝업이 처음 열릴 때만 데이터 가져오기
+        if (show && isInitialLoad) {
+          const auth = JSON.parse(localStorage.getItem('auth'));
+          if (auth?.id) {
+            setRecommendedLoading(activeTab === 'recommended');
+            dispatch(fetchBookmarks(auth.id))
+              .finally(() => {
+                setRecommendedLoading(false);
                 setIsInitialLoad(false);
-            }
-        };
-
-        loadBookmarks();
-    }, [show, dispatch, activeTab, isInitialLoad]);
-
-    // 북마크 목록 변경 감지를 위한 useEffect 추가 (기존 useEffect 유지)
-    useEffect(() => {
-        // 이 useEffect는 bookmarkedPerfumes의 변경만 감지하므로
-        // 초기 로딩/탭 변경과 관련 없이 실시간 업데이트만 처리
-        // 아무 작업도 필요 없음 - Redux 상태가 변경되면 자동으로 리렌더링됨
-    }, [bookmarkedPerfumes]);
-
-    // 북마크 목록 변경 감지를 위한 useEffect 추가
-    useEffect(() => {
-        if (show) {
-            const auth = JSON.parse(localStorage.getItem('auth'));
-            if (auth?.id) {
-                dispatch(fetchBookmarks(auth.id));
-            }
+              });
+          }
         }
-    }, [show, dispatch]);
+    }, [show, isInitialLoad, dispatch, activeTab]);
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);

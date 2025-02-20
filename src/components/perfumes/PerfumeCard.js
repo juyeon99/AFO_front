@@ -64,29 +64,27 @@ const PerfumeCard = ({
         };
     }, [clickTimer]);
 
-    // 컴포넌트 마운트 시 북마크 상태 확인
+    // 1. 데이터 로드용 useEffect (API 호출은 필요할 때만)
     useEffect(() => {
-        const checkBookmarkStatus = async () => {
-            if (auth?.id) {
-                try {
-                    // 초기 로드 시에만 fetchBookmarks 호출
-                    if (!bookmarkedPerfumes.length) {
-                        await dispatch(fetchBookmarks(auth.id));
-                    }
-                    
-                    // 북마크 상태 확인
-                    const isBookmarked = bookmarkedPerfumes.some(
-                        bookmark => bookmark.productId === perfume.id
-                    );
-                    setIsMarked(isBookmarked);
-                } catch (error) {
-                    console.error('북마크 상태 확인 실패:', error);
-                }
-            }
-        };
+        if (!bookmarkedPerfumes.length && auth?.id) {
+            dispatch(fetchBookmarks(auth.id))
+                .catch(error => console.error('북마크 상태 확인 실패:', error));
+        }
+    }, [auth?.id, dispatch, bookmarkedPerfumes.length]);
 
-        checkBookmarkStatus();
-    }, [perfume.id, auth?.id, dispatch, bookmarkedPerfumes]);
+    // 2. 상태 업데이트용 useEffect (UI 표시 최적화)
+    useEffect(() => {
+        if (bookmarkedPerfumes.length > 0) {
+            const isBookmarkedInRedux = bookmarkedPerfumes.some(
+                bookmark => bookmark.productId === perfume.id
+            );
+            
+            // 상태가 다를 때만 업데이트 (불필요한 리렌더링 방지)
+            if (isMarked !== isBookmarkedInRedux) {
+                setIsMarked(isBookmarkedInRedux);
+            }
+        }
+    }, [bookmarkedPerfumes, perfume.id, isMarked]);
 
     const handleCardClick = async (e) => {
         // 체크박스나 편집 버튼 클릭 시 무시

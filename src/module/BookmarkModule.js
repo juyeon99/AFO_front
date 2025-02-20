@@ -6,6 +6,7 @@ const initialState = {
     recommendedPerfumes: [],
     loading: false,
     error: null,
+    lastFetched: null // 추가
 };
 
 export const {
@@ -41,9 +42,19 @@ export const {
 });
 
 // Thunk 액션 생성자
-export const fetchBookmarks = (memberId) => async (dispatch) => {
+export const fetchBookmarks = (memberId) => async (dispatch, getState) => {
+    // 현재 상태 확인
+    const { loading, lastFetched } = getState().bookmark;
+    
+    // 이미 로딩 중이면 중복 호출 방지
+    if (loading) return;
+    
+    // 최근에 가져온 데이터가 있으면 불필요한 재요청 방지 (30초 동안)
+    const now = Date.now();
+    if (lastFetched && (now - lastFetched < 30000)) return;
+    
     try {
-      dispatch(fetchBookmarkStart());
+      dispatch(fetchBookmarkStart({ lastFetched: now }));
       
       // 캐시 사용 설정 - 네트워크 성능 향상
       const data = await getBookmarkedPerfumes(memberId);
@@ -56,7 +67,7 @@ export const fetchBookmarks = (memberId) => async (dispatch) => {
       dispatch(fetchBookmarkFail(error.message));
       throw error; // 에러 전파
     }
-  };
+};
 
 export const handleToggleBookmark = (productId, memberId) => async (dispatch) => {
     try {
@@ -80,10 +91,11 @@ export const handleDeleteBookmark = (productId, memberId) => async (dispatch) =>
 
 const bookmarkReducer = handleActions(
     {
-        [fetchBookmarkStart]: (state) => ({
+        [fetchBookmarkStart]: (state, { payload }) => ({
             ...state,
             loading: true,
             error: null,
+            lastFetched: payload?.lastFetched || state.lastFetched // payload에서 lastFetched 받기
         }),
         [fetchBookmarkSuccess]: (state, { payload }) => ({
             ...state,
