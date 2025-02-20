@@ -3,7 +3,8 @@ import {
     createReview, 
     updateReview, 
     deleteReview,
-    getReviewsByProductId
+    getReviewsByProductId,
+    getReviewsByMemberId
 } from "../api/ReviewAPICalls";
 
 
@@ -28,6 +29,9 @@ export const {
         deleteReviewSuccess,
         deleteReviewFail,
         resetReviews,
+        fetchMemberReviewsStart,
+        fetchMemberReviewsSuccess,
+        fetchMemberReviewsFail,
     },
 } = createActions({
     REVIEWS: {
@@ -45,6 +49,9 @@ export const {
         DELETE_REVIEW_SUCCESS: (reviewId) => reviewId,
         DELETE_REVIEW_FAIL: (error) => error,
         RESET_REVIEWS: () => {},
+        FETCH_MEMBER_REVIEWS_START: () => {},
+        FETCH_MEMBER_REVIEWS_SUCCESS: (reviews) => reviews,
+        FETCH_MEMBER_REVIEWS_FAIL: (error) => error,
     },
 });
 
@@ -76,6 +83,16 @@ export const fetchReviews = (productId) => async (dispatch) => {
     } catch (error) {
         console.error("리뷰 조회 실패:", error);
         dispatch(fetchReviewsFail(error.message || "리뷰 조회 중 오류가 발생했습니다"));
+    }
+};
+
+export const fetchMemberReviews = (memberId) => async (dispatch) => {
+    try {
+        dispatch(fetchMemberReviewsStart());
+        const reviews = await getReviewsByMemberId(memberId);
+        dispatch(fetchMemberReviewsSuccess(reviews));
+    } catch (error) {
+        dispatch(fetchMemberReviewsFail(error.message));
     }
 };
 
@@ -196,6 +213,22 @@ const reviewReducer = handleActions(
             reviews: [],
             loading: false,
             error: null,
+        }),
+        [fetchMemberReviewsStart]: (state) => ({
+            ...state,
+            loading: true,
+            error: null,
+        }),
+        [fetchMemberReviewsSuccess]: (state, { payload }) => ({
+            ...state,
+            reviews: payload,
+            loading: false,
+            error: null,
+        }),
+        [fetchMemberReviewsFail]: (state, { payload }) => ({
+            ...state,
+            loading: false,
+            error: payload,
         }),
     },
     initialState

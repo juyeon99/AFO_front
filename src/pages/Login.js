@@ -26,7 +26,6 @@ function Login() {
     useEffect(() => {
         const searchParam = new URLSearchParams(location.search);
         const code = searchParam.get('code'); // 카카오 리다이렉트로 받은 code 확인
-        console.log("리다이렉트 후 인증 코드:", code);
         if (code) {
             dispatch(handleOAuthKakao(code))
                 .then(() => {

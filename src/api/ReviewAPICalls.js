@@ -12,6 +12,17 @@ export const getReviewsByProductId = async (productId) => {
     }
 };
 
+// 특정 회원의 리뷰 목록 조회
+export const getReviewsByMemberId = async (memberId) => {
+    try {
+        const response = await apis.get(`/reviews/member/${memberId}`);
+        console.log("Member reviews response:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching member reviews:", error);
+        throw error;
+    }
+};
 
 // 리뷰 생성
 export const createReview = async (reviewData) => {
