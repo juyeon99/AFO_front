@@ -193,3 +193,28 @@
 .paginationDot.active {
     background: #000000;
 }
+
+.likedBorder {
+    position: relative; /* ✅ 가상 요소 배치를 위해 필요 */
+}
+
+/* ✅ 왼쪽 상단에 붉은색 삼각형 추가 */
+.likedBorder::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 15px solid red;  /* ✅ 삼각형 색상 */
+    border-top: 15px solid red;   /* ✅ 삼각형 색상 */
+    border-right: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+}
+
+.heartActive {
+    color: red; /* ✅ 활성화된 하트 색상 */
+}
+.heart {
+    color: gray; /* ✅ 기본 하트 색상 */
+}
