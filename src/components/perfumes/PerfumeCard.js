@@ -64,45 +64,53 @@ const PerfumeCard = ({
         if (e.target.type === 'checkbox' || e.target.closest('button')) {
             return;
         }
-
+    
         // 체크박스 모드일 때는 바로 체크박스 토글
         if (showCheckboxes) {
             onCheckboxChange(perfume.id);
             return;
         }
-
-        const currentTime = new Date().getTime();
-        const timeDiff = currentTime - lastClickTime;
-
-        // 더블클릭 감지 (300ms 이내의 연속 클릭)
-        if (timeDiff < 300) {
+    
+        // 이전 타이머가 있다면 제거
+        if (clickTimer) {
+            clearTimeout(clickTimer);
+            setClickTimer(null);
+        }
+    
+        if (clickCount === 0) {
+            // 첫 번째 클릭
+            setClickCount(1);
+            
+            // 싱글클릭 타이머 설정
+            const timer = setTimeout(() => {
+                // 타이머 만료 시 싱글 클릭으로 처리
+                navigate(`/perfumes/${perfume.id}`, {
+                    state: { previousPage: currentPage }
+                });
+                // 상태 초기화
+                setClickCount(0);
+                setClickTimer(null);
+            }, 300);
+            
+            setClickTimer(timer);
+            
+        } else {
+            // 두 번째 클릭 (더블클릭)
+            setClickCount(0);
+            
             // 더블클릭: 북마크 토글
             const auth = JSON.parse(localStorage.getItem('auth'));
             if (!auth?.id) {
                 alert('북마크 기능은 로그인이 필요합니다.');
                 return;
             }
-
+    
             try {
                 await toggleBookmark(perfume.id, auth.id);
                 setIsMarked(prev => !prev);
             } catch (error) {
                 console.error('북마크 토글 실패:', error);
             }
-            setLastClickTime(0); // 더블클릭 후 타이머 리셋
-        } else {
-            // 첫 번째 클릭
-            setLastClickTime(currentTime);
-
-            // 300ms 후에 싱글클릭으로 처리
-            setTimeout(() => {
-                if (new Date().getTime() - currentTime >= 300) {
-                    // 싱글 클릭: 상세 페이지로 이동
-                    navigate(`/perfumes/${perfume.id}`, {
-                        state: { previousPage: currentPage }
-                    });
-                }
-            }, 300);
         }
     };
 
