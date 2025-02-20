@@ -193,3 +193,14 @@
 .paginationDot.active {
     background: #000000;
 }
+
+.likedBorder {
+    border: 3px solid yellow; /* ✅ 좋아요한 리뷰의 테두리를 노란색으로 설정 */
+}
+
+.heartActive {
+    color: red; /* ✅ 활성화된 하트 색상 */
+}
+.heart {
+    color: gray; /* ✅ 기본 하트 색상 */
+}
