@@ -13,6 +13,7 @@ import { fetchPerfumes } from '../../module/PerfumeModule';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectPerfumes } from '../../module/PerfumeModule';
+import BookmarkPopover from '../../components/perfumes/BookmarkPopover';
 
 const PerfumeList = () => {
     const dispatch = useDispatch();
@@ -22,8 +23,8 @@ const PerfumeList = () => {
         if (!perfumes || perfumes.length === 0) {
             dispatch(fetchPerfumes());
         }
-    }, []);  
-    
+    }, []);
+
     const navigate = useNavigate();
     const {
         searchTerm,
@@ -71,10 +72,17 @@ const PerfumeList = () => {
         isEditing,
         setIsEditing,
         setImageUrlList,
-        editingImage, 
+        editingImage,
         setEditingImage,
-        handlePreviewClick
-    } = usePerfumeState(); 
+        handlePreviewClick,
+        showBookmarkModal,
+        setShowBookmarkModal,
+        bookmarkedPerfumes,
+        recommendedPerfumes,
+        handleBookmarkDelete,
+        handleBookmarkClick,
+        isBookmarked
+    } = usePerfumeState();
 
     if (isLoading) {
         return <LoadingScreen message="향수를 불러오는 중..." />;
@@ -113,14 +121,15 @@ const PerfumeList = () => {
                 <div className={styles.dividerLine} />
 
                 <PerfumeFilters
-                activeFilters={activeFilters}
-                handleFilterClick={handleFilterClick}
-                role={role}
-                handleAddButtonClick={handleAddButtonClick}
-                handleCheckboxToggle={handleCheckboxToggle}
-                handleDeleteButtonClick={handleDeleteButtonClick}
-                selectedPerfume={selectedPerfume}
-                setSelectedPerfume={setSelectedPerfume}  // setSelectedPerfume 전달
+                    activeFilters={activeFilters}
+                    handleFilterClick={handleFilterClick}
+                    role={role}
+                    handleAddButtonClick={handleAddButtonClick}
+                    handleCheckboxToggle={handleCheckboxToggle}
+                    handleDeleteButtonClick={handleDeleteButtonClick}
+                    selectedPerfume={selectedPerfume}
+                    setSelectedPerfume={setSelectedPerfume}  // setSelectedPerfume 전달
+                    handleBookmarkClick={handleBookmarkClick}
                 />
 
                 <div className={styles.itemsContainer}>
@@ -136,6 +145,7 @@ const PerfumeList = () => {
                                 role={role}
                                 onEditClick={handleEditButtonClick}
                                 currentPage={currentPage}
+                                isBookmarked={isBookmarked(perfume.id)}
                             />
                         ))}
                 </div>
@@ -156,8 +166,8 @@ const PerfumeList = () => {
                     successMessage={successMessage}
                     onSuccessClose={handleSuccessClose}
                     setShowUrlInput={setShowUrlInput}
-                    formData={formData} 
-                    setIsEditing={setIsEditing}  
+                    formData={formData}
+                    setIsEditing={setIsEditing}
                     setFormData={setFormData}
                     imageUrlList={imageUrlList}
                     imageUrlCount={imageUrlCount}
@@ -171,7 +181,16 @@ const PerfumeList = () => {
                     setImageUrlList={setImageUrlList}
                     editingImage={editingImage}
                     setEditingImage={setEditingImage}
-                    />
+                />
+
+                {/* 북마크 모달 */}
+                <BookmarkPopover
+                    show={showBookmarkModal}
+                    onClose={() => setShowBookmarkModal(false)}
+                    bookmarkedPerfumes={bookmarkedPerfumes}
+                    recommendedPerfumes={recommendedPerfumes}
+                    handleBookmarkDelete={handleBookmarkDelete}
+                />
             </div>
         </>
     );
