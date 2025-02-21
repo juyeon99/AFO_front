@@ -23,6 +23,26 @@
     box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.3);
 }
 
+/* 북마크된 카드 스타일 추가 */
+.card.bookmarked {
+    border: 2px solid #FF0000;
+}
+
+/* 북마크된 카드의 하트 아이콘 */
+.card.bookmarked::after {
+    content: '♥';
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    color: #FF0004;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* 선택된 카드 스타일 */
 .card.selected {
     background-color: #333;  /* 선택된 카드 배경을 검은색으로 */
@@ -58,6 +78,8 @@
     font-size: 18px;
     text-align: center;
     margin-bottom: 10px;
+    pointer-events: none;
+    user-select: none;
 }
 
 .divider {
@@ -74,6 +96,8 @@
     color: #000000;
     margin-top: 10px;
     font-family: 'Nanum Gothic';
+    pointer-events: none;
+    user-select: none;
 }
 
 .description {
@@ -93,10 +117,14 @@
     line-height: 1.8;
     border-radius: 10px;
     box-sizing: border-box;
+    pointer-events: none;
+    user-select: none;
 }
 
 .card:hover .description {
     bottom: 0;
+    pointer-events: none;
+    user-select: none;
 }
 
 /* 카드 상단의 체크박스 및 버튼 컨트롤 */
@@ -165,4 +193,6 @@
 .singleNote,
 .multiNote {
     font-size: 12px;
+    pointer-events: none;
+    user-select: none;
 }

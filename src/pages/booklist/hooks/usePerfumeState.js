@@ -8,12 +8,14 @@ import {
     createPerfume,
     modifyPerfume
 } from '../../../module/PerfumeModule';
+import { fetchBookmarks, handleDeleteBookmark } from '../../../module/BookmarkModule';
 
 const usePerfumeState = () => {
     const dispatch = useDispatch();
     const location = useLocation();
     const navigate = useNavigate();
     const perfumes = useSelector(selectPerfumes) || [];
+    const auth = useSelector(state => state.auth);
 
     // URL에서 페이지 번호 가져오기
     const queryParams = new URLSearchParams(location.search);
@@ -52,6 +54,9 @@ const usePerfumeState = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
     const [editingImage, setEditingImage] = useState(false);
+    const [showBookmarkModal, setShowBookmarkModal] = useState(false);
+    const bookmarkedPerfumes = useSelector(state => state.bookmark.bookmarkedPerfumes) || [];
+
 
     const itemsPerPage = 12;
     
@@ -100,6 +105,41 @@ const usePerfumeState = () => {
             (activeFilters.length === 0 || activeFilters.includes(perfume.grade))
         );
     });
+
+    // 북마크 관련 핸들러
+    const handleBookmarkClick = async () => {
+        console.log("📌 북마크 버튼 클릭됨!"); // ✅ 클릭 이벤트 실행 확인
+        setShowBookmarkModal(true); // ✅ 먼저 팝업을 띄우도록 설정
+
+        if (auth?.id) {
+            try {
+                await dispatch(fetchBookmarks(auth.id)); // ✅ 북마크 데이터를 가져옴
+                console.log("✅ 북마크 데이터 가져오기 성공");
+            } catch (error) {
+                console.error("🚨 북마크 데이터 가져오기 실패:", error);
+            }
+        }
+
+        // 상태 업데이트 강제 트리거 (리렌더링 보장)
+        setTimeout(() => {
+            setShowBookmarkModal((prev) => !prev); // ✅ 상태 변화를 유도하여 강제 리렌더링
+            setShowBookmarkModal((prev) => !prev); // ✅ 상태 변화를 두 번 유도하여 보장
+        }, 50);
+    };
+
+    const handleBookmarkDelete = async (productId) => {
+        try {
+            await dispatch(handleDeleteBookmark(productId, auth?.id));
+            dispatch(fetchBookmarks(auth?.id));
+        } catch (error) {
+            console.error("북마크 삭제 실패:", error);
+        }
+    };
+
+    // 북마크 확인 함수 추가
+    const isBookmarked = (perfumeId) => {
+        return bookmarkedPerfumes.some(bookmark => bookmark.productId === perfumeId);
+    };
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
@@ -343,6 +383,13 @@ const usePerfumeState = () => {
         setImageUrlList,
         editingImage, 
         setEditingImage,
+        handleBookmarkClick,
+        handleBookmarkDelete,
+        bookmarkedPerfumes,
+        showBookmarkModal,
+        setShowBookmarkModal,
+        isBookmarked,
+        bookmarkedPerfumes,
     };
 };
 
