@@ -215,6 +215,7 @@
     min-width: 20px;
     user-select: none;
     transform: translateY(-3px);
+    user-select: none;
 }
 
 .heart, .heartActive {

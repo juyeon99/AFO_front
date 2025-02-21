@@ -59,28 +59,19 @@ export const {
 export const fetchReviews = (productId) => async (dispatch) => {
     try {
         dispatch(fetchReviewsStart());
-        
-        // 캐시 처리 추가
-        const cacheKey = `reviews_${productId}`;
-        const cachedData = sessionStorage.getItem(cacheKey);
-        
-        if (cachedData) {
-            // 캐시된 데이터가 있으면 즉시 반환
-            dispatch(fetchReviewsSuccess(JSON.parse(cachedData)));
-            
-            // 백그라운드에서 최신 데이터 업데이트
-            const reviews = await getReviewsByProductId(productId);
-            sessionStorage.setItem(cacheKey, JSON.stringify(reviews));
-            dispatch(fetchReviewsSuccess(reviews));
-        } else {
-            // 캐시된 데이터가 없으면 API 호출
-            const reviews = await getReviewsByProductId(productId);
-            sessionStorage.setItem(cacheKey, JSON.stringify(reviews));
-            dispatch(fetchReviewsSuccess(reviews));
+
+        const reviews = await getReviewsByProductId(productId);
+        if (!Array.isArray(reviews)) {
+            throw new Error("fetchReviews API 반환값이 배열이 아닙니다.");
         }
+
+        dispatch(fetchReviewsSuccess(reviews));
+
+        return { payload: reviews }; // ✅ 항상 { payload: reviews } 형식으로 반환
     } catch (error) {
         console.error("리뷰 조회 실패:", error);
-        dispatch(fetchReviewsFail(error.message || "리뷰 조회 중 오류가 발생했습니다"));
+        dispatch(fetchReviewsFail(error.message || "리뷰 조회 중 오류 발생"));
+        return { payload: [] }; // ✅ 오류 발생 시 빈 배열 반환
     }
 };
 
