@@ -81,8 +81,8 @@ const MyReviewsPopover = ({ show, onClose }) => {
                     reviews.map(review => (
                         <div key={review.id} className={styles.reviewItem}>
                             <div className={styles.reviewHeader}>
-                                <span className={styles.date}>
-                                    {new Date(review.createdAt).toLocaleDateString()}
+                                <span className={styles.productName}>
+                                    {review.productNameKr}
                                 </span>
                                 <div className={styles.actions}>
                                     <button
@@ -124,6 +124,9 @@ const MyReviewsPopover = ({ show, onClose }) => {
                             ) : (
                                 <p className={styles.reviewContent}>{review.content}</p>
                             )}
+                            <span className={styles.date}>
+                                    {new Date(review.createdAt).toLocaleDateString()}
+                                </span>
                         </div>
                     ))
                 ) : (

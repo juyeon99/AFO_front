@@ -54,8 +54,7 @@ export const updateReview = async (reviewData) => {
         console.log('Updating review with data:', reviewData); // 데이터 확인용 로그
         const response = await apis.put(`/reviews`, {
             content: reviewData.content,
-            productId: reviewData.productId,
-            memberId: reviewData.memberId
+            reviewId: reviewData.id
         });
         console.log('Update response:', response.data); // 응답 확인용 로그
         return response.data;

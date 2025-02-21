@@ -1,8 +1,8 @@
 .popoverContainer {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 70%;
+    left: 14.5%;
+    transform: translate(0, -50%);
     width: 400px;
     max-height: 500px;
     background: white;
@@ -24,6 +24,7 @@
     margin: 0;
     font-size: 18px;
     color: #333;
+    
 }
 
 .editButton {
@@ -95,8 +96,10 @@
 .actions {
     display: flex;
     align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
 }
-
 .closeButton {
     background: none;
     border: none;
@@ -134,8 +137,11 @@
 }
 
 .date {
+    display: block;
     font-size: 14px;
     color: #666;
+    margin-top: 8px;  /* content와의 간격 */
+    text-align: right; /* 오른쪽 정렬 */
 }
 
 .reviewContent {
@@ -143,6 +149,7 @@
     line-height: 1.5;
     color: #333;
     margin: 0;
+    transform: translateY(5px);
 }
 
 .loading {
@@ -156,12 +163,6 @@
     padding: 30px 0;
     color: #666;
     font-size: 15px;
-}
-
-.actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
 }
 
 .deleteButton {
@@ -194,4 +195,15 @@
 
 .content::-webkit-scrollbar-thumb:hover {
     background: #A7A7A7;
+}
+
+.productName {
+    font-size: 14px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    flex: 1;
+    max-width: 55%; /* 60%에서 조금 더 줄임 */
+    min-width: 0;
 }
