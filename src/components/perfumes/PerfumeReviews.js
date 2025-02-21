@@ -31,24 +31,54 @@ const PerfumeReviews = ({ perfumeId }) => {
     const CARDS_PER_PAGE = 5;
     const totalPages = Math.ceil(reviews.length / CARDS_PER_PAGE);
     const [heartCounts, setHeartCounts] = useState({});
+    const [animation, setAnimation] = useState(null);
 
+    // 초기 데이터 로딩
     useEffect(() => {
-        if (perfumeId) {
-            dispatch(fetchReviews(perfumeId));
-        }
-    }, [perfumeId, dispatch]);
+        const initializeData = async () => {
+            try {
+                if (perfumeId) {
+                    // 리뷰 데이터 가져오기
+                    await dispatch(fetchReviews(perfumeId));
+                    
+                    // 하트 카운트 초기화
+                    const counts = {};
+                    reviews.forEach(review => {
+                        counts[review.id] = parseInt(review.heartCount) || 0;
+                    });
+                    setHeartCounts(counts);
 
-    // 리뷰 데이터가 변경될 때마다 슬라이더 상태 업데이트
+                    // 로그인한 경우 좋아요 상태 가져오기
+                    if (userId) {
+                        const likedReviewIds = await fetchUserLikedReviews(userId);
+                        setLikedReviews(likedReviewIds);
+                    }
+                }
+            } catch (error) {
+                console.error('Data initialization error:', error);
+            }
+        };
+
+        initializeData();
+    }, [perfumeId, userId, dispatch, reviews]);
+
+    // 리뷰 데이터가 변경될 때마다 슬라이더 상태와 하트 카운트 업데이트
     useEffect(() => {
         if (reviews.length > 0) {
             const totalPages = Math.ceil(reviews.length / CARDS_PER_PAGE);
             const cardWidth = 196 + 37;
             const maxScroll = (reviews.length - CARDS_PER_PAGE) * cardWidth;
 
-            // 새 리뷰가 추가되면 마지막 페이지로 이동
             setCurrentPage(totalPages);
             setSliderLeft(100);
             setCardOffset(maxScroll);
+
+            // 하트 카운트 업데이트
+            const counts = {};
+            reviews.forEach(review => {
+                counts[review.id] = review.heartCount || 0;
+            });
+            setHeartCounts(counts);
         } else {
             setCurrentPage(1);
             setSliderLeft(0);
@@ -56,42 +86,93 @@ const PerfumeReviews = ({ perfumeId }) => {
         }
     }, [reviews.length]);
 
+    // 로그인 상태 변경 감지
     useEffect(() => {
-        if (perfumeId && userId) {
-            loadLikedReviews();
-        }
-    }, [perfumeId, userId]);
+        const checkAuthAndUpdate = async () => {
+            if (userId) {
+                try {
+                    const likedReviewIds = await fetchUserLikedReviews(userId);
+                    setLikedReviews(likedReviewIds);
+                } catch (error) {
+                    console.error('Auth check error:', error);
+                }
+            } else {
+                setLikedReviews([]); // 로그아웃 시 좋아요 상태 초기화
+            }
+        };
+
+        checkAuthAndUpdate();
+    }, [userId]);
+
+    // 주기적 데이터 갱신
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                if (perfumeId) {
+                    const reviewsData = await dispatch(fetchReviews(perfumeId)).unwrap();
+
+                    // 하트 카운트 업데이트
+                    const counts = {};
+                    reviewsData.forEach(review => {
+                        counts[review.id] = parseInt(review.heartCount) || 0;
+                    });
+                    setHeartCounts(counts);
+
+                    if (userId) {
+                        await loadLikedReviews();
+                    }
+                }
+            } catch (error) {
+                console.error('Data fetch error:', error);
+            }
+        };
+
+        const interval = setInterval(fetchData, 5000);
+        return () => clearInterval(interval);
+    }, [perfumeId, userId, dispatch]);
 
     // 슬라이더 마우스 이벤트 핸들링
     useEffect(() => {
         const handleGlobalMouseMove = (e) => {
             if (isDragging) {
-                const sliderLine = document.querySelector(`.${styles.sliderLine}`);
-                if (!sliderLine) return;
-
-                const rect = sliderLine.getBoundingClientRect();
-                const newPosition = e.clientX - rect.left;
-                const maxPosition = rect.width - 100;
-
-                const boundedPosition = Math.max(0, Math.min(newPosition, maxPosition));
-                const percentage = (boundedPosition / maxPosition) * 100;
-
-                const cardWidth = 196 + 37;
-                const maxScroll = (reviews.length - CARDS_PER_PAGE) * cardWidth;
-                const newOffset = Math.min((percentage / 100) * maxScroll, maxScroll);
-
-                setSliderLeft(percentage);
-                setCardOffset(newOffset);
-
-                const approximatePage = Math.floor((newOffset / maxScroll) * totalPages) + 1;
-                if (approximatePage !== currentPage && approximatePage > 0 && approximatePage <= totalPages) {
-                    setCurrentPage(approximatePage);
+                if (animation) {
+                    cancelAnimationFrame(animation);
                 }
+
+                const animate = () => {
+                    const sliderLine = document.querySelector(`.${styles.sliderLine}`);
+                    if (!sliderLine) return;
+
+                    const rect = sliderLine.getBoundingClientRect();
+                    const newPosition = e.clientX - rect.left;
+                    const maxPosition = rect.width - 100;
+
+                    const boundedPosition = Math.max(0, Math.min(newPosition, maxPosition));
+                    const percentage = (boundedPosition / maxPosition) * 100;
+
+                    const cardWidth = 196 + 37;
+                    const maxScroll = (reviews.length - CARDS_PER_PAGE) * cardWidth;
+                    const newOffset = Math.min((percentage / 100) * maxScroll, maxScroll);
+
+                    setSliderLeft(percentage);
+                    setCardOffset(newOffset);
+
+                    const approximatePage = Math.floor((newOffset / maxScroll) * totalPages) + 1;
+                    if (approximatePage !== currentPage && approximatePage > 0 && approximatePage <= totalPages) {
+                        setCurrentPage(approximatePage);
+                    }
+                };
+
+                const animationId = requestAnimationFrame(animate);
+                setAnimation(animationId);
             }
         };
 
         const handleGlobalMouseUp = () => {
             setIsDragging(false);
+            if (animation) {
+                cancelAnimationFrame(animation);
+            }
         };
 
         window.addEventListener('mousemove', handleGlobalMouseMove);
@@ -100,15 +181,18 @@ const PerfumeReviews = ({ perfumeId }) => {
         return () => {
             window.removeEventListener('mousemove', handleGlobalMouseMove);
             window.removeEventListener('mouseup', handleGlobalMouseUp);
+            if (animation) {
+                cancelAnimationFrame(animation);
+            }
         };
-    }, [isDragging, currentPage, reviews.length, totalPages]);
+    }, [isDragging, currentPage, reviews.length, totalPages, animation]);
 
     const loadLikedReviews = async () => {
         if (!userId) return;
         try {
             const likedReviewIds = await fetchUserLikedReviews(userId);
             setLikedReviews(likedReviewIds);
-            
+
             // 각 리뷰의 좋아요 수 가져오기
             const counts = {};
             reviews.forEach(review => {
@@ -127,26 +211,53 @@ const PerfumeReviews = ({ perfumeId }) => {
         }
 
         try {
-            if (likedReviews.includes(reviewId)) {
+            const isLiked = likedReviews.includes(reviewId);
+
+            // 즉시 UI 업데이트
+            setLikedReviews(prev =>
+                isLiked ? prev.filter(id => id !== reviewId) : [...prev, reviewId]
+            );
+
+            // 즉시 카운트 업데이트
+            setHeartCounts(prev => ({
+                ...prev,
+                [reviewId]: isLiked ? Math.max(0, (prev[reviewId] || 1) - 1) : (prev[reviewId] || 0) + 1
+            }));
+
+            // 서버 요청
+            if (isLiked) {
                 await deleteHeart(reviewId);
-                setLikedReviews(prev => prev.filter(id => id !== reviewId));
-                // 좋아요 취소 시 카운트 감소
-                setHeartCounts(prev => ({
-                    ...prev,
-                    [reviewId]: Math.max(0, (prev[reviewId] || 1) - 1)
-                }));
             } else {
                 await createHeart(userId, reviewId);
-                setLikedReviews(prev => [...prev, reviewId]);
-                // 좋아요 시 카운트 증가
-                setHeartCounts(prev => ({
-                    ...prev,
-                    [reviewId]: (prev[reviewId] || 0) + 1
-                }));
             }
-            await loadLikedReviews(); // 서버와 동기화
+
+            // 서버에서 최신 데이터 가져오기
+            await dispatch(fetchReviews(perfumeId));
+            
+            // 현재 리뷰 데이터에서 하트 카운트 업데이트
+            const updatedCounts = {};
+            reviews.forEach(review => {
+                updatedCounts[review.id] = parseInt(review.heartCount) || 0;
+            });
+            setHeartCounts(updatedCounts);
+
+            // 사용자의 좋아요 상태 갱신
+            const updatedLikedReviews = await fetchUserLikedReviews(userId);
+            setLikedReviews(updatedLikedReviews);
+
         } catch (error) {
             console.error("좋아요 처리 실패:", error);
+            
+            // 에러 발생 시 서버 데이터로 복구
+            await dispatch(fetchReviews(perfumeId));
+            const updatedCounts = {};
+            reviews.forEach(review => {
+                updatedCounts[review.id] = parseInt(review.heartCount) || 0;
+            });
+            setHeartCounts(updatedCounts);
+            
+            const updatedLikedReviews = await fetchUserLikedReviews(userId);
+            setLikedReviews(updatedLikedReviews);
         }
     };
 
@@ -181,6 +292,7 @@ const PerfumeReviews = ({ perfumeId }) => {
     };
 
     const handleMouseDown = (e) => {
+        e.preventDefault(); // 드래그 시 텍스트 선택 방지
         setIsDragging(true);
         setStartX(e.clientX);
     };
@@ -226,16 +338,21 @@ const PerfumeReviews = ({ perfumeId }) => {
                                 <div className={styles.divider} />
                                 <p className={styles.reviewContent}>{review.content}</p>
                                 <p className={styles.reviewerName}>{review.memberName}</p>
-                                <button
-                                    className={likedReviews.includes(review.id) ? styles.heartActive : styles.heart}
-                                    onClick={() => handleToggleHeart(review.id)}
-                                >
-                                    <Heart 
-                                        size={20} 
-                                        fill={likedReviews.includes(review.id) ? "#FF0000" : "none"}
-                                        color={likedReviews.includes(review.id) ? "#FF0000" : "#000000"}
-                                    />
-                                </button>
+                                <div className={styles.heartContainer}>
+                                    <button
+                                        className={likedReviews.includes(review.id) ? styles.heartActive : styles.heart}
+                                        onClick={() => handleToggleHeart(review.id)}
+                                    >
+                                        <Heart
+                                            size={20}
+                                            fill={likedReviews.includes(review.id) ? "#FF0000" : "none"}
+                                            color={likedReviews.includes(review.id) ? "#FF0000" : "#000000"}
+                                        />
+                                    </button>
+                                    <span className={styles.heartCount}>
+                                        {heartCounts[review.id] || 0}
+                                    </span>
+                                </div>
                             </div>
                         ))}
                     </div>
