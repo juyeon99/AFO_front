@@ -59,3 +59,40 @@
     background-color: #CCC;
     transform: scale(1.1);
 }
+
+.bookmarkButton {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bookmarkButton:hover {
+    color: #ff4444;
+}
+
+.bookmarkWrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.bookmarkButton {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bookmarkButton:hover {
+    color: #ff4444;
+}
