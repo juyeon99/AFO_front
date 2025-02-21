@@ -39,31 +39,34 @@ export const fetchChatResponse = (userInput, imageFile = null) => async (dispatc
 
         // 로컬 스토리지에서 사용자 정보 확인
         const localAuth = JSON.parse(localStorage.getItem("auth"));
-        const userId = localAuth?.id || null; // 로그인된 경우에만 id 가져옴
+        const userId = localAuth?.id || null;
 
         // 서버 요청
         const response = await requestRecommendations(userInput, imageFile, userId);
         console.log("API 응답 데이터:", response);
 
-        // 4. 응답 데이터에서 필요한 필드 추출
+        // 백엔드 응답에 따라 채팅 메시지 객체 생성
         const chatMessage = response.mode === "chat" ? {
             id: response.id,
             type: "AI",
             content: response.content,
-            timestamp: new Date().toISOString(),
+            timestamp: response.timeStamp || new Date().toISOString(),
             mode: "chat",
+            recommendationType: response.recommendationType, // 추가
         } : {
             id: response.id,
-            mode: "recommendation",
             type: "AI",
+            mode: "recommendation",
+            content: response.content,  // 백엔드에서 전달한 답변 텍스트 추가
             lineId: response.lineId,
             imageUrl: response.imageUrl,
             recommendations: response.recommendations,
-            timestamp: new Date().toISOString(),
+            timestamp: response.timeStamp || new Date().toISOString(),
+            recommendationType: response.recommendationType, // 추가
         };
 
         dispatch(fetchChatSuccess(chatMessage));
-        return chatMessage
+        return chatMessage;
 
     } catch (error) {
         dispatch(fetchChatFail(error.message || "추천 요청 중 오류 발생"));

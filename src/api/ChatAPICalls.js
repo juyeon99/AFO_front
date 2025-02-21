@@ -20,6 +20,9 @@ export const requestRecommendations = async (userInput, imageFile = null, userId
         const response = await apis.post("/chats", formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
+        
+        console.log('채팅 추천 요청 응답:', response.data);
+        
         return response.data;
     } catch (error) {
         console.error("추천 요청 중 오류 발생:", error);

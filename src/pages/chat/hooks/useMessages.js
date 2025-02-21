@@ -97,7 +97,8 @@ export const useMessages = () => {
                     id: response.id || uuidv4(),
                     type: 'AI',
                     content: response.content,  // API 응답의 content 필드 사용
-                    mode: 'chat',
+                    mode: response.mode || 'chat',
+                    imageUrl: response.imageUrl || null,    
                     recommendations: response.recommendations || null,
                     timestamp: response.timeStamp || new Date().toISOString()
                 };

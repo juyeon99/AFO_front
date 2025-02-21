@@ -27,6 +27,22 @@ const MessageList = memo(({
     const messageRefs = useRef([]);
     const messagesEndRef = useRef(null);
 
+    // 메시지 리스트에서 추천 타입에 따른 CSS 클래스를 반환하는 함수
+    const getRecommendationClass = (recommendationType) => {
+        switch (recommendationType) {
+            case 1:
+                return styles.normalRecommendation;    // 일반추천
+            case 2:
+                return styles.fashionRecommendation;   // 패션 추천
+            case 3:
+                return styles.interiorRecommendation;  // 인테리어 추천
+            case 4:
+                return styles.therapyRecommendation;    // 테라피 추천
+            default:
+                return '';
+        }
+    };
+
     // 스크롤을 최하단으로 이동시키는 함수
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -137,9 +153,34 @@ const MessageList = memo(({
                                         <div className={styles.messageText}>
                                             {message.content}
                                         </div>
-                                        {message.mode === 'recommendation' && message.recommendations && (
-                                            <div className={styles.recommendations}>
-                                                {message.recommendations}
+                                        {message.mode === 'recommendation' && (
+                                            <div className={`${styles.recommendations} ${getRecommendationClass(message.recommendationType)}`}>
+                                                {/* 추천 이미지가 있는 경우 */}
+                                                {message.imageUrl && (
+                                                    <img
+                                                        src={message.imageUrl}
+                                                        alt="추천 이미지"
+                                                        className={styles.recommendationImage}
+                                                    />
+                                                )}
+                                                {/* 추천 제품 목록 렌더링 */}
+                                                {Array.isArray(message.recommendations) && message.recommendations.map((rec, idx) => (
+                                                    <div key={idx} className={`${styles.recommendationItem} ${styles[`perfumeType${rec.type}`]}`}>
+                                                        {rec.productImageUrls && rec.productImageUrls.length > 0 && (
+                                                            <img
+                                                                src={rec.productImageUrls[0]}
+                                                                alt={rec.productNameKr}
+                                                                className={styles.productImage}
+                                                            />
+                                                        )}
+                                                        <div className={styles.recommendationContent}>
+                                                            <h3 className={styles.productTitle}>{rec.productNameKr}</h3>
+                                                            <p className={styles.productInfo}>{rec.productBrand} • {rec.productGrade}</p>
+                                                            <p className={styles.recommendReason}>{rec.reason}</p>
+                                                            <p className={styles.situation}>{rec.situation}</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
                                         )}
                                     </div>
