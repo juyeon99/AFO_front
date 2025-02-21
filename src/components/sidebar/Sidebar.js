@@ -5,12 +5,14 @@ import { useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setMemberLeave } from '../../api/MemberAPICalls';
 import { logout } from '../../module/AuthModule';
+import MyReviewsPopover from '../sidebar/reviews/MyReviewsPopover';
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false); // 회원탈퇴/로그아웃 메뉴 열림 상태
     const { isLoggedIn, user } = useSelector((state) => state.auth);
     const [localUser, setLocalUser] = useState(null);
+    const [showMyReviews, setShowMyReviews] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -46,13 +48,13 @@ const Sidebar = () => {
                 alert('사용자 정보를 찾을 수 없습니다.');
                 return;
             }
-    
+
             const parsedUser = JSON.parse(storedUser);
             if (!parsedUser?.id) {
                 alert('회원 ID가 유효하지 않습니다.');
                 return;
             }
-    
+
             // setMemberLeave 함수 호출 후 성공 여부 확인
             const success = await setMemberLeave(parsedUser.id);
             if (success) {
@@ -67,7 +69,7 @@ const Sidebar = () => {
             alert('회원 탈퇴 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
         }
     };
-    
+
 
 
     const handleScrollToIntro = (e) => {
@@ -154,6 +156,12 @@ const Sidebar = () => {
                                     <div className="sidebar-menu">
                                         <button
                                             className="sidebar-auth-button"
+                                            onClick={() => setShowMyReviews(true)}
+                                        >
+                                            내가 작성한 리뷰
+                                        </button>
+                                        <button
+                                            className="sidebar-auth-button"
                                             onClick={handleMemberLeave}
                                         >
                                             회원탈퇴
@@ -178,6 +186,19 @@ const Sidebar = () => {
                     onClick={toggleSidebar}
                 />
             )}
+
+            {showMyReviews && (
+                <div className="review-popover-container">
+                    <div
+                        onClick={() => setShowMyReviews(false)}
+                    />
+                    <MyReviewsPopover
+                        show={showMyReviews}
+                        onClose={() => setShowMyReviews(false)}
+                    />
+                </div>
+            )}
+
         </>
     );
 };

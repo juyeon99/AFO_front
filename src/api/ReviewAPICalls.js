@@ -12,6 +12,24 @@ export const getReviewsByProductId = async (productId) => {
     }
 };
 
+// 특정 회원의 리뷰 목록 조회
+export const getReviewsByMemberId = async (memberId) => {
+    try {
+        // memberId 유효성 검사
+        if (!memberId) {
+            throw new Error('Invalid memberId');
+        }
+
+        console.log('Requesting reviews with memberId:', memberId);
+
+        const response = await apis.get(`/reviews/member/${memberId}`);
+        console.log("Member reviews response:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching member reviews:", error);
+        throw error;
+    }
+};
 
 // 리뷰 생성
 export const createReview = async (reviewData) => {
@@ -33,7 +51,12 @@ export const createReview = async (reviewData) => {
 // 리뷰 수정
 export const updateReview = async (reviewData) => {
     try {
-        const response = await apis.put("/reviews", reviewData);
+        console.log('Updating review with data:', reviewData); // 데이터 확인용 로그
+        const response = await apis.put(`/reviews`, {
+            content: reviewData.content,
+            reviewId: reviewData.id
+        });
+        console.log('Update response:', response.data); // 응답 확인용 로그
         return response.data;
     } catch (error) {
         console.error("Error updating review:", error);
