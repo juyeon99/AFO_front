@@ -5,13 +5,20 @@ import { resetReviews } from "./ReviewModule";
 // 초기 상태
 const initialState = {
     perfumes: [], // 향수 목록
+    currentPerfume: null,  // 현재 선택된 향수 추가
     loading: false, // 로딩 상태
     error: null, //에러 메시지
+    lastFetchTime: {},     // 캐시 시간 추적 추가
+    cache: {},            // 캐시 데이터 추가
 };
 
-// 액션 생성
+// 캐시 유효 시간 (5분)
+const CACHE_DURATION = 5 * 60 * 1000;
+
+// 액션 생성 - 캐시 관련 액션 추가
 export const {
-    perfumes: { fetchPerfumeStart,
+    perfumes: {
+        fetchPerfumeStart,
         fetchPerfumeSuccess,
         fetchPerfumeFail,
         modifyPerfumeStart,
@@ -26,7 +33,9 @@ export const {
         fetchPerfumeByIdStart,
         fetchPerfumeByIdSuccess,
         fetchPerfumeByIdFail,
-
+        setPerfumeCache,          // 캐시 설정 액션 추가
+        clearPerfumeCache,        // 캐시 초기화 액션 추가
+        setCurrentPerfume         // 현재 향수 설정 액션 추가
     },
 } = createActions({
     PERFUMES: {
@@ -45,10 +54,24 @@ export const {
         FETCH_PERFUME_BY_ID_START: () => { },
         FETCH_PERFUME_BY_ID_SUCCESS: (perfume) => perfume,
         FETCH_PERFUME_BY_ID_FAIL: (error) => error,
+        SET_PERFUME_CACHE: (payload) => payload,
+        CLEAR_PERFUME_CACHE: () => {},
+        SET_CURRENT_PERFUME: (perfume) => perfume,
     },
 });
 
-// redux thunk
+// 캐시 유효성 검사 함수 추가
+const isCacheValid = (state, productId) => {
+    const cachedData = state.cache[productId];
+    const lastFetch = state.lastFetchTime[productId];
+    return (
+        cachedData &&
+        lastFetch &&
+        Date.now() - lastFetch < CACHE_DURATION
+    );
+};
+
+// redux thunk - 기존 함수들
 export const fetchPerfumes = () => async (dispatch) => {
     try {
         dispatch(fetchPerfumeStart());
@@ -66,6 +89,12 @@ export const modifyPerfume = (perfumeData) => async (dispatch) => {
         dispatch(modifyPerfumeStart());
         const updatedPerfume = await modifyPerfumes(perfumeData);
         dispatch(modifyPerfumeSuccess(updatedPerfume));
+        // 캐시 업데이트 추가
+        dispatch(setPerfumeCache({
+            id: perfumeData.id,
+            data: updatedPerfume,
+            timestamp: Date.now()
+        }));
     } catch (error) {
         dispatch(modifyPerfumeFail(error.message || "향수 수정 실패"));
     }
@@ -76,6 +105,8 @@ export const deletePerfume = (perfumeId) => async (dispatch) => {
         dispatch(deletePerfumeStart());
         await deletePerfumes(perfumeId);
         dispatch(deletePerfumeSuccess(perfumeId));
+        // 캐시 제거 추가
+        dispatch(clearPerfumeCache());
     } catch (error) {
         dispatch(deletePerfumeFail(error.message || "향수 삭제 실패"));
     }
@@ -84,61 +115,59 @@ export const deletePerfume = (perfumeId) => async (dispatch) => {
 export const createPerfume = (perfumeData) => async (dispatch) => {
     try {
         dispatch(createPerfumeStart());
-        const newPerfume = await createPerfumes(perfumeData); // API 호출
+        const newPerfume = await createPerfumes(perfumeData);
         dispatch(createPerfumeSuccess(newPerfume));
+        // 캐시 업데이트 추가
+        dispatch(setPerfumeCache({
+            id: newPerfume.id,
+            data: newPerfume,
+            timestamp: Date.now()
+        }));
     } catch (error) {
         dispatch(createPerfumeFail(error.message || "향수 추가 실패"));
     }
 };
 
+// fetchPerfumeById 개선
 export const fetchPerfumeById = (productId) => async (dispatch, getState) => {
     try {
-        // 이미 해당 향수 데이터가 있는지 확인
-        const state = getState();
-        const existingPerfume = state.perfumes.perfumes.find(
-            p => p.id === parseInt(productId)
-        );
-
-        // 새로고침 상태 확인 (state.perfumes.perfumes가 비어있는 경우)
-        const isRefreshed = state.perfumes.perfumes.length === 0;
-
-        // 항상 새로운 데이터를 가져오도록 수정하되, 기존 데이터도 활용
+        const state = getState().perfumes;
+        
         dispatch(fetchPerfumeByIdStart());
         
-        // 기존 데이터가 있으면 먼저 보여주기
-        if (existingPerfume && !isRefreshed) {
-            dispatch(fetchPerfumeByIdSuccess(existingPerfume));
+        // 캐시 확인
+        if (isCacheValid(state, productId)) {
+            const cachedPerfume = state.cache[productId];
+            dispatch(fetchPerfumeByIdSuccess(cachedPerfume));
+            dispatch(setCurrentPerfume(cachedPerfume));
+            return;
         }
-        
+
         // 새로운 데이터 가져오기
         const perfume = await getProductDetail(productId);
         
-        if (perfume) {
-            dispatch(fetchPerfumeByIdSuccess(perfume));
-            dispatch(resetReviews());
-        } else {
+        if (!perfume) {
             throw new Error("향수 데이터를 찾을 수 없습니다.");
         }
-        
+
+        // 캐시 업데이트
+        dispatch(setPerfumeCache({
+            id: productId,
+            data: perfume,
+            timestamp: Date.now()
+        }));
+
+        // 상태 업데이트 - resetReviews 제거
+        dispatch(fetchPerfumeByIdSuccess(perfume));
+        dispatch(setCurrentPerfume(perfume));
+
     } catch (error) {
         console.error("향수 데이터 로드 실패:", error);
         dispatch(fetchPerfumeByIdFail(error.message || "향수 상세 정보 불러오기 실패"));
-        
-        // 에러 발생 시 재시도 (기존 데이터가 없는 경우에만)
-        if (!getState().perfumes.perfumes.length) {
-            try {
-                const perfume = await getProductDetail(productId);
-                if (perfume) {
-                    dispatch(fetchPerfumeByIdSuccess(perfume));
-                }
-            } catch (retryError) {
-                console.error("재시도 실패:", retryError);
-            }
-        }
     }
 };
 
-// 리듀서
+// 리듀서 개선
 const perfumeReducer = handleActions(
     {
         [fetchPerfumeStart]: (state) => ({
@@ -148,14 +177,14 @@ const perfumeReducer = handleActions(
         }),
         [fetchPerfumeSuccess]: (state, { payload }) => ({
             ...state,
-            perfumes: payload, // 향수 목록
+            perfumes: payload,
             loading: false,
             error: null,
         }),
         [fetchPerfumeFail]: (state, { payload }) => ({
             ...state,
             loading: false,
-            error: payload, // 에러 메시지
+            error: payload,
         }),
         [modifyPerfumeStart]: (state) => ({
             ...state,
@@ -167,6 +196,7 @@ const perfumeReducer = handleActions(
             perfumes: state.perfumes.map((perfume) =>
                 perfume.id === payload.id ? payload : perfume
             ),
+            currentPerfume: state.currentPerfume?.id === payload.id ? payload : state.currentPerfume,
             loading: false,
             error: null,
         }),
@@ -183,6 +213,7 @@ const perfumeReducer = handleActions(
         [deletePerfumeSuccess]: (state, { payload }) => ({
             ...state,
             perfumes: state.perfumes.filter((perfume) => perfume.id !== payload),
+            currentPerfume: state.currentPerfume?.id === payload ? null : state.currentPerfume,
             loading: false,
             error: null,
         }),
@@ -198,7 +229,7 @@ const perfumeReducer = handleActions(
         }),
         [createPerfumeSuccess]: (state, { payload }) => ({
             ...state,
-            perfumes: [...state.perfumes, payload], // 새로 추가된 향수 포함
+            perfumes: [...state.perfumes, payload],
             loading: false,
             error: null,
         }),
@@ -225,13 +256,35 @@ const perfumeReducer = handleActions(
             loading: false,
             error: payload,
         }),
+        [setPerfumeCache]: (state, { payload }) => ({
+            ...state,
+            cache: {
+                ...state.cache,
+                [payload.id]: payload.data,
+            },
+            lastFetchTime: {
+                ...state.lastFetchTime,
+                [payload.id]: payload.timestamp,
+            },
+        }),
+        [clearPerfumeCache]: (state) => ({
+            ...state,
+            cache: {},
+            lastFetchTime: {},
+        }),
+        [setCurrentPerfume]: (state, { payload }) => ({
+            ...state,
+            currentPerfume: payload,
+        }),
     },
     initialState
 );
 
-
+// 선택자 함수들 개선
 export const selectPerfumes = (state) => state.perfumes?.perfumes || [];
+export const selectCurrentPerfume = (state) => state.perfumes?.currentPerfume || null;
 export const selectLoading = (state) => state.perfumes?.loading || false;
 export const selectError = (state) => state.perfumes?.error || null;
+export const selectPerfumeCache = (state) => state.perfumes?.cache || {};
 
 export default perfumeReducer;

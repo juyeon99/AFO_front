@@ -21,6 +21,7 @@ const usePerfumeReviewState = (perfumeId) => {
     const [isModalOpen, setIsModalOpen] = useState(false);  // 🔑 모달 열림 상태
     const [likedReviews, setLikedReviews] = useState([]);
     const [heartCounts, setHeartCounts] = useState({});
+    const [hasInitialized, setHasInitialized] = useState(false);
 
     // Redux & Auth
     const perfumes = useSelector(selectPerfumes);
@@ -36,55 +37,46 @@ const usePerfumeReviewState = (perfumeId) => {
 
     // (1) 초기 로딩 (마운트 시 1회) : 리뷰 + 좋아요
     useEffect(() => {
+        if (!perfumeId) return;
+        
         const initializeData = async () => {
             try {
-                if (perfumeId) {
-                    // 리뷰 데이터 가져오기
-                    await dispatch(fetchReviews(perfumeId));
-                    
-                    // 하트 카운트 초기화 (fetchReviews 후 Redux에서 업데이트된 리뷰를 useSelector가 가져오게 됨)
-                    // reviews는 Redux에서 업데이트된 상태로 렌더링 시 자동 반영됨.
-                    
-                    // 로그인한 경우 좋아요 상태 가져오기
-                    if (userId) {
-                        const likedReviewIds = await fetchUserLikedReviews(userId);
-                        setLikedReviews(likedReviewIds);
-                    }
-                }
-            } catch (error) {
-                console.error('Data initialization error:', error);
-            }
-        };
-    
-        initializeData();
-    }, [perfumeId, userId, dispatch]);    
-
-    // (2) 새로고침(focus) 시 다시 fetch
-    useEffect(() => {
-        const handleFocus = async () => {
-            if (!perfumeId) return;
-            try {
-                const result = await dispatch(fetchReviews(perfumeId));
-                if (result?.payload) {
-                    const counts = {};
-                    result.payload.forEach(review => {
-                        counts[review.id] = review.heartCount || 0;
-                    });
-                    setHeartCounts(counts);
-                }
+                await dispatch(fetchReviews(perfumeId));
                 if (userId) {
                     const likedReviewIds = await fetchUserLikedReviews(userId);
                     setLikedReviews(likedReviewIds);
                 }
+                setHasInitialized(true);
             } catch (error) {
-                console.error('Focus refresh error:', error);
+                console.error('Data initialization error:', error);
             }
         };
-        window.addEventListener('focus', handleFocus);
-        return () => {
-            window.removeEventListener('focus', handleFocus);
+
+        initializeData();
+    }, [perfumeId]); // 페이지 진입시 1회
+
+    // (2) 실제 새로고침 감지
+    useEffect(() => {
+        const handleRealRefresh = async () => {
+            if (!perfumeId) return;
+            
+            // performance.navigation.type이 1이면 실제 새로고침
+            if (performance.navigation.type === 1) {
+                try {
+                    await dispatch(fetchReviews(perfumeId));
+                    if (userId) {
+                        const likedReviewIds = await fetchUserLikedReviews(userId);
+                        setLikedReviews(likedReviewIds);
+                    }
+                } catch (error) {
+                    console.error('Refresh data fetch error:', error);
+                }
+            }
         };
-    }, [perfumeId, userId, dispatch]);
+
+        window.addEventListener('load', handleRealRefresh);
+        return () => window.removeEventListener('load', handleRealRefresh);
+    }, [perfumeId, userId]);
 
     // (3) 리뷰 변경 시 슬라이더 상태 & 하트 카운트 업데이트
     useEffect(() => {
