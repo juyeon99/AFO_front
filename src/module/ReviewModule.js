@@ -62,14 +62,12 @@ export const fetchReviews = (productId) => async (dispatch) => {
             dispatch(fetchReviewsSuccess(JSON.parse(cachedData)));
             
             // 백그라운드에서 최신 데이터 업데이트
-            const productDetail = await getReviewsByProductId(productId);
-            const reviews = productDetail || [];
+            const reviews = await getReviewsByProductId(productId);
             sessionStorage.setItem(cacheKey, JSON.stringify(reviews));
             dispatch(fetchReviewsSuccess(reviews));
         } else {
             // 캐시된 데이터가 없으면 API 호출
-            const productDetail = await getReviewsByProductId(productId);
-            const reviews = productDetail || [];
+            const reviews = await getReviewsByProductId(productId);
             sessionStorage.setItem(cacheKey, JSON.stringify(reviews));
             dispatch(fetchReviewsSuccess(reviews));
         }

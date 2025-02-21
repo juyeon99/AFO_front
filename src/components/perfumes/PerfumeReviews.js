@@ -9,7 +9,7 @@ import { fetchUserLikedReviews, createHeart, deleteHeart } from '../../api/Perfu
 
 const PerfumeReviews = ({ perfumeId }) => {
     const dispatch = useDispatch();
-    
+
     const [selectedReview, setSelectedReview] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [isDragging, setIsDragging] = useState(false);
@@ -80,26 +80,37 @@ const PerfumeReviews = ({ perfumeId }) => {
         }
     };
 
-    const handleReviewSubmit = () => {
+    const handleReviewSubmit = async () => {
         if (!userId) {
             alert('리뷰를 작성하려면 로그인이 필요합니다.');
             return;
         }
 
-        dispatch(createNewReview({
-            productId: perfumeId,
-            memberId: userId,
-            content: reviewContent
-        }));
+        try {
+            await dispatch(createNewReview({
+                productId: perfumeId,
+                memberId: userId,
+                content: reviewContent
+            }));
 
-        setReviewContent('');
-        dispatch(fetchReviews(perfumeId));
+            setReviewContent('');
+            setIsModalOpen(false); // 모달 닫기
+
+            // 리뷰 목록 즉시 새로고침
+            await dispatch(fetchReviews(perfumeId));
+        } catch (error) {
+            console.error("리뷰 작성 실패:", error);
+            alert('리뷰 작성에 실패했습니다.');
+        }
     };
 
+    // 모달 닫기 핸들러 수정
     const handleModalClose = async () => {
         setIsModalOpen(false);
-        await dispatch(fetchReviews(perfumeId));
-        if (userId) await loadLikedReviews();
+        if (userId) {
+            await dispatch(fetchReviews(perfumeId));
+            await loadLikedReviews();
+        }
     };
 
     const handleMouseDown = (e) => {
@@ -162,7 +173,7 @@ const PerfumeReviews = ({ perfumeId }) => {
                                 <p className={styles.reviewContent}>{review.content}</p>
                                 <p className={styles.reviewerName}>{review.name}</p>
                                 <button className={likedReviews.includes(review.id) ? styles.heartActive : styles.heart}
-                                        onClick={() => handleToggleHeart(review.id)}>
+                                    onClick={() => handleToggleHeart(review.id)}>
                                     🙂
                                 </button>
                             </div>
