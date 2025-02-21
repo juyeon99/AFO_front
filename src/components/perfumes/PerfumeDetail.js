@@ -18,37 +18,20 @@ const PerfumeDetail = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // 페이지 로드/새로고침 시 항상 전체 향수 목록과 현재 향수 데이터 불러오기
+    useEffect(() => {
+        dispatch(fetchPerfumes());
+        if (id) {
+            dispatch(fetchPerfumeById(id)); // 현재 향수 상세 정보 로드
+            dispatch(fetchReviews(id)); // 현재 향수의 리뷰 로드
+        }
+    }, [dispatch, id]);
+
     // ID 기반으로 현재 향수 찾기
     const perfume = useMemo(() =>
         perfumes?.find(p => p.id === parseInt(id)),
         [perfumes, id]
     );
-
-    // 페이지 로드/새로고침 시 데이터 로딩
-    useEffect(() => {
-        const loadInitialData = async () => {
-            if (!id) return;
-            
-            setIsLoading(true);
-            setError(null);
-            
-            try {
-                // 향수 데이터와 리뷰 데이터 동시에 로드
-                await Promise.all([
-                    dispatch(fetchPerfumeById(id)),
-                    dispatch(fetchReviews(id))
-                ]);
-                
-            } catch (error) {
-                console.error('데이터 로딩 실패:', error);
-                setError(error.message);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        
-        loadInitialData();
-    }, [dispatch, id]); // perfumes 제거
 
     // 이전 페이지 정보 확인용
     useEffect(() => {
