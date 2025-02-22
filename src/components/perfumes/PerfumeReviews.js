@@ -21,6 +21,7 @@ const PerfumeReviews = ({ perfumeId }) => {
         perfume,
         CARDS_PER_PAGE,
         totalPages,
+        mostLikedReview,
         handleMouseDown,
         handleToggleHeart,
         handleReviewSubmit,
@@ -39,7 +40,7 @@ const PerfumeReviews = ({ perfumeId }) => {
                 <div className={styles.topReviewCard}>
                     <h4>사용자 리뷰 Top 1</h4>
                     <div className={styles.reviewContent}>
-                        <p>{reviews?.[0]?.content || "사용자 리뷰가 없습니다."}</p>
+                        <p>{mostLikedReview?.content || "사용자 리뷰가 없습니다."}</p>
                     </div>
                 </div>
             </div>

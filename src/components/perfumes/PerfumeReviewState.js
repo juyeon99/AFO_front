@@ -18,7 +18,7 @@ const usePerfumeReviewState = (perfumeId) => {
     const [animation, setAnimation] = useState(null);
 
     const [reviewContent, setReviewContent] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);  // 🔑 모달 열림 상태
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [likedReviews, setLikedReviews] = useState([]);
     const [heartCounts, setHeartCounts] = useState({});
     const [hasInitialized, setHasInitialized] = useState(false);
@@ -26,7 +26,15 @@ const usePerfumeReviewState = (perfumeId) => {
     // Redux & Auth
     const perfumes = useSelector(selectPerfumes);
     const perfume = perfumes?.find(p => p.id === perfumeId);
-    const reviews = useSelector(selectReviews) ?? [];
+    const rawReviews = useSelector(selectReviews) ?? [];
+    
+    // 리뷰를 최신순으로 정렬
+    const reviews = [...rawReviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // 가장 좋아요가 많은 리뷰 찾기
+    const mostLikedReview = reviews.length > 0 
+        ? [...reviews].sort((a, b) => (b.heartCount || 0) - (a.heartCount || 0))[0]
+        : null;
 
     const auth = JSON.parse(localStorage.getItem('auth'));
     const userId = auth?.id;
@@ -47,20 +55,24 @@ const usePerfumeReviewState = (perfumeId) => {
                     setLikedReviews(likedReviewIds);
                 }
                 setHasInitialized(true);
+                
+                // 초기 로딩 시 슬라이더를 맨 앞으로 설정
+                setCurrentPage(1);
+                setSliderLeft(0);
+                setCardOffset(0);
             } catch (error) {
                 console.error('Data initialization error:', error);
             }
         };
 
         initializeData();
-    }, [perfumeId]); // 페이지 진입시 1회
+    }, [perfumeId]);
 
     // (2) 실제 새로고침 감지
     useEffect(() => {
         const handleRealRefresh = async () => {
             if (!perfumeId) return;
             
-            // performance.navigation.type이 1이면 실제 새로고침
             if (performance.navigation.type === 1) {
                 try {
                     await dispatch(fetchReviews(perfumeId));
@@ -68,6 +80,10 @@ const usePerfumeReviewState = (perfumeId) => {
                         const likedReviewIds = await fetchUserLikedReviews(userId);
                         setLikedReviews(likedReviewIds);
                     }
+                    // 새로고침 시에도 슬라이더를 맨 앞으로 설정
+                    setCurrentPage(1);
+                    setSliderLeft(0);
+                    setCardOffset(0);
                 } catch (error) {
                     console.error('Refresh data fetch error:', error);
                 }
@@ -81,25 +97,13 @@ const usePerfumeReviewState = (perfumeId) => {
     // (3) 리뷰 변경 시 슬라이더 상태 & 하트 카운트 업데이트
     useEffect(() => {
         if (reviews.length > 0) {
-            const totalPages = Math.ceil(reviews.length / CARDS_PER_PAGE);
-            const cardWidth = 196 + 37;
-            const maxScroll = (reviews.length - CARDS_PER_PAGE) * cardWidth;
-
-            setCurrentPage(totalPages);
-            setSliderLeft(100);
-            setCardOffset(maxScroll);
-
             const counts = {};
             reviews.forEach(review => {
                 counts[review.id] = review.heartCount || 0;
             });
             setHeartCounts(counts);
-        } else {
-            setCurrentPage(1);
-            setSliderLeft(0);
-            setCardOffset(0);
         }
-    }, [reviews.length, CARDS_PER_PAGE]);
+    }, [reviews.length]);
 
     // (4) 슬라이더 마우스 이벤트 (드래그 & 이동)
     useEffect(() => {
@@ -206,8 +210,13 @@ const usePerfumeReviewState = (perfumeId) => {
             }));
             setReviewContent('');
             setIsModalOpen(false);
-            // 리뷰 작성 후 최신 데이터
+            
+            // 리뷰 작성 후 최신 데이터를 가져오고 슬라이더를 맨 앞으로 리셋
             await dispatch(fetchReviews(perfumeId));
+            setCurrentPage(1);
+            setSliderLeft(0);
+            setCardOffset(0);
+            
         } catch (error) {
             console.error("리뷰 작성 실패:", error);
             alert('리뷰 작성에 실패했습니다.');
@@ -218,6 +227,7 @@ const usePerfumeReviewState = (perfumeId) => {
     const handleModalOpen = () => {
         setIsModalOpen(true);
     };
+    
     const handleModalClose = async () => {
         setIsModalOpen(false);
         if (userId) {
@@ -248,12 +258,13 @@ const usePerfumeReviewState = (perfumeId) => {
         perfume,
         CARDS_PER_PAGE,
         totalPages,
+        mostLikedReview,
         // 핸들러
         handleMouseDown,
         handleToggleHeart,
         handleReviewSubmit,
         handleModalClose,
-        handleModalOpen,    // 🔑 모달 열기 핸들러
+        handleModalOpen,
         setReviewContent,
         setCurrentPage,
         setSliderLeft,
