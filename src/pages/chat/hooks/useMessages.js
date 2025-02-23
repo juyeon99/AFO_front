@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { fetchChatResponse } from '../../../module/ChatModule';
+import { useChatHistory } from './useChatHistory';
 
 /**
  * 채팅 메시지를 관리하는 Hook
@@ -15,15 +16,34 @@ import { fetchChatResponse } from '../../../module/ChatModule';
 export const useMessages = () => {
     const dispatch = useDispatch();
 
-    // 메시지 목록 상태 관리
-    // 첫 메시지는 AI의 환영 메시지
     const [messages, setMessages] = useState([{
         id: uuidv4(),
         type: 'AI',
         content: '안녕하세요. 센티크입니다. 당신에게 어울리는 향을 찾아드리겠습니다.',
         mode: 'chat',
-        isInitialMessage: true
+        isInitialMessage: true,
+        style: {
+            fontSize: '20px',
+            lineHeight: '1.6'
+        }
     }]);
+
+    const { chatHistory, loadChatHistory } = useChatHistory();
+
+    // 컴포넌트 마운트 시 채팅 기록 로드
+    useEffect(() => {
+        loadChatHistory();
+    }, []);
+
+    // 채팅 기록이 로드되면 초기 메시지와 함께 설정
+    useEffect(() => {
+        if (chatHistory && chatHistory.length > 0) {
+            setMessages(prevMessages => [
+                prevMessages[0], // 초기 메시지 유지
+                ...chatHistory  // 채팅 기록 추가
+            ]);
+        }
+    }, [chatHistory]);
 
     // 로딩 상태와 재시도 가능 여부
     const [isLoading, setIsLoading] = useState(false);      // 메시지 전송 중인지
@@ -100,6 +120,7 @@ export const useMessages = () => {
                     mode: response.mode || 'chat',
                     imageUrl: response.imageUrl || null,    
                     recommendations: response.recommendations || null,
+                    recommendationType: response.recommendationType || null,
                     timestamp: response.timeStamp || new Date().toISOString()
                 };
                 console.log('생성된 AI 메시지:', aiMessage); 

@@ -1,8 +1,12 @@
 import React, { memo } from 'react';
-import styles from '../../../css/chat/MessageItem.module.css';
+import styles from '../../../css/chat/MessageList.module.css';
+import recommendationStyles from '../../../css/chat/RecommendationItem.module.css';
+import RecommendationItem from './RecommendationItem';
 
 /**
  * 채팅 메시지의 개별 항목을 표시하는 컴포넌트
+ * 
+ * MessageItem.js는 개별 메시지를 처리하는 역할
  * 
  * 주요 기능:
  * - 사용자/AI 메시지 구분하여 다른 스타일로 표시
@@ -18,22 +22,6 @@ import styles from '../../../css/chat/MessageItem.module.css';
  * @param {Function} props.openModal - 이미지 클릭시 모달 열기 함수
  * @param {string} props.color - 메시지 장식용 컬러
  */
-
-// 추천 타입에 따른 CSS 클래스를 반환하는 헬퍼 함수
-const getRecommendationClass = (recommendationType) => {
-    switch (recommendationType) {
-        case 1:
-            return styles.normalRecommendation;    // 일반추천
-        case 2:
-            return styles.fashionRecommendation;   // 패션 추천
-        case 3:
-            return styles.interiorRecommendation;  // 인테리어 추천
-        case 4:
-            return styles.therapyRecommendation;    // 테라피 추천
-        default:
-            return '';
-    }
-};
 
 const MessageItem = memo(({
     message,
@@ -69,7 +57,7 @@ const MessageItem = memo(({
     // 초기 메시지일 경우 다른 스타일 적용
     if (message?.isInitialMessage) {
         return (
-            <div className="chat-bot-message">
+            <div className={styles.chatmessage}>
                 <img
                     src="/images/logo-bot.png"
                     alt="Bot Avatar"
@@ -81,14 +69,10 @@ const MessageItem = memo(({
         );
     }
 
-    // 일반 메시지 렌더링
     return (
-        <div className={`
-            ${styles.messageItem}
-            ${message?.type === 'USER' ? styles.userMessage : styles.botMessage}
-            ${message?.images?.length > 0 && message.content ? styles.withImageAndText : ''}
-            ${isHighlighted ? styles.highlighted : ''}
-        `}>
+        <div className={`${styles.message} ${
+            message?.type === 'USER' ? styles.userMessage : styles.botMessage
+        }`}>
             {/* AI 메시지 렌더링 */}
             {message?.type === 'AI' && (
                 <>
@@ -97,75 +81,57 @@ const MessageItem = memo(({
                         alt="Bot Avatar"
                         className={styles.avatar}
                     />
-                    <div className={styles.messageContent}>
-                        <p className={styles.messageText}>
-                            {highlightText(message.content)}
-                        </p>
-                        {/* 추천 모드일 경우, recommendationType에 따라 감각적으로 다른 스타일 적용 */}
-                        {message.mode === 'recommendation' && (
-                            <div className={`${styles.recommendations} ${getRecommendationClass(message.recommendationType)}`}>
-                                {/* 추천 이미지가 있는 경우 */}
-                                {message.imageUrl && (
-                                    <img
-                                        src={message.imageUrl}
-                                        alt="추천 이미지"
-                                        className={styles.recommendationImage}
-                                    />
-                                )}
-                                {/* 추천 제품 목록 렌더링 */}
-                                {Array.isArray(message.recommendations) && message.recommendations.map((rec, idx) => (
-                                    <div key={idx} className={styles.recommendationItem}>
-                                        <p>
-                                            <strong>{rec.productNameKr}</strong> ({rec.productBrand} / {rec.productGrade})
-                                        </p>
-                                        <p>{rec.reason}</p>
-                                        <p>{rec.situation}</p>
-                                        {rec.productImageUrls && rec.productImageUrls.map((imgUrl, idy) => (
-                                            <img
-                                                key={idy}
-                                                src={imgUrl}
-                                                alt="추천 상품 이미지"
-                                                className={styles.productImage}
-                                            />
-                                        ))}
-                                    </div>
-                                ))}
+                    <div className={styles.messageWrapper}>
+                        <div className={styles.messageContent}>
+                            <div className={styles.messageText}>
+                                {highlightText(message.content)}
                             </div>
-                        )}
-                        <div
-                            className={styles.colorBar}
-                            style={{ backgroundColor: color }}
-                        />
+                            {message.mode === 'recommendation' && (
+                                <div className={styles.recommendations}>
+                                    {message.imageUrl && (
+                                        <img
+                                            src={message.imageUrl}
+                                            alt="추천 이미지"
+                                            className={styles.recommendationImage}
+                                        />
+                                    )}
+                                    {Array.isArray(message.recommendations) && 
+                                        message.recommendations.map((rec, idx) => (
+                                            <RecommendationItem key={idx} recommendation={rec} />
+                                        ))
+                                    }
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </>
             )}
 
             {/* 사용자 메시지 렌더링 */}
             {message?.type === 'USER' && (
-                <div className={styles.messageContent}>
-                    {/* 이미지가 있는 경우 이미지 갤러리 표시 */}
-                    {message.images && message.images.length > 0 && (
-                        <div className={styles.imageContainer}>
-                            {message.images.map((image, idx) => (
-                                <img
-                                    key={idx}
-                                    alt="Uploaded"
-                                    className={styles.uploadedImage}
-                                    onClick={() => openModal(image.url)}
-                                />
-                            ))}
-                        </div>
-                    )}
-                    {/* 텍스트 메시지가 있는 경우 표시 */}
-                    {message.content && (
-                        <p className={styles.messageText}>
-                            {highlightText(message.content)}
-                        </p>
-                    )}
-                    <div className={styles.colorCircle} />
+                <div className={styles.messageWrapper}>
+                    <div className={styles.messageContent}>
+                        {message.content && (
+                            <div className={styles.messageText}>
+                                {highlightText(message.content)}
+                            </div>
+                        )}
+                        {message.images && message.images.length > 0 && (
+                            <div className={styles.imageContainer}>
+                                {message.images.map((image, idx) => (
+                                    <img
+                                        key={idx}
+                                        src={image.url}
+                                        alt="Uploaded"
+                                        className={styles.uploadedImage}
+                                        onClick={() => openModal(image.url)}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
-
         </div>
     );
 });
