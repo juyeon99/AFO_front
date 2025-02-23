@@ -5,6 +5,7 @@ import ReviewSlider from '../../components/perfumes/ReviewSlider';
 import ReviewModal from './ReviewModal';
 import { Heart } from 'lucide-react';
 import usePerfumeReviewState from './PerfumeReviewState';
+import ReviewSummary from './ReviewSummary';
 
 const PerfumeReviews = ({ perfumeId }) => {
     const {
@@ -35,6 +36,9 @@ const PerfumeReviews = ({ perfumeId }) => {
 
     return (
         <div className={styles.reviewsContainer}>
+            {/* 리뷰 요약 섹션 추가 */}
+            <ReviewSummary perfumeId={perfumeId} />
+            
             {/* 상단 Top 1 리뷰 */}
             <div className={styles.topReviewsSection}>
                 <div className={styles.topReviewCard}>

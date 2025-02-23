@@ -11,6 +11,7 @@
     z-index: 1000;
     display: flex;
     flex-direction: column;
+    user-select: none;
 }
 
 .section {
@@ -66,6 +67,7 @@
     height: 80px;
     object-fit: cover;
     margin-bottom: 8px;
+    user-select: none;
 }
 
 .closeButton {
@@ -119,18 +121,21 @@
     font-weight: bold;
     font-size: 14px;
     margin: 0;
+    user-select: none;
 }
 
 .perfumeBrand {
     font-size: 12px;
     color: #666;
     margin: 0;
+    user-select: none;
 }
 
 .mainAccord {
     font-size: 12px;
     color: #888;
     margin: 0;
+    user-select: none;
 }
 
 .loading {
