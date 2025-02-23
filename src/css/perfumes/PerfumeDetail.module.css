@@ -10,7 +10,7 @@
     padding: 0 20px;
     box-sizing: border-box;
     overflow: visible;
-    min-height: 3200px; /* 더 큰 값으로 설정 */
+    min-height: 3350px; /* 더 큰 값으로 설정 */
 }
 /* 디버깅을 위한 임시 스타일 */
 /* .container::before {
@@ -378,9 +378,9 @@
 
 .similarPerfumesSection {
     position: absolute;
-    width: 100%;
+    width: 1362px;
     left: 3%;
-    top: 2100px; /* 기존 2000px에서 증가 */
+    top: 2200px;
     height: 600px; /* 충분한 높이 */
 }
 
