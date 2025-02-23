@@ -85,3 +85,28 @@ export const deleteReview = async (reviewId) => {
         throw error;
     }
 };
+
+// 리뷰 요약 조회
+export const getReviewSummary = async (productId) => {
+    try {
+        // productId 유효성 검사 추가
+        if (!productId) {
+            throw new Error('Invalid productId');
+        }
+
+        // GET 메소드로 변경
+        const response = await apis.get(`/reviews/summary/${productId}`);
+        
+        // 응답 데이터 형식 확인 및 처리
+        if (response.data === null || response.data === undefined) {
+            return "리뷰 요약 정보가 없습니다.";
+        }
+
+        console.log("Review summary response:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching review summary:", error);
+        // 에러 발생 시 기본 메시지 반환
+        return "리뷰 요약을 불러오는데 실패했습니다.";
+    }
+};

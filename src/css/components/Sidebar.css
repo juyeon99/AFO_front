@@ -10,6 +10,8 @@
 
 .sidebar-menu {
     translate: 40px -120px;
+    position: relative;
+    z-index: 2;  /* 메뉴가 항상 위에 보이도록 */
 }
 
 .sidebar-menu-button {
@@ -74,6 +76,7 @@
     transition: color 0.2s;
     display: block;
     visibility: visible;
+    user-select: none;
 }
 
 .admin-sidebar-link {
@@ -89,31 +92,46 @@
 
 @media (max-width: 1200px) {
     .sidebar-link:nth-child(5) {
-        display: none; /* 다섯 번째 링크 숨김 */
+        display: none;
+    }
+    .sidebar-menu {
+        translate: 40px -100px;  /* 위로 조금 올림 */
     }
 }
 
 @media (max-width: 1000px) {
     .sidebar-link:nth-child(4) {
-        display: none; /* 네 번째 링크 숨김 */
+        display: none;
+    }
+    .sidebar-menu {
+        translate: 40px -80px;
     }
 }
 
 @media (max-width: 800px) {
     .sidebar-link:nth-child(3) {
-        display: none; /* 세 번째 링크 숨김 */
+        display: none;
+    }
+    .sidebar-menu {
+        translate: 40px -60px;
     }
 }
 
 @media (max-width: 600px) {
     .sidebar-link:nth-child(2) {
-        display: none; /* 두 번째 링크 숨김 */
+        display: none;
+    }
+    .sidebar-menu {
+        translate: 40px -40px;
     }
 }
 
 @media (max-width: 400px) {
     .sidebar-link:nth-child(1) {
-        display: none; /* 첫 번째 링크 숨김 */
+        display: none;
+    }
+    .sidebar-menu {
+        translate: 40px -20px;
     }
 }
 
@@ -129,7 +147,7 @@
     transition: color 0.2s;
     text-align: left;
     width: 100%;
-    margin-left: 50px;
+    margin-left: 30px;
 
     white-space: nowrap;
     /* 텍스트가 줄 바꿈되지 않도록 */
@@ -138,6 +156,7 @@
     text-overflow: ellipsis;
     /* 넘치는 텍스트는 생략 (...) */
     display: inline-block;
+    user-select: none;
 }
 
 .sidebar-auth-button:hover {
@@ -172,6 +191,7 @@
     border-radius: 50%;
     object-fit: cover;
     padding-right: 10px;
+    user-select: none;
 }
 
 .sidebar-username {
@@ -185,6 +205,7 @@
     display: inline-block;
     /* 가로 정렬 유지 */
     cursor: pointer;
+    user-select: none;
 }
 
 .sidebar-bottom-links {
@@ -217,4 +238,9 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
+}
+
+/* 내가 작성한 리뷰 버튼을 위한 특별한 스타일 추가 */
+.sidebar-auth-button[data-type="my-reviews"] {
+    margin-left: 10px;  /* 기존 50px에서 30px로 줄임 */
 }
