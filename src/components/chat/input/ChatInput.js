@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useRef } from 'react';
 import ImageUpload from './ImageUpload';
 import styles from '../../../css/chat/ChatInput.module.css';
 
@@ -55,27 +55,47 @@ const ChatInput = memo(({
         }
     };
 
+        // 이미지 삭제 핸들러
+        const handleImageRemove = () => {
+            setSelectedImages([]);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';  // 파일 입력 초기화
+            }
+        };
+    
+        // 이미지 붙여넣기 핸들러
+        const handlePaste = (e) => {
+            const items = e.clipboardData?.items;
+            if (!items) return;
+    
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    e.preventDefault();
+                    const file = item.getAsFile();
+                    handleImageUpload({ target: { files: [file] } });
+                    break;  // 첫 번째 이미지만 처리
+                }
+            }
+        };    
+
     return (
         <div className={styles.inputAreaWrapper}>
             {/* 선택된 이미지 미리보기 */}
             {selectedImages.length > 0 && (
                 <div className={styles.imagePreviewContainer}>
-                    {selectedImages.map((image, idx) => {
-                        // 이미지 URL이 없으면 건너뛰기
-                        if (!image?.url) {
-                            console.error('Invalid image:', image);
-                            return null;
-                        }
-                        return (
-                            <img
-                                key={idx}
-                                src={image.url}
-                                alt="Preview"
-                                className={styles.imagePreview}
-                            />
-                        );
-                    })}
-
+                    <div className={styles.imagePreviewWrapper}>
+                        <img
+                            src={selectedImages[0].url}
+                            alt="Preview"
+                            className={styles.imagePreview}
+                        />
+                        <button 
+                            onClick={handleImageRemove}
+                            className={styles.removeImageButton}
+                        >
+                            ×
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -92,6 +112,7 @@ const ChatInput = memo(({
                     type="text"
                     value={input}
                     onChange={handleInputChange}
+                    onPaste={handlePaste}
                     onKeyPress={handleKeyPress}
                     placeholder="메시지를 입력하세요"
                     className={styles.input}

@@ -1,12 +1,8 @@
 import React, { memo } from 'react';
-import styles from '../../../css/chat/MessageList.module.css';
-import recommendationStyles from '../../../css/chat/RecommendationItem.module.css';
-import RecommendationItem from './RecommendationItem';
+import styles from '../../../css/chat/MessageItem.module.css';
 
 /**
  * 채팅 메시지의 개별 항목을 표시하는 컴포넌트
- * 
- * MessageItem.js는 개별 메시지를 처리하는 역할
  * 
  * 주요 기능:
  * - 사용자/AI 메시지 구분하여 다른 스타일로 표시
@@ -31,10 +27,10 @@ const MessageItem = memo(({
     color
 }) => {
     /**
-     * 검색어와 일치하는 텍스트를 하이라이트 처리하는 함수
-     * @param {string} text - 원본 텍스트
-     * @returns {string|JSX.Element} 하이라이트된 텍스트
-     */
+   * 검색어와 일치하는 텍스트를 하이라이트 처리하는 함수
+   * @param {string} text - 원본 텍스트
+   * @returns {string|JSX.Element} 하이라이트된 텍스트
+   */
     const highlightText = (text) => {
         // 텍스트나 검색어가 없으면 원본 반환
         if (!text || !searchInput) return text;
@@ -57,7 +53,7 @@ const MessageItem = memo(({
     // 초기 메시지일 경우 다른 스타일 적용
     if (message?.isInitialMessage) {
         return (
-            <div className={styles.chatmessage}>
+            <div className="chat-bot-message">
                 <img
                     src="/images/logo-bot.png"
                     alt="Bot Avatar"
@@ -69,10 +65,14 @@ const MessageItem = memo(({
         );
     }
 
+    // 일반 메시지 렌더링
     return (
-        <div className={`${styles.message} ${
-            message?.type === 'USER' ? styles.userMessage : styles.botMessage
-        }`}>
+        <div className={`
+            ${styles.messageItem}
+            ${message?.type === 'USER' ? styles.userMessage : styles.botMessage}
+            ${message?.images?.length > 0 && message.content ? styles.withImageAndText : ''}
+            ${isHighlighted ? styles.highlighted : ''}
+        `}>
             {/* AI 메시지 렌더링 */}
             {message?.type === 'AI' && (
                 <>
@@ -81,61 +81,42 @@ const MessageItem = memo(({
                         alt="Bot Avatar"
                         className={styles.avatar}
                     />
-                    <div className={styles.messageWrapper}>
-                        <div className={styles.messageContent}>
-                            <div className={styles.messageText}>
-                                {highlightText(message.content)}
-                            </div>
-                            {message.mode === 'recommendation' && (
-                                <div className={styles.recommendations}>
-                                    {message.imageUrl && (
-                                        <img
-                                            src={message.imageUrl}
-                                            alt="추천 이미지"
-                                            className={styles.recommendationImage}
-                                        />
-                                    )}
-                                    {Array.isArray(message.recommendations) && 
-                                        message.recommendations.map((rec, idx) => (
-                                            <RecommendationItem key={idx} recommendation={rec} />
-                                        ))
-                                    }
-                                </div>
-                            )}
-                        </div>
+                    <div className={styles.messageContent}>
+                        <p className={styles.messageText}>
+                            {highlightText(message.content)}
+                        </p>
                     </div>
                 </>
             )}
 
             {/* 사용자 메시지 렌더링 */}
             {message?.type === 'USER' && (
-                <div className={styles.messageWrapper}>
-                    <div className={styles.messageContent}>
-                        {message.content && (
-                            <div className={styles.messageText}>
-                                {highlightText(message.content)}
-                            </div>
-                        )}
-                        {message.images && message.images.length > 0 && (
-                            <div className={styles.imageContainer}>
-                                {message.images.map((image, idx) => (
-                                    <img
-                                        key={idx}
-                                        src={image.url}
-                                        alt="Uploaded"
-                                        className={styles.uploadedImage}
-                                        onClick={() => openModal(image.url)}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                <div className={styles.messageContent}>
+                    {/* 이미지가 있는 경우 이미지 갤러리 표시 */}
+                    {message.images && message.images.length > 0 && (
+                        <div className={styles.imageContainer}>
+                            {message.images.map((imageUrl, idx) => (
+                                <img
+                                    key={idx}
+                                    src={typeof imageUrl === 'string' ? imageUrl : imageUrl.url} // URL 처리 수정
+                                    alt="Uploaded"
+                                    className={styles.uploadedImage}
+                                    onClick={() => openModal(typeof imageUrl === 'string' ? imageUrl : imageUrl.url)}
+                                />
+                            ))}
+                        </div>
+                    )}
+                    {/* 텍스트 메시지가 있는 경우 표시 */}
+                    {message.content && (
+                        <p className={styles.messageText}>
+                            {highlightText(message.content)}
+                        </p>
+                    )}
                 </div>
             )}
+
         </div>
     );
 });
-
-MessageItem.displayName = 'MessageItem';
 
 export default MessageItem;

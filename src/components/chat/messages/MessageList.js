@@ -1,19 +1,18 @@
 import React, { memo, useRef, useEffect } from 'react';
 import MessageItem from './MessageItem';
+import RecommendationItem from './RecommendationItem';
 import LoadingDots from './LoadingDots';
 import styles from '../../../css/chat/MessageList.module.css';
 
-/**
- * 전체 메시지 목록과 스크롤 컨테이너를 관리하는 컴포넌트
- */
 const MessageList = memo(({
-    messages = [],                    
-    isLoading = false,               
-    highlightedMessageIndexes = [],   
-    currentHighlightedIndex = null,   
-    searchInput = '',                 
-    openImageModal                    
+    messages = [],
+    isLoading = false,
+    highlightedMessageIndexes = [],
+    currentHighlightedIndex = null,
+    searchInput = '',
+    openImageModal
 }) => {
+
     const messageRefs = useRef([]);
     const messagesEndRef = useRef(null);
 
@@ -41,24 +40,32 @@ const MessageList = memo(({
         <div className={styles.messageBox}>
             <div className={styles.messagesContainer}>
                 {messages.map((message, index) => (
-                    <div
-                        key={message.id || index}
-                        ref={el => messageRefs.current[index] = el}
-                        id={`message-${index}`}
-                        className={`${styles.message} ${
-                            message.type === 'USER' ? styles.userMessage : styles.botMessage
-                        } ${
-                            highlightedMessageIndexes?.includes(index) ? styles.highlightedMessage : ''
-                        }`}
-                    >
-                        <MessageItem
-                            message={message}
-                            isHighlighted={highlightedMessageIndexes?.includes(index)}
-                            searchInput={searchInput}
-                            openModal={openImageModal}
-                            color={message.color}
-                        />
-                    </div>
+                    <React.Fragment key={message.id || index}>
+                        <div
+                            ref={el => messageRefs.current[index] = el}
+                            id={`message-${index}`}
+                            className={`${styles.message} ${message.type === 'USER' ? styles.userMessage : styles.botMessage}
+                                ${highlightedMessageIndexes?.includes(index) ? styles.highlightedMessage : ''}`}
+                        >
+                            <MessageItem
+                                message={message}
+                                isHighlighted={highlightedMessageIndexes.includes(index)}
+                                searchInput={searchInput}
+                                openModal={openImageModal}
+                            />
+                        </div>
+                        {message.type === 'AI' && message.mode === 'recommendation' && (
+                            <div className={styles.recommendationWrapper}>
+                                <RecommendationItem
+                                    content={message.content}
+                                    imageUrl={message.imageUrl}
+                                    recommendations={message.recommendations}
+                                    openImageModal={openImageModal}
+                                    chatId={message.id}
+                                />
+                            </div>
+                        )}
+                    </React.Fragment>
                 ))}
                 {isLoading && <LoadingDots />}
                 <div ref={messagesEndRef} />
@@ -68,4 +75,5 @@ const MessageList = memo(({
 });
 
 MessageList.displayName = 'MessageList';
+
 export default MessageList;
