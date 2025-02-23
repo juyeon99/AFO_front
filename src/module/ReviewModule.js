@@ -4,7 +4,8 @@ import {
     updateReview, 
     deleteReview,
     getReviewsByProductId,
-    getReviewsByMemberId
+    getReviewsByMemberId,
+    getReviewSummary
 } from "../api/ReviewAPICalls";
 
 
@@ -12,6 +13,7 @@ const initialState = {
     reviews: [],
     loading: false,
     error: null,
+    summary: null,
 };
 
 export const {
@@ -32,6 +34,9 @@ export const {
         fetchMemberReviewsStart,
         fetchMemberReviewsSuccess,
         fetchMemberReviewsFail,
+        fetchReviewSummaryStart,
+        fetchReviewSummarySuccess,
+        fetchReviewSummaryFail,
     },
 } = createActions({
     REVIEWS: {
@@ -52,6 +57,9 @@ export const {
         FETCH_MEMBER_REVIEWS_START: () => {},
         FETCH_MEMBER_REVIEWS_SUCCESS: (reviews) => reviews,
         FETCH_MEMBER_REVIEWS_FAIL: (error) => error,
+        FETCH_REVIEW_SUMMARY_START: () => {},
+        FETCH_REVIEW_SUMMARY_SUCCESS: (summary) => summary,
+        FETCH_REVIEW_SUMMARY_FAIL: (error) => error,
     },
 });
 
@@ -155,6 +163,36 @@ export const deleteExistingReview = (reviewId, productId) => async (dispatch, ge
     }
 };
 
+// Thunk 액션 수정
+export const fetchReviewSummary = (productId) => async (dispatch) => {
+    try {
+        dispatch(fetchReviewSummaryStart());
+        
+        // productId 유효성 검사 추가
+        if (!productId) {
+            throw new Error('Invalid productId');
+        }
+
+        const summary = await getReviewSummary(productId);
+        
+        // 응답이 문자열인지 확인
+        if (typeof summary === 'string') {
+            dispatch(fetchReviewSummarySuccess(summary));
+            return summary;
+        } else {
+            // 다른 형식의 응답이 온 경우 처리
+            const summaryText = summary?.summary || "리뷰 요약을 불러오는데 실패했습니다.";
+            dispatch(fetchReviewSummarySuccess(summaryText));
+            return summaryText;
+        }
+    } catch (error) {
+        console.error("Error in fetchReviewSummary:", error);
+        const errorMessage = "리뷰 요약을 불러오는데 실패했습니다.";
+        dispatch(fetchReviewSummaryFail(errorMessage));
+        return errorMessage;
+    }
+};
+
 // 리듀서는 변경 없음
 const reviewReducer = handleActions(
     {
@@ -214,6 +252,22 @@ const reviewReducer = handleActions(
             loading: false,
             error: payload,
         }),
+        [fetchReviewSummaryStart]: (state) => ({
+            ...state,
+            loading: true,
+            error: null,
+        }),
+        [fetchReviewSummarySuccess]: (state, { payload }) => ({
+            ...state,
+            summary: payload,
+            loading: false,
+            error: null,
+        }),
+        [fetchReviewSummaryFail]: (state, { payload }) => ({
+            ...state,
+            loading: false,
+            error: payload,
+        }),
     },
     initialState
 );
@@ -221,5 +275,6 @@ const reviewReducer = handleActions(
 export const selectReviews = (state) => state.reviews.reviews;
 export const selectReviewLoading = (state) => state.reviews.loading;
 export const selectReviewError = (state) => state.reviews.error;
+export const selectReviewSummary = (state) => state.reviews.summary;
 
 export default reviewReducer;
