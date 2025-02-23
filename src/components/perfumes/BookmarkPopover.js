@@ -14,15 +14,15 @@ const BookmarkPopover = ({ show, onClose }) => {
     useEffect(() => {
         // 팝업이 처음 열릴 때만 데이터 가져오기
         if (show && isInitialLoad) {
-          const auth = JSON.parse(localStorage.getItem('auth'));
-          if (auth?.id) {
-            setRecommendedLoading(activeTab === 'recommended');
-            dispatch(fetchBookmarks(auth.id))
-              .finally(() => {
-                setRecommendedLoading(false);
-                setIsInitialLoad(false);
-              });
-          }
+            const auth = JSON.parse(localStorage.getItem('auth'));
+            if (auth?.id) {
+                setRecommendedLoading(activeTab === 'recommended');
+                dispatch(fetchBookmarks(auth.id))
+                    .finally(() => {
+                        setRecommendedLoading(false);
+                        setIsInitialLoad(false);
+                    });
+            }
         }
     }, [show, isInitialLoad, dispatch, activeTab]);
 

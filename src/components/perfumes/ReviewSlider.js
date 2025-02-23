@@ -7,7 +7,7 @@ const ReviewSlider = ({
     isDragging,
     sliderLeft,
     cardOffset,
-    allReviews,
+    allReviews = [],
     CARDS_PER_PAGE,
     onMouseDown,
     setCurrentPage,
@@ -18,13 +18,16 @@ const ReviewSlider = ({
     const [maxScroll, setMaxScroll] = useState(0);
 
     useEffect(() => {
-        if (allReviews.length > 0) {
-            const cardWidth = 196 + 37;
-            const totalWidth = allReviews.length * cardWidth;
-            const visibleWidth = CARDS_PER_PAGE * cardWidth;
-            setMaxScroll(Math.max(0, totalWidth - visibleWidth));
+        if (!allReviews || allReviews.length === 0) { 
+            setMaxScroll(0);
+            return;
         }
-    }, [allReviews.length, CARDS_PER_PAGE]);
+    
+        const cardWidth = 196 + 37;
+        const totalWidth = allReviews.length * cardWidth;
+        const visibleWidth = CARDS_PER_PAGE * cardWidth;
+        setMaxScroll(Math.max(0, totalWidth - visibleWidth));
+    }, [allReviews, CARDS_PER_PAGE]);
 
     const handleSliderClick = (e) => {
         if (!e.target.className.includes(styles.sliderHandle)) {
