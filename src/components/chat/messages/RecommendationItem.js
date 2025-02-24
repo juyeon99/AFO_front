@@ -10,15 +10,23 @@ import SaveScentButton from './SaveScentButton';
 
 const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId, recommendationType, lineId }) => {
     console.log('RecommendationItem chatId:', chatId);
-    console.log('RecommendationItem recommendationType:', recommendationType);
+    console.log('RecommendationItem lineId:', lineId);
 
-    // lineId로 해당하는 향수 계열 찾기
-    // filters를 직접 사용
     const getLineName = (lineId) => {
-        if (!lineId) return '';
-        const filter = SCENT_FILTERS.find(f => f.id === parseInt(lineId));
+        if (!lineId) {
+            console.log('No lineId provided');
+            return '';
+        }
+
+        const parsedLineId = parseInt(lineId);
+        const filter = SCENT_FILTERS.find(f => f.id === parsedLineId);
+        console.log('LineId:', lineId, 'Parsed:', parsedLineId, 'Filter:', filter);
         return filter ? filter.name : '';
     };
+
+    // 메시지의 lineId를 사용
+    const messageLineName = getLineName(recommendationType);
+    console.log('Message Line Name:', messageLineName);
 
     const getRecommendationTypeInfo = (type) => {
         switch (type) {
@@ -111,9 +119,9 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
                         />
                         <div className={styles.cardContent}>
                             {/* lineId를 향수 계열 이름으로 변환하여 표시 */}
-                            {product.lineId && (
+                            {messageLineName && (
                                 <p className={styles.productLine}>
-                                    {getLineName(product.lineId)}
+                                    {messageLineName}
                                 </p>
                             )}
                             <p className={styles.productBrand}>{product.productBrand}</p>

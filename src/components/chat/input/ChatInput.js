@@ -1,5 +1,6 @@
-import React, { useState, memo, useRef } from 'react';
+import React, { useState, memo } from 'react';
 import ImageUpload from './ImageUpload';
+import PropTypes from 'prop-types';
 import styles from '../../../css/chat/ChatInput.module.css';
 
 /**
@@ -15,7 +16,8 @@ const ChatInput = memo(({
     selectedImages,      // 선택된 이미지들
     setSelectedImages,   // 이미지 목록 변경 함수
     handleRemoveImage,   // 이미지 삭제 함수
-    fileInputRef        // 파일 입력창 참조
+    fileInputRef,        // 파일 입력창 참조
+    backgroundClass     // 배경 클래스
 }) => {
     // 입력된 메시지를 저장하는 상태
     const [input, setInput] = useState('');
@@ -79,7 +81,7 @@ const ChatInput = memo(({
         };    
 
     return (
-        <div className={styles.inputAreaWrapper}>
+        <div className={`${styles.inputAreaWrapper} ${backgroundClass}`}>
             {/* 선택된 이미지 미리보기 */}
             {selectedImages.length > 0 && (
                 <div className={styles.imagePreviewContainer}>
@@ -131,5 +133,15 @@ const ChatInput = memo(({
         </div>
     );
 });
+
+ChatInput.propTypes = {
+    onSend: PropTypes.func.isRequired,
+    handleImageUpload: PropTypes.func.isRequired,
+    selectedImages: PropTypes.array.isRequired,
+    setSelectedImages: PropTypes.func.isRequired,
+    handleRemoveImage: PropTypes.func.isRequired,
+    fileInputRef: PropTypes.object.isRequired,
+    backgroundClass: PropTypes.string  // PropTypes 추가
+};
 
 export default ChatInput;

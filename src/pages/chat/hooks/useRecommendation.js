@@ -26,8 +26,7 @@ export const SCENT_FILTERS = [
     { id: 11, name: 'Floral', color: '#FF80C1' },
     { id: 12, name: 'Musk', color: '#F8E4FF' },
     { id: 13, name: 'Powdery', color: '#FFFFFF' },
-    { id: 14, name: 'Amber', color: '#FFE8D3' },
-    { id: 15, name: 'Tobacco Leather', color: '#000000' },
+    { id: 14, name: 'Tobacco Leather', color: '#000000' },
 ];
 
 export const useRecommendation = () => {

@@ -3,10 +3,67 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #EFEDED;
     padding: 20px;
     border-top: 1px solid #e0e0e0;
+    background-color: #EFEDED;
     position: relative;
+}
+
+/* 향수 계열별 배경 스타일 */
+.perfume-line-spicy {
+    background: #ffb5b5;  /* FF5757 기반 */
+}
+
+.perfume-line-fruity {
+    background: #fcd2b6;  /* FFBD43 기반 */
+}
+
+.perfume-line-citrus {
+    background: #ffef9f;  /* FFE043 기반 */
+}
+
+.perfume-line-green {
+    background: #C9F0CD;  /* 62D66A 기반 */
+}
+
+.perfume-line-aldehyde {
+    background: #9fc2f7;  /* 98D1FF 기반 */
+}
+
+.perfume-line-aquatic {
+    background: #a0e4ff;  /* 56D2FF 기반 */
+}
+
+.perfume-line-fougere {
+    background: #92ffe7;  /* 7ED3BB 기반 */
+}
+
+.perfume-line-gourmand {
+    background: #a5846f;  /* A1522C 기반 */
+}
+
+.perfume-line-woody {
+    background: #d1b591;  /* 86390F 기반 */
+}
+
+.perfume-line-oriental {
+    background: #E8CCFF;  /* C061FF 기반 */
+}
+
+.perfume-line-floral {
+    background: #fccfe6;  /* FF80C1 기반 */
+}
+
+.perfume-line-musk {
+    background: #e4cdee;  /* F8E4FF 기반 */
+}
+
+.perfume-line-powdery {
+    background: #F8F8F8;  /* FFFFFF 기반 */
+}
+
+.perfume-line-tobaccoLeather {
+    background: #e4e4e4;  /* 000000 기반 */
 }
 
 .inputArea {
@@ -18,7 +75,6 @@
     background-color: white;
     border-radius: 10px;
     padding: 10px 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .input {
@@ -27,7 +83,6 @@
     outline: none;
     font-size: 14px;
     padding: 8px;
-    background: transparent;
 }
 
 .fileUpload {
@@ -68,7 +123,6 @@
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 10px;
-    background-color: #f9f9f9;
     max-width: 200px;
 }
 

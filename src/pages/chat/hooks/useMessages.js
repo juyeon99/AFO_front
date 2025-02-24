@@ -103,15 +103,16 @@ export const useMessages = () => {
         const imageFile = images?.[0]?.file || null;
         console.log('전달될 이미지 파일:', imageFile);
     
-        // 사용자 메시지를 즉시 추가하여 채팅창에 표시
+        // 사용자 메시지 구조 분리
         const userMessage = {
             id: new Date().getTime().toString(),
             type: 'USER',
             content,
-            imageUrl: images?.[0]?.url || null, // Blob URL 임시 저장
+            // USER 메시지는 첨부한 이미지만 사용
+            userImage: images?.[0]?.url || null,
             images: images.map(img => ({ 
                 url: img.url,
-                file: img.file  // 파일 객체도 함께 저장
+                file: img.file
             })),
             mode: 'chat'
         };
@@ -119,32 +120,18 @@ export const useMessages = () => {
     
         setIsLoading(true);
         try {
-            // imageFile을 명시적으로 전달
             const response = await dispatch(fetchChatResponse(content, imageFile, null));
-    
             console.log('API 응답 전체:', response);
     
             if (response) {
                 setMessages(prev => {
-                    // 기존 메시지의 이미지 URL을 서버 응답의 URL로 업데이트
-                    const updatedMessages = prev.map(msg => 
-                        msg.id === userMessage.id 
-                            ? { ...msg, imageUrl: response.imageUrl || msg.imageUrl } 
-                            : msg
-                    );
-    
-                    const isDuplicate = updatedMessages.some(msg => msg.id === response.id);
-                    if (isDuplicate) {
-                        console.warn('중복된 AI 메시지 추가 방지:', response.id);
-                        return updatedMessages;
-                    }
-    
-                    // AI 메시지 추가
+                    // AI 메시지 구조 분리
                     const aiMessage = {
                         id: response.id,
                         type: 'AI',
                         content: response.content,
                         mode: response.mode || 'chat',
+                        // AI 메시지는 서버에서 받은 이미지만 사용
                         imageUrl: response.imageUrl || null,
                         lineId: response.lineId || null,
                         recommendations: response.recommendations || null,
@@ -153,13 +140,14 @@ export const useMessages = () => {
                     };
     
                     console.log('추가되는 AI 메시지:', aiMessage);
-                    return [...updatedMessages, aiMessage];
+                    return [...prev, aiMessage];
                 });
     
                 setRetryAvailable(false);
             }
         } catch (error) {
-            // ... 기존 에러 처리 코드 유지
+            console.error('메시지 전송 중 오류:', error);
+            setRetryAvailable(true);
         } finally {
             setIsLoading(false);
         }
