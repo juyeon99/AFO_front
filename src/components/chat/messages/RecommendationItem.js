@@ -8,8 +8,9 @@ import SpaIcon from '@mui/icons-material/Spa';     // 테라피
 import { SCENT_FILTERS } from '../../../pages/chat/hooks/useRecommendation';
 import SaveScentButton from './SaveScentButton';
 
-const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId }) => {
+const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId, recommendationType, lineId }) => {
     console.log('RecommendationItem chatId:', chatId);
+    console.log('RecommendationItem recommendationType:', recommendationType);
 
     // lineId로 해당하는 향수 계열 찾기
     // filters를 직접 사용
@@ -64,7 +65,7 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId 
         }
     };
 
-    const typeInfo = getRecommendationTypeInfo(recommendations[0]?.type || 1);
+    const typeInfo = getRecommendationTypeInfo(recommendationType || 1);
 
     return (
         <div className={`${styles.recommendationContainer} ${typeInfo.className}`}>
@@ -117,7 +118,7 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId 
                             )}
                             <p className={styles.productBrand}>{product.productBrand}</p>
                             <h3 className={styles.productTitle}>{product.productNameKr}</h3>
-                            <p className={styles.productGrade}>{product.productGrade}</p>
+                            <p className={styles.productGrade}>{product.productGrade || ''}</p>
                         </div>
                     </div>
                 ))}

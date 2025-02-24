@@ -21,18 +21,28 @@ export const useAuth = () => {
         setIsLoggedIn(!!userData);  // 로그인 정보가 있으면 true, 없으면 false
         
         // 로컬 스토리지에서 비회원 채팅 횟수 가져오기
-        const savedCount = parseInt(localStorage.getItem('nonMemberChatCount'), 10);
+        const savedCount = parseInt(localStorage.getItem('nonMemberChatCount'), 3);
         // 저장된 횟수가 있으면 설정
         if (!isNaN(savedCount)) {
             setNonMemberChatCount(savedCount);
         }
     }, []); // 빈 배열을 넣어서 한 번만 실행되도록 함
 
+    // 비회원 채팅 횟수를 증가시키는 함수
+    const incrementNonMemberChatCount = () => {
+        setNonMemberChatCount(prevCount => {
+            const newCount = prevCount + 1;
+            localStorage.setItem('nonMemberChatCount', newCount);
+            return newCount;
+        });
+    };
+
     // 로그인 상태와 비회원 채팅 횟수 관련 함수들을 반환
     return {
         isLoggedIn,              // 로그인 여부
         setIsLoggedIn,           // 로그인 상태 변경 함수
         nonMemberChatCount,      // 비회원 채팅 횟수
-        setNonMemberChatCount    // 비회원 채팅 횟수 변경 함수
+        setNonMemberChatCount,   // 비회원 채팅 횟수 변경 함수
+        incrementNonMemberChatCount // 비회원 채팅 횟수 증가 함수
     };
 };

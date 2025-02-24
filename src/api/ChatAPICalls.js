@@ -10,17 +10,34 @@ export const requestRecommendations = async (userInput, imageFile = null, userId
         }
 
         const formData = new FormData();
+        formData.append("content", userInput || "");
+        
+        // 이미지 파일 처리 개선
+        if (imageFile) {
+            // Blob URL인 경우 실제 파일로 변환
+            if (typeof imageFile === 'string' && imageFile.startsWith('blob:')) {
+                const response = await fetch(imageFile);
+                const blob = await response.blob();
+                formData.append("image", blob, "image.jpg"); // 적절한 파일명 지정
+            }
+            // File 객체인 경우 직접 추가
+            else if (imageFile instanceof File) {
+                formData.append("image", imageFile);
+            }
+            // 그 외의 경우 에러 처리
+            else {
+                console.error("지원하지 않는 이미지 형식:", imageFile);
+                throw new Error("지원하지 않는 이미지 형식입니다.");
+            }
+        }
+
+        if (userId) formData.append("memberId", userId);
+
+        // FormData 내용 로깅 (디버깅용)
         console.log("전송할 FormData:");
         for (let [key, value] of formData.entries()) {
             console.log(`${key}:`, value);
         }
-        formData.append("content", userInput);
-        if (imageFile instanceof File) {
-            formData.append("image", imageFile);
-        } else {
-            console.error("잘못된 이미지 파일 형식:", imageFile);
-        }
-        if (userId) formData.append("memberId", userId);
 
         const response = await apis.post("/chats", formData, {
             headers: { "Content-Type": "multipart/form-data" },
@@ -33,7 +50,6 @@ export const requestRecommendations = async (userInput, imageFile = null, userId
         throw new Error(error.response?.data?.message || "추천 요청 중 오류가 발생했습니다.");
     }
 };
-
 
 // 로그인한 회원의 채팅 내역 가져오기
 export const getChatHistory = async (memberId) => {

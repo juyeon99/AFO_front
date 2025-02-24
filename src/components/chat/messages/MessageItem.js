@@ -89,31 +89,28 @@ const MessageItem = memo(({
                 </>
             )}
 
-            {/* 사용자 메시지 렌더링 */}
-            {message?.type === 'USER' && (
-                <div className={styles.messageContent}>
-                    {/* 이미지가 있는 경우 이미지 갤러리 표시 */}
-                    {message.images && message.images.length > 0 && (
-                        <div className={styles.imageContainer}>
-                            {message.images.map((imageUrl, idx) => (
-                                <img
-                                    key={idx}
-                                    src={typeof imageUrl === 'string' ? imageUrl : imageUrl.url} // URL 처리 수정
-                                    alt="Uploaded"
-                                    className={styles.uploadedImage}
-                                    onClick={() => openModal(typeof imageUrl === 'string' ? imageUrl : imageUrl.url)}
-                                />
-                            ))}
-                        </div>
-                    )}
-                    {/* 텍스트 메시지가 있는 경우 표시 */}
-                    {message.content && (
-                        <p className={styles.messageText}>
-                            {highlightText(message.content)}
-                        </p>
-                    )}
-                </div>
-            )}
+     {/* 사용자 메시지 렌더링 */}
+{message?.type === 'USER' && (
+    <div className={styles.messageContent}>
+        {/* 이미지가 있는 경우 이미지 표시 */}
+        {message.imageUrl && (
+            <div className={styles.imageContainer}>
+                <img
+                    src={message.imageUrl}
+                    alt="Uploaded"
+                    className={styles.uploadedImage}
+                    onClick={() => openModal(message.imageUrl)}
+                />
+            </div>
+        )}
+        {/* 텍스트 메시지가 있는 경우 표시 */}
+        {message.content && (
+            <p className={styles.messageText}>
+                {highlightText(message.content)}
+            </p>
+        )}
+    </div>
+)}
 
         </div>
     );

@@ -61,6 +61,8 @@ const MessageList = memo(({
                                     imageUrl={message.imageUrl}
                                     recommendations={message.recommendations}
                                     openImageModal={openImageModal}
+                                    recommendationType={message.recommendationType}
+                                    lineId={message.lineId}
                                     chatId={message.id}
                                 />
                             </div>

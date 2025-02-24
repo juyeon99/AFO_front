@@ -15,7 +15,6 @@ import { useNavigate } from 'react-router-dom'; // 페이지 이동
  */
 
 export const useChat = () => {
-    // 페이지 이동을 위한 함수
     const navigate = useNavigate();
 
     // 각 기능별 훅 사용
@@ -29,7 +28,6 @@ export const useChat = () => {
         addMessage 
     } = useMessages();
     
-    // useSearch에서 반환되는 값들을 직접 받아옴
     const {
         searchInput,
         setSearchInput,
@@ -45,21 +43,22 @@ export const useChat = () => {
     const { uploadProps } = useUpload();
     const { modalProps } = useModal();
 
-    // 메시지 관련 props 통합
-    const messageProps = {
-        messages,
-        isLoading,
-        highlightedMessageIndexes,
-        currentHighlightedIndex
+    // 메시지 전송 핸들러 추가
+    const handleSendMessage = async (content) => {
+        if (selectedImages.length > 0 || content.trim()) {
+            const imageFile = selectedImages[0]?.file || null;
+            console.log('전송할 이미지:', imageFile);
+            await addMessage(content, selectedImages);
+            setSelectedImages([]); // 이미지 전송 후 초기화
+        }
     };
 
-    // 입력 관련 props 통합
+    // inputProps 수정
     const inputProps = {
-        onSend: addMessage,
+        onSend: handleSendMessage,  // addMessage 대신 handleSendMessage 사용
         ...uploadProps,
     };
 
-    // 뒤로가기 버튼을 눌렀을 때 실행되는 함수
     const handleGoBack = () => navigate(-1);
 
     return {
@@ -70,13 +69,13 @@ export const useChat = () => {
             retryAvailable,
             selectedImages,
             setSelectedImages,
-            addMessage,
-            openImageModal: modalProps.imageModal.openModal,  // 이미지 모달 함수 추가
-            highlightedMessageIndexes,  // 검색 하이라이트 정보 추가
-            currentHighlightedIndex     // 현재 하이라이트 인덱스 추가
+            addMessage: handleSendMessage, // 여기도 handleSendMessage로 변경
+            openImageModal: modalProps.imageModal.openModal,
+            highlightedMessageIndexes,
+            currentHighlightedIndex
         },
         inputProps,
-        searchProps: {  // 검색 관련 props 구조 수정
+        searchProps: {
             searchInput,
             setSearchInput,
             handleSearch,

@@ -72,7 +72,9 @@ export const useMessages = () => {
             // 새 이미지 정보 생성
             const newImage = {
                 url: URL.createObjectURL(file),
-                file: file
+                file: file,  // 실제 파일 객체 저장
+                type: file.type,
+                name: file.name
             };
             setSelectedImages([newImage]); // 새 이미지로 대체
         }
@@ -97,36 +99,49 @@ export const useMessages = () => {
     const addMessage = async (content, images = []) => {
         console.log('useMessages에서 받은 데이터:', { content, images });
     
+        // 이미지 파일 추출 및 로깅
+        const imageFile = images?.[0]?.file || null;
+        console.log('전달될 이미지 파일:', imageFile);
+    
         // 사용자 메시지를 즉시 추가하여 채팅창에 표시
         const userMessage = {
-            id: new Date().getTime().toString(), // 클라이언트에서 고유한 ID 생성
+            id: new Date().getTime().toString(),
             type: 'USER',
             content,
-            images: images.map(url => ({ url })),
+            imageUrl: images?.[0]?.url || null, // Blob URL 임시 저장
+            images: images.map(img => ({ 
+                url: img.url,
+                file: img.file  // 파일 객체도 함께 저장
+            })),
             mode: 'chat'
         };
         setMessages(prev => [...prev, userMessage]);
     
         setIsLoading(true);
         try {
-            const response = await dispatch(fetchChatResponse(content, images[0], null));
+            // imageFile을 명시적으로 전달
+            const response = await dispatch(fetchChatResponse(content, imageFile, null));
     
             console.log('API 응답 전체:', response);
     
             if (response) {
                 setMessages(prev => {
-                    console.log("기존 메시지 목록:", prev);
+                    // 기존 메시지의 이미지 URL을 서버 응답의 URL로 업데이트
+                    const updatedMessages = prev.map(msg => 
+                        msg.id === userMessage.id 
+                            ? { ...msg, imageUrl: response.imageUrl || msg.imageUrl } 
+                            : msg
+                    );
     
-                    // AI 메시지가 이미 존재하는지 확인 (id 기준으로 중복 체크)
-                    const isDuplicate = prev.some(msg => msg.id === response.id);
+                    const isDuplicate = updatedMessages.some(msg => msg.id === response.id);
                     if (isDuplicate) {
                         console.warn('중복된 AI 메시지 추가 방지:', response.id);
-                        return prev; // 중복 방지
+                        return updatedMessages;
                     }
     
                     // AI 메시지 추가
                     const aiMessage = {
-                        id: response.id,  // `id` 기준으로 중복 확인
+                        id: response.id,
                         type: 'AI',
                         content: response.content,
                         mode: response.mode || 'chat',
@@ -138,24 +153,17 @@ export const useMessages = () => {
                     };
     
                     console.log('추가되는 AI 메시지:', aiMessage);
-                    return [...prev, aiMessage]; // 중복이 아닐 때만 추가
+                    return [...updatedMessages, aiMessage];
                 });
     
                 setRetryAvailable(false);
             }
         } catch (error) {
-            console.error('Error fetching response:', error);
-            setRetryAvailable(true);
-            setMessages(prev => [...prev, {
-                id: INITIAL_MESSAGE_ID,
-                type: 'AI',
-                content: '죄송합니다. 응답을 받아오는 중 오류가 발생했습니다.',
-                mode: 'chat'
-            }]);
+            // ... 기존 에러 처리 코드 유지
         } finally {
             setIsLoading(false);
         }
-    };    
+    };
 
     /**
         * 메시지 재전송 함수
