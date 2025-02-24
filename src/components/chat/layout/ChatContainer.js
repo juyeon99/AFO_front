@@ -22,11 +22,11 @@ import { useModal } from '../../../pages/chat/hooks/useModal';
  */
 
 const ChatContainer = memo(({
-    messageProps,     // 메시지 목록 관련 속성들
-    inputProps,      // 입력창 관련 속성들
-    searchProps,     // 검색 관련 속성들
-    modalProps,      // 모달 관련 속성들
-    handleGoBack     // 뒤로가기 처리 함수
+    messageProps,   // 메시지 목록 관련 속성들
+    inputProps,     // 입력창 관련 속성들
+    searchProps,    // 검색 관련 속성들
+    modalProps,     // 모달 관련 속성들
+    handleGoBack    // 뒤로가기 처리 함수
 }) => {
 
     const getBackgroundClass = () => {
@@ -88,14 +88,25 @@ const ChatContainer = memo(({
 
     // 이미지 업로드 관련 기능들
     const {
-        selectedImages,      // 선택된 이미지들
-        setSelectedImages,   // 이미지 선택 상태 변경
-        handleImageUpload,   // 이미지 업로드 처리
-        handleRemoveImage    // 이미지 제거 처리
+        selectedImages,     // 선택된 이미지들
+        setSelectedImages,  // 이미지 선택 상태 변경
+        handleImageUpload,  // 이미지 업로드 처리
+        handleRemoveImage   // 이미지 제거 처리
     } = useUpload();
 
-    // 모달 상태 관리
-    const { modalProps: { isLoginModalOpen, loginModal, imageModal } } = useModal();
+    // 로그인 상태와 비회원 채팅 횟수 관리
+    const {
+        isLoggedIn,
+        incrementNonMemberChatCount,
+        nonMemberChatCount,
+        hasStartedChat,
+        hasReceivedRecommendation,
+        startChat,
+        setRecommendationReceived,
+        resetChat
+    } = useAuth();
+
+    const { loginModal } = modalProps;
 
     // searchProps가 undefined일 경우를 대비한 기본값 설정
     const defaultSearchProps = {
@@ -113,6 +124,33 @@ const ChatContainer = memo(({
     // searchProps가 없을 경우 기본값 사용
     const finalSearchProps = searchProps || defaultSearchProps;
     const fileInputRef = useRef(null);
+
+    // 채팅 초기화 로직
+    useEffect(() => {
+        if (!isLoggedIn && messageProps.messages.length === 0) {
+            resetChat();
+        }
+    }, [isLoggedIn, messageProps.messages.length]);
+
+    // 첫 AI 응답 시 대화 시작 상태만 설정
+    useEffect(() => {
+        if (!isLoggedIn && messageProps.messages.length > 0) {
+            const lastMessage = messageProps.messages[messageProps.messages.length - 1];
+            if (lastMessage?.type === 'AI' && !hasStartedChat) {
+                startChat();
+            }
+        }
+    }, [messageProps.messages]);
+
+    // AI 향수 추천 응답 감지
+    useEffect(() => {
+        if (!isLoggedIn && messageProps.messages.length > 0) {
+            const lastMessage = messageProps.messages[messageProps.messages.length - 1];
+            if (lastMessage?.type === 'AI' && lastMessage?.mode === 'recommendation') {
+                setRecommendationReceived();
+            }
+        }
+    }, [messageProps.messages]);
 
     return (
         <div className={`${styles.chatLayout} ${backgroundClass}`}>
@@ -140,15 +178,25 @@ const ChatContainer = memo(({
                 {/* 하단 메시지 가림막 */}
                 <div className={`${styles.inputOverlay} ${backgroundClass}`} />
 
-                <div className={styles.inputSection}>
+                <div className={`${styles.inputSection} ${backgroundClass}`}>
                     {/* 메시지 입력창 */}
-                    <ChatInput {...inputProps}
-                        backgroundClass={backgroundClass}
-                        onSend={inputProps.onSend}
+                    <ChatInput
+                        {...inputProps}
+                        onSend={(message) => {
+                            if (!isLoggedIn) {
+                                if (hasReceivedRecommendation || nonMemberChatCount >= 3) {
+                                    loginModal.onOpen();
+                                    return;
+                                }
+                                incrementNonMemberChatCount();
+                            }
+                            inputProps.onSend(message);
+                        }}
                         selectedImages={selectedImages}
                         setSelectedImages={setSelectedImages}
                         handleImageUpload={handleImageUpload}
                         handleRemoveImage={handleRemoveImage}
+                        backgroundClass={backgroundClass}
                         fileInputRef={fileInputRef}
                     />
                 </div>
@@ -160,7 +208,15 @@ const ChatContainer = memo(({
 
                 {/* 로그인 안내 모달 */}
                 {modalProps?.isLoginModalOpen && (
-                    <LoginModal {...modalProps.loginModal} />
+                    <LoginModal
+                        isOpen={modalProps.isLoginModalOpen}
+                        onClose={modalProps.loginModal.onClose}
+                        onLogin={() => {
+                            // 로그인 페이지로 이동하는 로직
+                            window.location.href = '/login';
+                            // 또는 다른 로그인 처리 로직
+                        }}
+                    />
                 )}
             </div>
         </div>
