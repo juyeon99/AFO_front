@@ -42,12 +42,16 @@ const SimilarPerfumes = ({ perfumeId ,initialData = null, onPerfumeChange }) => 
         loadSimilarPerfumes();
     }, [perfumeId, initialData]);
 
-    const handleCardClick = (id) => {
+    const handleCardClick = async (id) => {
         // 향수 변경 시 부모 컴포넌트에 알림
         if (onPerfumeChange) {
             onPerfumeChange(id);
         }
-        navigate(`/perfumes/${id}`);
+        
+        await navigate(`/perfumes/${id}`);
+        
+        // 페이지 최상단으로 즉시 이동
+        window.scrollTo(0, 0);
     };
 
     const PerfumeCardList = ({ perfumes, title }) => (

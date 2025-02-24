@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { fetchChatResponse } from '../../../module/ChatModule';
+import { useChatHistory } from './useChatHistory';
 
 /**
  * 채팅 메시지를 관리하는 Hook
@@ -14,16 +15,44 @@ import { fetchChatResponse } from '../../../module/ChatModule';
 
 export const useMessages = () => {
     const dispatch = useDispatch();
-
-    // 메시지 목록 상태 관리
-    // 첫 메시지는 AI의 환영 메시지
+    const INITIAL_MESSAGE_ID = '000000000000000000000000';
     const [messages, setMessages] = useState([{
-        id: uuidv4(),
+        id: INITIAL_MESSAGE_ID,  // 고정된 ID 사용
         type: 'AI',
         content: '안녕하세요. 센티크입니다. 당신에게 어울리는 향을 찾아드리겠습니다.',
         mode: 'chat',
-        isInitialMessage: true
+        isInitialMessage: true,
+        style: {
+            fontSize: '20px',
+            lineHeight: '1.6'
+        }
     }]);
+
+    const { chatHistory, loadChatHistory } = useChatHistory();
+
+    // 컴포넌트 마운트 시 채팅 기록 로드
+    useEffect(() => {
+        loadChatHistory();
+    }, []);
+
+    // 채팅 기록이 로드되면 초기 메시지와 함께 설정
+    useEffect(() => {
+        if (chatHistory && chatHistory.length > 0) {
+            setMessages(prevMessages => {
+                console.log("기존 메시지:", prevMessages);
+                console.log("로드된 채팅 기록:", chatHistory);
+    
+                // 중복 메시지 제거
+                const existingIds = new Set(prevMessages.map(msg => msg.chatId || msg.id));
+                const uniqueMessages = chatHistory.filter(msg => !existingIds.has(msg.chatId || msg.id));
+    
+                console.log("새롭게 추가될 메시지:", uniqueMessages);
+    
+                return [...prevMessages, ...uniqueMessages];
+            });
+        }
+    }, [chatHistory]);    
+    
 
     // 로딩 상태와 재시도 가능 여부
     const [isLoading, setIsLoading] = useState(false);      // 메시지 전송 중인지
@@ -66,51 +95,59 @@ export const useMessages = () => {
     * 3. 응답 받으면 AI 메시지 추가
     */
     const addMessage = async (content, images = []) => {
-        console.log('useMessages에서 받은 데이터:', {
-            content: content,
-            images: images
-        });
-        // 사용자 메시지 추가
+        console.log('useMessages에서 받은 데이터:', { content, images });
+    
+        // 사용자 메시지를 즉시 추가하여 채팅창에 표시
         const userMessage = {
-            id: uuidv4(),
+            id: new Date().getTime().toString(), // 클라이언트에서 고유한 ID 생성
             type: 'USER',
             content,
-            images: images.map(url => ({ url })), // 이미지 배열로 저장
+            images: images.map(url => ({ url })),
             mode: 'chat'
         };
         setMessages(prev => [...prev, userMessage]);
-
-        // AI 응답 요청
+    
         setIsLoading(true);
         try {
-            // ChatAPICalls.js의 형식에 맞춰 데이터 전달
-            const response = await dispatch(fetchChatResponse(
-                content,           // userInput
-                images[0],        // imageFile
-                null              // userId (필요한 경우 추가)
-            ));
-
+            const response = await dispatch(fetchChatResponse(content, images[0], null));
+    
             console.log('API 응답 전체:', response);
-
+    
             if (response) {
-                const aiMessage = {
-                    id: response.id || uuidv4(),
-                    type: 'AI',
-                    content: response.content,  // API 응답의 content 필드 사용
-                    mode: response.mode || 'chat',
-                    imageUrl: response.imageUrl || null,    
-                    recommendations: response.recommendations || null,
-                    timestamp: response.timeStamp || new Date().toISOString()
-                };
-                console.log('생성된 AI 메시지:', aiMessage); 
-                setMessages(prev => [...prev, aiMessage]);
+                setMessages(prev => {
+                    console.log("기존 메시지 목록:", prev);
+    
+                    // AI 메시지가 이미 존재하는지 확인 (id 기준으로 중복 체크)
+                    const isDuplicate = prev.some(msg => msg.id === response.id);
+                    if (isDuplicate) {
+                        console.warn('중복된 AI 메시지 추가 방지:', response.id);
+                        return prev; // 중복 방지
+                    }
+    
+                    // AI 메시지 추가
+                    const aiMessage = {
+                        id: response.id,  // `id` 기준으로 중복 확인
+                        type: 'AI',
+                        content: response.content,
+                        mode: response.mode || 'chat',
+                        imageUrl: response.imageUrl || null,
+                        lineId: response.lineId || null,
+                        recommendations: response.recommendations || null,
+                        recommendationType: response.recommendationType || null,
+                        timestamp: response.timeStamp || new Date().toISOString()
+                    };
+    
+                    console.log('추가되는 AI 메시지:', aiMessage);
+                    return [...prev, aiMessage]; // 중복이 아닐 때만 추가
+                });
+    
                 setRetryAvailable(false);
             }
         } catch (error) {
             console.error('Error fetching response:', error);
             setRetryAvailable(true);
             setMessages(prev => [...prev, {
-                id: uuidv4(),
+                id: INITIAL_MESSAGE_ID,
                 type: 'AI',
                 content: '죄송합니다. 응답을 받아오는 중 오류가 발생했습니다.',
                 mode: 'chat'
@@ -118,7 +155,7 @@ export const useMessages = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    };    
 
     /**
         * 메시지 재전송 함수

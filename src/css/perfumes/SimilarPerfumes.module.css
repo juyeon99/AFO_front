@@ -9,7 +9,7 @@
     width: 1380px;  /* PerfumeDetail의 divider와 동일한 너비 */
     margin: 40px auto;
     position: relative;
-    left: calc(50% - 1380px/2 + -55px);  /* PerfumeDetail의 divider와 동일한 위치 */
+    left: calc(50% - 1362px/2 + 180px);  /* PerfumeDetail의 divider와 동일한 위치 */
 }
 
 .sectionTitle {
@@ -26,7 +26,6 @@
     justify-content: center;
     gap: 40px;  /* 카드 사이 간격 */
     flex-wrap: wrap;
-    margin: 0 auto;
     padding: 20px;
 }
 

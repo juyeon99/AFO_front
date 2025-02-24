@@ -17,7 +17,8 @@ import styles from '../../../css/chat/Modal.module.css';
 
 // React.memo로 감싸서 불필요한 리렌더링 방지
 const ImageModal = memo(({ image, onClose, isOpen }) => {
-    if (!isOpen) return null;
+    console.log('ImageModal 렌더링:', { image, onClose, isOpen });
+    if (!image) return null;
     
     return (
         // 모달 오버레이 - 배경을 어둡게 처리하고 클릭시 모달 닫기

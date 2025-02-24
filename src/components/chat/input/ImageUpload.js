@@ -10,11 +10,12 @@ import styles from '../../../css/chat/ChatInput.module.css';
 
 const ImageUpload = memo(({
     onUpload,      // 이미지가 선택됐을 때 실행되는 함수
-    fileInputRef   // 파일 입력창을 제어하기 위한 참조
+    fileInputRef,   // 파일 입력창을 제어하기 위한 참조
+    onPaste
 }) => {
     return (
         // 파일 업로드 영역
-        <div className={styles.fileUpload}>
+        <div className={styles.fileUpload} onPaste={onPaste}>
             {/* 
                 이미지 업로드 버튼
                 - 클릭하면 숨겨진 파일 선택창이 열림
@@ -40,6 +41,7 @@ const ImageUpload = memo(({
                 onChange={onUpload}     // 파일 선택시 실행될 함수
                 ref={fileInputRef}      // 파일 입력창 참조
                 style={{ display: 'none' }}  // 화면에서 숨김
+                multiple={false}
             />
         </div>
     );

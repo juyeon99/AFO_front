@@ -15,6 +15,8 @@ const PerfumeDetail = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const location = useLocation();
     const perfumes = useSelector(selectPerfumes);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     // 페이지 로드/새로고침 시 항상 전체 향수 목록과 현재 향수 데이터 불러오기
     useEffect(() => {

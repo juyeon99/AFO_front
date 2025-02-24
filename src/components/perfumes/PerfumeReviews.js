@@ -1,175 +1,108 @@
-import React, { useState, useEffect } from 'react';
+// PerfumeReviews.js
+import React from 'react';
 import styles from '../../css/perfumes/PerfumeReviews.module.css';
 import ReviewSlider from '../../components/perfumes/ReviewSlider';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectPerfumes } from '../../module/PerfumeModule';
-import { fetchReviews, selectReviews, createNewReview } from '../../module/ReviewModule';
 import ReviewModal from './ReviewModal';
-import { fetchUserLikedReviews, createHeart, deleteHeart } from '../../api/PerfumeAPICalls';
+import { Heart } from 'lucide-react';
+import usePerfumeReviewState from './PerfumeReviewState';
+import ReviewSummary from './ReviewSummary';
 
 const PerfumeReviews = ({ perfumeId }) => {
-    const dispatch = useDispatch();
-    
-    const [selectedReview, setSelectedReview] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [isDragging, setIsDragging] = useState(false);
-    const [startX, setStartX] = useState(0);
-    const [sliderLeft, setSliderLeft] = useState(0);
-    const [cardOffset, setCardOffset] = useState(0);
-    const [reviewContent, setReviewContent] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [likedReviews, setLikedReviews] = useState([]);
-
-    const perfumes = useSelector(selectPerfumes);
-    const perfume = perfumes?.find(p => p.id === perfumeId);
-    const reviews = useSelector(selectReviews) ?? [];
-
-    const auth = JSON.parse(localStorage.getItem('auth'));
-    const userId = auth?.id;
-
-    const CARDS_PER_PAGE = 5;
-    const totalPages = Math.ceil(reviews.length / CARDS_PER_PAGE);
-
-    useEffect(() => {
-        if (perfumeId) {
-            dispatch(fetchReviews(perfumeId));
-        }
-    }, [perfumeId, dispatch]);
-
-    useEffect(() => {
-        if (reviews.length > 0) {
-            setCurrentPage(totalPages);
-            setSliderLeft(0);
-            setCardOffset(0);
-        }
-    }, [reviews.length, CARDS_PER_PAGE]);
-
-    useEffect(() => {
-        if (perfumeId && userId) {
-            loadLikedReviews();
-        }
-    }, [perfumeId, userId]);
-
-    const loadLikedReviews = async () => {
-        if (!userId) return;
-        try {
-            const likedReviewIds = await fetchUserLikedReviews(userId);
-            setLikedReviews(likedReviewIds);
-        } catch (error) {
-            console.error("좋아요 데이터 불러오기 실패:", error);
-        }
-    };
-
-    const handleToggleHeart = async (reviewId) => {
-        if (!userId) {
-            alert("로그인이 필요합니다.");
-            return;
-        }
-
-        try {
-            if (likedReviews.includes(reviewId)) {
-                await deleteHeart(reviewId);
-                setLikedReviews(prev => prev.filter(id => id !== reviewId));
-            } else {
-                await createHeart(userId, reviewId);
-                setLikedReviews(prev => [...prev, reviewId]);
-            }
-            await loadLikedReviews();
-        } catch (error) {
-            console.error("좋아요 처리 실패:", error);
-        }
-    };
-
-    const handleReviewSubmit = () => {
-        if (!userId) {
-            alert('리뷰를 작성하려면 로그인이 필요합니다.');
-            return;
-        }
-
-        dispatch(createNewReview({
-            productId: perfumeId,
-            memberId: userId,
-            content: reviewContent
-        }));
-
-        setReviewContent('');
-        dispatch(fetchReviews(perfumeId));
-    };
-
-    const handleModalClose = async () => {
-        setIsModalOpen(false);
-        await dispatch(fetchReviews(perfumeId));
-        if (userId) await loadLikedReviews();
-    };
-
-    const handleMouseDown = (e) => {
-        setIsDragging(true);
-        setStartX(e.clientX);
-    };
-
-    const handleMouseMove = (e) => {
-        if (!isDragging) return;
-
-        const cardWidth = 196 + 37;
-        const maxOffset = (reviews.length - CARDS_PER_PAGE) * cardWidth;
-
-        let newOffset = cardOffset + (e.clientX - startX);
-        newOffset = Math.max(0, Math.min(newOffset, maxOffset));
-
-        setCardOffset(newOffset);
-        setSliderLeft((newOffset / maxOffset) * 100);
-
-        const newPage = Math.ceil(newOffset / (cardWidth * CARDS_PER_PAGE)) + 1;
-        if (newPage !== currentPage) setCurrentPage(newPage);
-    };
-
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
-
-    useEffect(() => {
-        window.addEventListener("mousemove", handleMouseMove);
-        window.addEventListener("mouseup", handleMouseUp);
-
-        return () => {
-            window.removeEventListener("mousemove", handleMouseMove);
-            window.removeEventListener("mouseup", handleMouseUp);
-        };
-    }, [isDragging, cardOffset, reviews.length, totalPages]);
+    const {
+        isDragging,
+        sliderLeft,
+        cardOffset,
+        currentPage,
+        animation,
+        reviewContent,
+        isModalOpen,
+        likedReviews,
+        heartCounts,
+        reviews,
+        perfume,
+        CARDS_PER_PAGE,
+        totalPages,
+        mostLikedReview,
+        handleMouseDown,
+        handleToggleHeart,
+        handleReviewSubmit,
+        handleModalClose,
+        handleModalOpen,
+        setReviewContent,
+        setCurrentPage,
+        setSliderLeft,
+        setCardOffset,
+    } = usePerfumeReviewState(perfumeId);
 
     return (
         <div className={styles.reviewsContainer}>
+            {/* 리뷰 요약 섹션 추가 */}
+            <ReviewSummary perfumeId={perfumeId} />
+
+            {/* 상단 Top 1 리뷰 */}
             <div className={styles.topReviewsSection}>
                 <div className={styles.topReviewCard}>
                     <h4>사용자 리뷰 Top 1</h4>
                     <div className={styles.reviewContent}>
-                        <p>{reviews?.[0]?.content || "사용자 리뷰가 없습니다."}</p>
+                        <p>{mostLikedReview?.content || "사용자 리뷰가 없습니다."}</p>
                     </div>
                 </div>
             </div>
 
+            {/* 리뷰 목록 섹션 */}
             <div className={styles.reviewListSection}>
-                <button className={styles.writeReviewBtn} onClick={() => setIsModalOpen(true)}>
+                {/* 🔹 "리뷰 작성하기" 버튼 → 모달 열기 */}
+                <button className={styles.writeReviewBtn} onClick={handleModalOpen}>
                     리뷰 작성하기
                 </button>
 
-                <ReviewModal isOpen={isModalOpen} onClose={handleModalClose} perfume={perfume} onSubmit={handleReviewSubmit} />
+                {/* 리뷰 작성 모달 */}
+                <ReviewModal
+                    isOpen={isModalOpen}
+                    onClose={handleModalClose}
+                    perfume={perfume}
+                    onSubmit={handleReviewSubmit}
+                />
 
                 <div className={styles.reviewCardsContainer}>
                     <div className={styles.reviewCards} style={{ transform: `translateX(-${cardOffset}px)` }}>
                         {reviews.map(review => (
-                            <div key={review.id} className={`${styles.reviewCard} ${likedReviews.includes(review.id) ? styles.likedBorder : ''}`}>
+                            <div
+                                key={review.id}
+                                className={`${styles.reviewCard} ${likedReviews.includes(review.id) ? styles.likedBorder : ''}`}
+                            >
+                                {/* 이미지, divider, 내용, 작성자 */}
+                                <img
+                                    src={perfume?.imageUrlList?.[0]}
+                                    alt="향수 이미지"
+                                    className={styles.perfumeThumb}
+                                />
+                                <div className={styles.divider} />
                                 <p className={styles.reviewContent}>{review.content}</p>
-                                <p className={styles.reviewerName}>{review.name}</p>
-                                <button className={likedReviews.includes(review.id) ? styles.heartActive : styles.heart}
-                                        onClick={() => handleToggleHeart(review.id)}>
-                                    🙂
-                                </button>
+                                <p className={styles.reviewerName}>{review.memberName}</p>
+
+                                {/* 좋아요(하트) */}
+                                <div className={styles.heartContainer}>
+                                    <button
+                                        className={likedReviews.includes(review.id) ? styles.heartActive : styles.heart}
+                                        onClick={() => handleToggleHeart(review.id)}
+                                    >
+                                        <Heart
+                                            size={20}
+                                            fill={likedReviews.includes(review.id) ? "#FF0000" : "none"}
+                                            color={likedReviews.includes(review.id) ? "#FF0000" : "#000000"}
+                                        />
+                                    </button>
+                                    <span className={styles.heartCount}>
+                                        {heartCounts[review.id] || 0}
+                                    </span>
+                                </div>
                             </div>
                         ))}
                     </div>
                 </div>
 
+                {/* 슬라이더 */}
                 <ReviewSlider
                     currentPage={currentPage}
                     totalPages={totalPages}
@@ -179,7 +112,13 @@ const PerfumeReviews = ({ perfumeId }) => {
                     allReviews={reviews}
                     CARDS_PER_PAGE={CARDS_PER_PAGE}
                     onMouseDown={handleMouseDown}
-                    setCurrentPage={setCurrentPage}
+                    setCurrentPage={(page) => {
+                        setCurrentPage(page);
+                        const percentage = ((page - 1) / (totalPages - 1)) * 100;
+                        const newOffset = (percentage / 100) * ((reviews.length - CARDS_PER_PAGE) * (196 + 37));
+                        setSliderLeft(percentage);
+                        setCardOffset(newOffset);
+                    }}
                     setSliderLeft={setSliderLeft}
                     setCardOffset={setCardOffset}
                 />

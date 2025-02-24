@@ -5,6 +5,7 @@
     overflow-y: auto;
     position: relative;  /* 추가 */
     overflow-y: auto;
+    transition: background 0.3s ease;
 }
 
 .container {
@@ -64,7 +65,7 @@
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
-    max-width: 800px;  /* 노란색 영역에 맞게 조정 */
+    max-width: 1200px;  /* 노란색 영역에 맞게 조정 */
     width: calc(100% - 40px);
     padding: 0;
 }
@@ -125,4 +126,65 @@
 .containerWrapper {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+}
+
+/* 배경 테마 */
+.perfume-line.default {
+    background: linear-gradient(to bottom, rgba(239, 237, 237, 0.7), #EFEDED);
+}
+
+.perfume-line.spicy {
+    background: linear-gradient(to bottom, rgba(255, 87, 87, 0.5), rgba(255, 87, 87, 0.3));
+}
+
+.perfume-line.fruity {
+    background: linear-gradient(to bottom, rgba(255, 189, 67, 0.5), rgba(255, 189, 67, 0.3));
+}
+
+.perfume-line.citrus {
+    background: linear-gradient(to bottom, rgba(255, 224, 67, 0.5), rgba(255, 224, 67, 0.3));
+}
+
+.perfume-line.green {
+    background: linear-gradient(to bottom, rgba(98, 214, 106, 0.5), rgba(98, 214, 106, 0.3));
+}
+
+.perfume-line.aldehyde {
+    background: linear-gradient(to bottom, rgba(152, 209, 255, 0.5), rgba(152, 209, 255, 0.3));
+}
+
+.perfume-line.aquatic {
+    background: linear-gradient(to bottom, rgba(86, 210, 255, 0.5), rgba(86, 210, 255, 0.3));
+}
+
+.perfume-line.fougere {
+    background: linear-gradient(to bottom, rgba(255, 217, 166, 0.5), rgba(255, 217, 166, 0.3));
+}
+
+.perfume-line.gourmand {
+    background: linear-gradient(to bottom, rgba(161, 82, 44, 0.5), rgba(161, 82, 44, 0.3));
+}
+
+.perfume-line.woody {
+    background: linear-gradient(to bottom, rgba(134, 57, 15, 0.5), rgba(134, 57, 15, 0.3));
+}
+
+.perfume-line.oriental {
+    background: linear-gradient(to bottom, rgba(192, 97, 255, 0.5), rgba(192, 97, 255, 0.3));
+}
+
+.perfume-line.floral {
+    background: linear-gradient(to bottom, rgba(255, 128, 193, 0.5), rgba(255, 128, 193, 0.3));
+}
+
+.perfume-line.musk {
+    background: linear-gradient(to bottom, rgba(248, 228, 255, 0.5), rgba(248, 228, 255, 0.3));
+}
+
+.perfume-line.powdery {
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3));
+}
+
+.perfume-line.tobacco-leather {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3));
 }

@@ -1,3 +1,7 @@
+import { useDispatch, useSelector } from 'react-redux';
+import { useRef } from 'react';
+import { selectChatHistory, fetchChatHistory } from '../../../module/ChatModule';
+
 /**
  * 채팅 기록을 관리하는 Hook
  * 

@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useRef } from 'react';
 import ChatHeader from './ChatHeader';
 import MessageList from '../messages/MessageList';
 import ChatInput from '../input/ChatInput';
@@ -26,6 +26,7 @@ const ChatContainer = memo(({
     modalProps,      // 모달 관련 속성들
     handleGoBack     // 뒤로가기 처리 함수
 }) => {
+
     // 이미지 업로드 관련 기능들
     const {
         selectedImages,      // 선택된 이미지들
@@ -49,6 +50,7 @@ const ChatContainer = memo(({
 
     // searchProps가 없을 경우 기본값 사용
     const finalSearchProps = searchProps || defaultSearchProps;
+    const fileInputRef = useRef(null);
 
     return (
         <div className={styles.chatLayout}>
@@ -65,8 +67,10 @@ const ChatContainer = memo(({
 
             <div className={styles.messageSection}>
                 {/* 메시지 목록 */}
-                <MessageList {...messageProps}
+                <MessageList 
+                    {...messageProps}
                     searchInput={searchProps?.searchInput}
+                    openImageModal={modalProps.imageModal.openModal}
                 />
             </div>
 
@@ -76,10 +80,12 @@ const ChatContainer = memo(({
             <div className={styles.inputSection}>
                 {/* 메시지 입력창 */}
                 <ChatInput {...inputProps}
+                    onSend={inputProps.onSend}
                     selectedImages={selectedImages}
                     setSelectedImages={setSelectedImages}
                     handleImageUpload={handleImageUpload}
                     handleRemoveImage={handleRemoveImage}
+                    fileInputRef={fileInputRef}
                 />
             </div>
 
