@@ -23,6 +23,7 @@ import ErrorScreen from './Fail';
 import Therapy from './pages/therapy/Therapy';
 import TherapyDiffuserRecommend from './components/therapy/TherapyDiffuserRecommend';
 import PerfumeDetail from './components/perfumes/PerfumeDetail';
+import ScentLens from './pages/Scentlens';
 
 // 원래 로그인
 import LoginTest from "./pages/test/LoginTest";
@@ -80,6 +81,7 @@ function App() {
           <Route path="/admin/spices" element={<AdminSpicesList />} />
           <Route path="/admin/perfumes" element={<AdminPerfumeList />} />
           <Route path='/fail' element={<ErrorScreen />} />
+          <Route path='/scentlens' element={<ScentLens/>}/>
 
           {/* <Route path='/logintest' element={<LoginTest />} />
           <Route path='/oauth/redirected/kakao' element={<KakaoRedirectPage />} />
