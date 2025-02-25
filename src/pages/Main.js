@@ -232,7 +232,7 @@ function Main() {
                             className="main-start-button"
                             onClick={() => document.getElementById('file-input').click()}
                         >
-                            ScentLens
+                            IMAGE
                         </button>
                         <input
                             id="file-input"
