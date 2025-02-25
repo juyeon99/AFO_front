@@ -23,7 +23,7 @@ import ErrorScreen from './Fail';
 import Therapy from './pages/therapy/Therapy';
 import TherapyDiffuserRecommend from './components/therapy/TherapyDiffuserRecommend';
 import PerfumeDetail from './components/perfumes/PerfumeDetail';
-import ScentLens from './pages/Scentlens';
+import ScentLens from './pages/scentlens/Scentlens';
 
 // 원래 로그인
 import LoginTest from "./pages/test/LoginTest";

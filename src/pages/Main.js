@@ -2,10 +2,10 @@ import '../css/Main.css';
 import React, { useEffect, useState, useRef } from 'react';
 import { NavLink } from 'react-router-dom'
 import DashboardModal from './admin/DashboardModal';
-import { ChartColumnIncreasing } from "lucide-react"; 
+import { ChartColumnIncreasing } from "lucide-react";
 import ColorLoadingScreen from "../components/loading/ColorLoadingScreen"
 import { useNavigate } from "react-router-dom";
-import ImageCropper from "./image/ImageCropper";
+import ImageCropper from "../pages/scentlens/image/ImageCropper";
 import axios from "axios";
 
 function Main() {
@@ -193,13 +193,13 @@ function Main() {
                         <div className="admin-banner">
                             관리자입니다.
                         </div>
-                        <button 
+                        <button
                             className="dashboard-button"
                             onClick={() => setIsDashboardOpen(true)}
                         >
-                            사용자 대시보드 <ChartColumnIncreasing size={20} style={{ marginRight: '5px', verticalAlign: 'middle'}} />
+                            사용자 대시보드 <ChartColumnIncreasing size={20} style={{ marginRight: '5px', verticalAlign: 'middle' }} />
                         </button>
-                        <DashboardModal 
+                        <DashboardModal
                             isOpen={isDashboardOpen}
                             onClose={() => setIsDashboardOpen(false)}
                         />
@@ -223,18 +223,25 @@ function Main() {
                 ></div>
                 <h1 className="main-title">"일상에 자연스럽게 스며드는 향기, 당신의 순간을 향기로 완성하세요."</h1>
                 <div className="main-content" style={{ opacity: videoOpacity }}>
-                    <NavLink to="/chat">
-                        <button className="main-start-button">START ▶</button>
-                    </NavLink>
-                    
-                    <br/>
-                    <button
-                        className="main-start-button"
-                        style={{ marginTop: '5px' }}
-                        onClick={() => document.getElementById('file-input').click()}
-                    >
-                        ScentLens
-                    </button>
+                    <div className="main-buttons-container">
+                        <NavLink to="/chat">
+                            <button className="main-start-button">CHAT</button>
+                        </NavLink>
+
+                        <button
+                            className="main-start-button"
+                            onClick={() => document.getElementById('file-input').click()}
+                        >
+                            ScentLens
+                        </button>
+                        <input
+                            id="file-input"
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={(e) => handleImageUpload(e.target.files[0])}
+                        />
+                    </div>
                     <input
                         id="file-input"
                         type="file"

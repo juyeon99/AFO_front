@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 const themes = [
     'spicy', 'fruity', 'citrus', 'green', 'aldehyde', 
     'aquatic', 'fougere', 'gourmand', 'woody', 'oriental', 
-    'floral', 'musk', 'powdery', 'amber', 'tobacco-leather'
+    'floral', 'musk', 'powdery', 'amber', 'tobacco_leather'
 ];
 
 // 랜덤으로 테마를 선택하는 헬퍼 함수
