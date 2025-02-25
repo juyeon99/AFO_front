@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import React, { memo } from 'react';
 import ImageUpload from './ImageUpload';
 import PropTypes from 'prop-types';
 import styles from '../../../css/chat/ChatInput.module.css';
@@ -17,71 +17,66 @@ const ChatInput = memo(({
     setSelectedImages,   // 이미지 목록 변경 함수
     handleRemoveImage,   // 이미지 삭제 함수
     fileInputRef,        // 파일 입력창 참조
-    backgroundClass     // 배경 클래스
+    input,               // 입력값 상태 (외부에서 관리)
+    setInput             // 입력값 상태 변경 함수 (외부에서 관리)
 }) => {
-    // 입력된 메시지를 저장하는 상태
-    const [input, setInput] = useState('');
-
     // 메시지 입력시 실행되는 함수
     const handleInputChange = (e) => {
         setInput(e.target.value);
     };
 
-
     // 메시지 전송 버튼 클릭시 실행되는 함수
     const handleSendMessage = () => {
         // 메시지나 이미지가 있을 때만 전송
         if (input.trim() || selectedImages.length > 0) {
-            // 선택된 이미지들의 URL만 추출
             const imageUrls = selectedImages.map(img => img.url);
             console.log('ChatInput에서 전송하는 데이터:', {
                 input: input,
                 imageUrls: imageUrls
             });
+
             // 메시지와 이미지 전송
             onSend(input, imageUrls);
+
             // 입력창 초기화
             setInput('');
-            // 이미지 목록 초기화
-            setSelectedImages([]);
+            setSelectedImages([]); // 이미지 목록 초기화
         }
     };
 
-
     // Enter 키 입력시 메시지 전송
     const handleKeyPress = (e) => {
-        // Shift + Enter가 아닌 Enter만 눌렀을 때
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault(); // 줄바꿈 방지
             handleSendMessage();
         }
     };
 
-        // 이미지 삭제 핸들러
-        const handleImageRemove = () => {
-            setSelectedImages([]);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';  // 파일 입력 초기화
+    // 이미지 삭제 핸들러
+    const handleImageRemove = () => {
+        setSelectedImages([]);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';  // 파일 입력 초기화
+        }
+    };
+
+    // 이미지 붙여넣기 핸들러
+    const handlePaste = (e) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+
+        for (let item of items) {
+            if (item.type.indexOf('image') !== -1) {
+                e.preventDefault();
+                const file = item.getAsFile();
+                handleImageUpload({ target: { files: [file] } });
+                break;  // 첫 번째 이미지만 처리
             }
-        };
-    
-        // 이미지 붙여넣기 핸들러
-        const handlePaste = (e) => {
-            const items = e.clipboardData?.items;
-            if (!items) return;
-    
-            for (let item of items) {
-                if (item.type.indexOf('image') !== -1) {
-                    e.preventDefault();
-                    const file = item.getAsFile();
-                    handleImageUpload({ target: { files: [file] } });
-                    break;  // 첫 번째 이미지만 처리
-                }
-            }
-        };    
+        }
+    };
 
     return (
-        <div className={`${styles.inputAreaWrapper} ${backgroundClass}`}>
+        <div className={styles.inputAreaWrapper}>
             {/* 선택된 이미지 미리보기 */}
             {selectedImages.length > 0 && (
                 <div className={styles.imagePreviewContainer}>
@@ -124,7 +119,6 @@ const ChatInput = memo(({
                 <button
                     className={styles.sendButton}
                     onClick={handleSendMessage}
-                    // 메시지나 이미지가 없으면 비활성화
                     disabled={!input.trim() && selectedImages.length === 0}
                 >
                     ➤
@@ -141,7 +135,8 @@ ChatInput.propTypes = {
     setSelectedImages: PropTypes.func.isRequired,
     handleRemoveImage: PropTypes.func.isRequired,
     fileInputRef: PropTypes.object.isRequired,
-    backgroundClass: PropTypes.string  // PropTypes 추가
+    input: PropTypes.string.isRequired,  // 입력값 상태
+    setInput: PropTypes.func.isRequired  // 입력값 상태 변경 함수
 };
 
 export default ChatInput;

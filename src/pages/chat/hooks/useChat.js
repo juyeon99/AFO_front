@@ -3,6 +3,7 @@ import { useSearch } from './useSearch';        // 검색 관련 기능
 import { useUpload } from './useUpload';        // 이미지 업로드 관련 기능
 import { useModal } from './useModal';          // 팝업창 관리
 import { useNavigate } from 'react-router-dom'; // 페이지 이동
+import { useState } from 'react';
 
 /**
  * 채팅 기능을 모아둔 Hook
@@ -17,17 +18,16 @@ import { useNavigate } from 'react-router-dom'; // 페이지 이동
 export const useChat = () => {
     const navigate = useNavigate();
 
-    // 각 기능별 훅 사용
+    // 메시지 관련 상태 및 함수
     const { 
         messages, 
         setMessages, 
         isLoading, 
         retryAvailable, 
-        selectedImages, 
-        setSelectedImages, 
         addMessage 
     } = useMessages();
     
+    // 검색 관련 상태 및 함수
     const {
         searchInput,
         setSearchInput,
@@ -36,12 +36,21 @@ export const useChat = () => {
         goToNextHighlight,
         clearSearch,
         currentHighlightedIndex,
-        highlightedMessageIndexes,
-        isSearchMode
+        highlightedMessageIndexes
     } = useSearch(messages);
     
-    const { uploadProps } = useUpload();
+    // 이미지 업로드 관련 상태 및 함수
+    const { 
+        selectedImages, 
+        setSelectedImages, 
+        handleRemoveImage 
+    } = useUpload();
+
+    // 모달 관련 상태
     const { modalProps } = useModal();
+
+    // input 상태 추가 (가이드 메시지 입력 반영)
+    const [input, setInput] = useState("");
 
     // 메시지 전송 핸들러 추가
     const handleSendMessage = async (content) => {
@@ -50,13 +59,18 @@ export const useChat = () => {
             console.log('전송할 이미지:', imageFile);
             await addMessage(content, selectedImages);
             setSelectedImages([]); // 이미지 전송 후 초기화
+            setInput(""); // 입력창 초기화
         }
     };
 
     // inputProps 수정
     const inputProps = {
         onSend: handleSendMessage,  // addMessage 대신 handleSendMessage 사용
-        ...uploadProps,
+        setInput, // 가이드 메시지가 입력될 수 있도록 추가
+        input, // 입력값 상태
+        selectedImages,
+        setSelectedImages,
+        handleRemoveImage
     };
 
     const handleGoBack = () => navigate(-1);

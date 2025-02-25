@@ -8,7 +8,7 @@ import LoginModal from '../modals/LoginModal';
 import styles from '../../../css/chat/ChatContainer.module.css';
 import { useUpload } from '../../../pages/chat/hooks/useUpload';
 import { useAuth } from '../../../pages/chat/hooks/useAuth';
-import { useModal } from '../../../pages/chat/hooks/useModal';
+import GuideMessages from '../../chat/messages/GuideMessages';
 
 /**
  * 채팅 화면의 전체 구조를 담당하는 컴포넌트
@@ -28,63 +28,6 @@ const ChatContainer = memo(({
     modalProps,     // 모달 관련 속성들
     handleGoBack    // 뒤로가기 처리 함수
 }) => {
-
-    const getBackgroundClass = () => {
-        // 모든 메시지 중 가장 최근의 recommendation 모드 메시지 찾기
-        const lastRecommendation = [...messageProps.messages]
-            .reverse()
-            .find(msg => msg.type === 'AI' && msg.mode === 'recommendation');
-
-        console.log('마지막 추천 메시지:', lastRecommendation);
-        console.log('lineId:', lastRecommendation?.lineId);
-
-        if (!lastRecommendation || !lastRecommendation.lineId) {
-            return styles['perfume-line-default'];
-        }
-
-        // 색상 매핑 객체
-        const lineColors = {
-            1: '#FF5757',  // Spicy
-            2: '#FFBD43',  // Fruity
-            3: '#FFE043',  // Citrus
-            4: '#62D66A',  // Green
-            5: '#98D1FF',  // Aldehyde
-            6: '#56D2FF',  // Aquatic
-            7: '#FFD9A6',  // Fougere
-            8: '#A1522C',  // Gourmand
-            9: '#86390F',  // Woody
-            10: '#C061FF', // Oriental
-            11: '#FF80C1', // Floral
-            12: '#F8E4FF', // Musk
-            13: '#FFFFFF', // Powdery
-            14: '#654321'  // Tobacco Leather
-        };
-
-        const lineTypes = {
-            1: 'perfume-line-spicy',
-            2: 'perfume-line-fruity',
-            3: 'perfume-line-citrus',
-            4: 'perfume-line-green',
-            5: 'perfume-line-aldehyde',
-            6: 'perfume-line-aquatic',
-            7: 'perfume-line-fougere',
-            8: 'perfume-line-gourmand',
-            9: 'perfume-line-woody',
-            10: 'perfume-line-oriental',
-            11: 'perfume-line-floral',
-            12: 'perfume-line-musk',
-            13: 'perfume-line-powdery',
-            14: 'perfume-line-tobaccoLeather'
-        };
-
-        console.log('선택된 라인 색상:', lineColors[lastRecommendation.lineId]);
-        console.log('선택된 배경 클래스:', lineTypes[lastRecommendation.lineId]);
-
-        return styles[lineTypes[lastRecommendation.lineId]] || styles['perfume-line-default'];
-    };
-
-    // 배경 클래스 계산
-    const backgroundClass = getBackgroundClass();
 
     // 이미지 업로드 관련 기능들
     const {
@@ -152,9 +95,26 @@ const ChatContainer = memo(({
         }
     }, [messageProps.messages]);
 
+    // 메시지 목록 컨테이너 참조
+    const messageContainerRef = useRef(null);
+
+    // 메시지 목록이 변경될 때마다 스크롤을 맨 아래로 이동
+    useEffect(() => {
+        if (messageContainerRef.current) {
+            messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+        }
+    }, [messageProps.messages]);
+
+    // 페이지 로드 시 스크롤을 맨 아래로 이동
+    useEffect(() => {
+        if (messageContainerRef.current) {
+            messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+        }
+    }, []);
+
     return (
-        <div className={`${styles.chatLayout} ${backgroundClass}`}>
-            <div className={`${styles.container} ${backgroundClass}`}>
+        <div className={styles.chatLayout}>
+            <div className={styles.ChatContainer}>
                 <div className={styles.headerSection}>
                     {/* 상단 헤더 */}
                     <ChatHeader onGoBack={handleGoBack} />
@@ -164,21 +124,24 @@ const ChatContainer = memo(({
                 </div>
 
                 {/* 메세지 가림막 추가 */}
-                <div className={`${styles.messageOverlay} ${backgroundClass}`} />
+                <div className={styles.messageOverlay} />
 
-                <div className={`${styles.messageSection} ${backgroundClass}`}>
+                <div className={styles.messageSection}>
                     {/* 메시지 목록 */}
                     <MessageList
                         {...messageProps}
                         searchInput={searchProps?.searchInput}
                         openImageModal={modalProps.imageModal.openModal}
                     />
+
+                    {/* 가이드 메시지 추가 */}
+                    <GuideMessages onSend={inputProps.onSend} />
                 </div>
 
                 {/* 하단 메시지 가림막 */}
-                <div className={`${styles.inputOverlay} ${backgroundClass}`} />
+                <div className={styles.inputOverlay} />
 
-                <div className={`${styles.inputSection} ${backgroundClass}`}>
+                <div className={styles.inputSection}>
                     {/* 메시지 입력창 */}
                     <ChatInput
                         {...inputProps}
@@ -196,7 +159,6 @@ const ChatContainer = memo(({
                         setSelectedImages={setSelectedImages}
                         handleImageUpload={handleImageUpload}
                         handleRemoveImage={handleRemoveImage}
-                        backgroundClass={backgroundClass}
                         fileInputRef={fileInputRef}
                     />
                 </div>
