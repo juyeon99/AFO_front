@@ -195,12 +195,23 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
                             openImageModal(imageUrl); // 이미지 URL을 전달
                         }
                     }}
-                    style={{ cursor: 'pointer' }}
+                    style={{ 
+                        cursor: 'pointer',
+                        border: `5px solid ${currentLineColor}`,  // 컨테이너에 테두리 추가
+                        borderRadius: '10px',  // 모서리 둥글게
+                        overflow: 'hidden'     // 내부 이미지가 테두리를 넘지 않도록
+                    }}
                 >
                     <img
                         src={imageUrl}
                         alt="향 이미지"
                         className={styles.commonImage}
+                        style={{ 
+                            width: '100%',     // 컨테이너에 맞게 너비 조정
+                            height: '100%',    // 컨테이너에 맞게 높이 조정
+                            objectFit: 'cover', // 이미지 비율 유지하며 채우기
+                            border: 'none'      // 이미지 자체의 테두리는 제거
+                        }}
                     />
                 </div>
             )}
