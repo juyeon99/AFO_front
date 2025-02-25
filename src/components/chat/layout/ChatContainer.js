@@ -145,7 +145,7 @@ const ChatContainer = memo(({
                     {/* 메시지 입력창 */}
                     <ChatInput
                         {...inputProps}
-                        onSend={(message) => {
+                        onSend={(message, images) => {  // images 매개변수 추가
                             if (!isLoggedIn) {
                                 if (hasReceivedRecommendation || nonMemberChatCount >= 3) {
                                     loginModal.onOpen();
@@ -153,7 +153,7 @@ const ChatContainer = memo(({
                                 }
                                 incrementNonMemberChatCount();
                             }
-                            inputProps.onSend(message);
+                            inputProps.onSend(message, images);  // images도 함께 전달
                         }}
                         selectedImages={selectedImages}
                         setSelectedImages={setSelectedImages}

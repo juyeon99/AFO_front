@@ -14,11 +14,11 @@ function History() {
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     };
 
-    const [currentDateIndex, setCurrentDateIndex] = useState(0); // 현재 선택된 날짜의 인덱스 저장
-    const [currentCardIndex, setCurrentCardIndex] = useState(0); // 현재 표시되는 카드의 인덱스 저장
-    const [userName, setUserName] = useState(""); // 사용자 이름 저장
-    const [mappedHistory, setMappedHistory] = useState([]); // 매핑된 데이터를 저장
-    const [uniqueDates, setUniqueDates] = useState([]); // 유니크한 날짜 저장
+    const [currentDateIndex, setCurrentDateIndex] = useState(0);
+    const [currentCardIndex, setCurrentCardIndex] = useState(0);
+    const [userName, setUserName] = useState("");
+    const [mappedHistory, setMappedHistory] = useState([]);
+    const [uniqueDates, setUniqueDates] = useState([]);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -62,13 +62,18 @@ function History() {
     useEffect(() => {
         // 데이터가 로드되면 매핑 및 날짜 정리
         if (historyData?.length > 0) {
+            // 데이터 구조에 맞게 매핑
             const mapped = historyData.map((item) => ({
                 ...item,
                 recommendations: item.recommendations.map((rec) => ({
                     ...rec,
-                    imageUrl: item.imageUrl,
-                    lineId: item.lineId,
+                    perfumeImageUrl: rec.productImageUrls?.[0] || "",
+                    perfumeName: rec.productNameKr || "",
+                    perfumeBrand: rec.productBrand || "",
+                    reason: rec.reason || "",
+                    situation: rec.situation || "",
                 })),
+                lineId: item.lineId?.toString() || "",
             })).sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp)); // 최신순 정렬
 
             const dates = [...new Set(mapped.map((item) => formatDate(item.timeStamp)))];
@@ -82,12 +87,16 @@ function History() {
     // 현재 선택된 날짜에 맞는 카드 필터링
     const filteredCards = mappedHistory
         .filter((item) => formatDate(item.timeStamp) === uniqueDates[currentDateIndex])
-        .flatMap((item) => item.recommendations);
+        .flatMap((item) => item.recommendations.map(rec => ({
+            ...rec,
+            lineId: item.lineId // 각 추천에 lineId 추가
+        })));
 
     const visibleCards = filteredCards.slice(currentCardIndex, currentCardIndex + cardsPerPage);
 
+    // 현재 표시되는 첫 번째 카드의 lineId 가져오기
     const currentCardLineId = visibleCards[0]?.lineId || "";
-    const currentCardLine = lines.find((line) => line.id === currentCardLineId?.toString()) || { name: "Unknown", color: "#000000" };
+    const currentCardLine = lines.find((line) => line.id === currentCardLineId) || { name: "Unknown", color: "#000000" };
     const currentCardLineName = currentCardLine.name;
     const currentCardLineColor = currentCardLine.color;
 
@@ -151,20 +160,38 @@ function History() {
                             <h2 className="history-main-title">{`${userName}님의 향수 카드`}</h2>
                             <h2 className="history-title" style={{ color: currentCardLineColor }}>{currentCardLineName} 계열</h2>
                         </div>
+                        {/* 카드 컨테이너 - 이미지와 기본 정보만 표시 */}
                         <div className="card-container">
                             {visibleCards.map((card, index) => (
                                 <div className="history-card" key={index}>
-                                    <img src={card.perfumeImageUrl || "https://via.placeholder.com/150"} alt={card.perfume || "Default"} className="card-image" />
+                                    <img src={card.perfumeImageUrl || "https://via.placeholder.com/150"} alt={card.perfumeName || "Default"} className="card-image" />
                                     <div className="card-content">
                                         <h3 className="card-perfume-name">{card.perfumeName}</h3>
                                         <h3 className="card-perfume-brand">{card.perfumeBrand}</h3>
-                                        <hr className="divider" />
-                                        <p className="card-description"><strong>추천 이유:</strong> {card.reason}</p>
-                                        <p className="card-description"><strong>추천 상황:</strong> {card.situation}</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
+
+                        {/* 모든 카드의 추천 정보 표시 */}
+                        <div className="all-recommendations">
+                            {visibleCards.map((card, index) => (
+                                <div className="recommendation-group" key={index}>
+                                    <h4 className="recommendation-perfume-name">{card.perfumeName}</h4>
+                                    <div className="recommendation-row">
+                                        <div className="recommendation-box">
+                                            <span className="recommendation-label">추천 이유</span>
+                                            <p className="recommendation-text">{card.reason}</p>
+                                        </div>
+                                        <div className="recommendation-box">
+                                            <span className="recommendation-label">추천 상황</span>
+                                            <p className="recommendation-text">{card.situation}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
                         <button className="prev-arrow" onClick={() => handleCardChange('prev')}>&#5130;</button>
                         <button className="next-arrow" onClick={() => handleCardChange('next')}>&#5125;</button>
                     </>

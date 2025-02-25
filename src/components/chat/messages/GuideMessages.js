@@ -13,22 +13,33 @@ const extractTooltipText = (text) => {
     return match ? match[1] : null;
 };
 
-// 컴포넌트 외부에 변수 선언 (새로고침 시 초기화됨)
-let hasUserInteracted = false;
+// 현재 렌더링 사이클에서만 사용할 변수 (새로고침 시 초기화됨)
+let hasInteractedInCurrentSession = false;
 
 const GuideMessages = ({ onSend }) => {
     const [visible, setVisible] = useState(true);
     
-    // 컴포넌트가 마운트될 때마다 visible 상태 초기화
+    // 컴포넌트 마운트 시 항상 가이드 메시지 표시
     useEffect(() => {
-        setVisible(!hasUserInteracted);
+        // 현재 세션에서 상호작용이 있었는지 확인
+        if (hasInteractedInCurrentSession) {
+            setVisible(false);
+        } else {
+            setVisible(true);
+        }
     }, []);
     
     // 가이드 메시지 클릭 시 처리
     const handleSendMessage = (message) => {
-        hasUserInteracted = true;
+        hasInteractedInCurrentSession = true;
         setVisible(false);
         onSend(message);
+    };
+    
+    // 일반 메시지 전송 시 가이드 메시지 숨김 처리를 위한 함수
+    const hideGuideMessages = () => {
+        hasInteractedInCurrentSession = true;
+        setVisible(false);
     };
 
     if (!visible) return null;
@@ -41,10 +52,7 @@ const GuideMessages = ({ onSend }) => {
                     <div key={message.id} className={styles.guideMessageWrapper}>
                         <button 
                             className={`${styles.guideMessageButton} ${message.imageRelated ? styles.imageGuide : ''}`}
-                            onClick={() => {
-                                handleSendMessage(message.cleanText);
-                                setVisible(false);
-                            }}
+                            onClick={() => handleSendMessage(message.cleanText)}
                         >
                             {message.cleanText}
                         </button>
@@ -55,6 +63,11 @@ const GuideMessages = ({ onSend }) => {
             })}
         </div>
     );
+};
+
+// 외부에서 가이드 메시지 숨김 처리를 위한 함수 노출
+GuideMessages.hideGuideMessages = () => {
+    hasInteractedInCurrentSession = true;
 };
 
 export default GuideMessages;
