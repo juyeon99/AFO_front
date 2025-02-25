@@ -9,7 +9,6 @@ import styles from '../../../css/chat/ChatInput.module.css';
  * 이 컴포넌트는 채팅창 맨 아래에 있는 입력 영역입니다.
  * 메시지를 입력하고 이미지를 첨부할 수 있습니다.
  */
-
 const ChatInput = memo(({
     onSend,              // 메시지 전송 함수
     handleImageUpload,   // 이미지 업로드 처리 함수
@@ -17,72 +16,82 @@ const ChatInput = memo(({
     setSelectedImages,   // 이미지 목록 변경 함수
     handleRemoveImage,   // 이미지 삭제 함수
     fileInputRef,        // 파일 입력창 참조
-    backgroundClass     // 배경 클래스
+    backgroundClass      // 배경 스타일 클래스
 }) => {
-    // 입력된 메시지를 저장하는 상태
+    // 사용자가 입력한 텍스트 메시지를 저장하는 상태
     const [input, setInput] = useState('');
 
-    // 메시지 입력시 실행되는 함수
+    /**
+     * 메시지 입력창의 내용이 변경될 때 호출되는 핸들러
+     * @param {Event} e - 입력 이벤트 객체
+     */
     const handleInputChange = (e) => {
         setInput(e.target.value);
     };
 
-
-    // 메시지 전송 버튼 클릭시 실행되는 함수
+    /**
+     * 메시지 전송 버튼 클릭 시 호출되는 핸들러
+     * - 입력된 텍스트 메시지와 선택된 이미지가 있으면 전송 처리
+     */
     const handleSendMessage = () => {
-        // 메시지나 이미지가 있을 때만 전송
         if (input.trim() || selectedImages.length > 0) {
-            // 선택된 이미지들의 URL만 추출
-            const imageUrls = selectedImages.map(img => img.url);
-            console.log('ChatInput에서 전송하는 데이터:', {
-                input: input,
-                imageUrls: imageUrls
-            });
-            // 메시지와 이미지 전송
-            onSend(input, imageUrls);
-            // 입력창 초기화
+            // 전송할 때 전체 이미지 객체 배열을 전달 (미리보기 URL 포함)
+            console.log('전송할 이미지 객체:', selectedImages);
+            onSend(input, selectedImages);
+            // 전송 후 입력창과 선택된 이미지 초기화
             setInput('');
-            // 이미지 목록 초기화
             setSelectedImages([]);
         }
     };
 
-
-    // Enter 키 입력시 메시지 전송
+    /**
+     * 키보드 이벤트 핸들러: Enter 키 입력 시 메시지 전송
+     * - Shift + Enter 입력 시 줄바꿈을 허용하고, Enter만 입력 시 메시지 전송
+     * @param {Event} e - 키보드 이벤트 객체
+     */
     const handleKeyPress = (e) => {
-        // Shift + Enter가 아닌 Enter만 눌렀을 때
         if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault(); // 줄바꿈 방지
+            e.preventDefault(); // Enter 키로 인한 줄바꿈 방지
             handleSendMessage();
         }
     };
 
-        // 이미지 삭제 핸들러
-        const handleImageRemove = () => {
-            setSelectedImages([]);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';  // 파일 입력 초기화
-            }
-        };
+    /**
+     * 이미지 삭제 핸들러
+     * - 선택된 모든 이미지를 제거하고 파일 입력창을 초기화
+     */
+    const handleImageRemove = () => {
+        setSelectedImages([]);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';  // 파일 입력 필드 초기화
+        }
+    };
+
+    /**
+     * 이미지 붙여넣기 핸들러
+     * - 클립보드에 복사된 이미지가 있으면 이를 업로드 처리
+     * - 첫 번째 이미지 항목만 처리함
+     * @param {Event} e - 붙여넣기 이벤트 객체
+     */
+    const handlePaste = (e) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
     
-        // 이미지 붙여넣기 핸들러
-        const handlePaste = (e) => {
-            const items = e.clipboardData?.items;
-            if (!items) return;
-    
-            for (let item of items) {
-                if (item.type.indexOf('image') !== -1) {
-                    e.preventDefault();
-                    const file = item.getAsFile();
-                    handleImageUpload({ target: { files: [file] } });
-                    break;  // 첫 번째 이미지만 처리
-                }
+        // 클립보드 데이터 내에서 이미지 파일 검색
+        for (let item of items) {
+            if (item.type.indexOf('image') !== -1) {
+                e.preventDefault(); // 기본 붙여넣기 동작 방지
+                const file = item.getAsFile();
+                // 이미지 업로드 핸들러에 이미지 파일 전달
+                handleImageUpload({ target: { files: [file] } });
+                break;  // 첫 번째 이미지만 처리
             }
-        };    
+        }
+    };
 
     return (
         <div className={`${styles.inputAreaWrapper} ${backgroundClass}`}>
-            {/* 선택된 이미지 미리보기 */}
+            {/* 선택된 이미지 미리보기 영역 */}
             {selectedImages.length > 0 && (
                 <div className={styles.imagePreviewContainer}>
                     <div className={styles.imagePreviewWrapper}>
@@ -91,6 +100,7 @@ const ChatInput = memo(({
                             alt="Preview"
                             className={styles.imagePreview}
                         />
+                        {/* 이미지 삭제 버튼 */}
                         <button 
                             onClick={handleImageRemove}
                             className={styles.removeImageButton}
@@ -101,9 +111,9 @@ const ChatInput = memo(({
                 </div>
             )}
 
-            {/* 메시지 입력 영역 */}
+            {/* 메시지 입력 및 전송 영역 */}
             <div className={styles.inputArea}>
-                {/* 이미지 업로드 버튼 */}
+                {/* 이미지 업로드 버튼 컴포넌트 */}
                 <ImageUpload
                     onUpload={handleImageUpload}
                     fileInputRef={fileInputRef}
@@ -114,18 +124,17 @@ const ChatInput = memo(({
                     type="text"
                     value={input}
                     onChange={handleInputChange}
-                    onPaste={handlePaste}
-                    onKeyPress={handleKeyPress}
+                    onPaste={handlePaste}       // 이미지 붙여넣기 처리
+                    onKeyPress={handleKeyPress} // Enter 키로 메시지 전송
                     placeholder="메시지를 입력하세요"
                     className={styles.input}
                 />
 
-                {/* 전송 버튼 */}
+                {/* 메시지 전송 버튼 */}
                 <button
                     className={styles.sendButton}
                     onClick={handleSendMessage}
-                    // 메시지나 이미지가 없으면 비활성화
-                    disabled={!input.trim() && selectedImages.length === 0}
+                    disabled={!input.trim() && selectedImages.length === 0} // 메시지나 이미지가 없으면 버튼 비활성화
                 >
                     ➤
                 </button>
@@ -141,7 +150,7 @@ ChatInput.propTypes = {
     setSelectedImages: PropTypes.func.isRequired,
     handleRemoveImage: PropTypes.func.isRequired,
     fileInputRef: PropTypes.object.isRequired,
-    backgroundClass: PropTypes.string  // PropTypes 추가
+    backgroundClass: PropTypes.string  // 배경 스타일 클래스 (선택적)
 };
 
 export default ChatInput;
