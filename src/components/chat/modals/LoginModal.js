@@ -28,7 +28,7 @@ const LoginModal = memo(({ isOpen, onClose, onLogin }) => {
                 {/* 모달 제목 */}
                 <h2 className={styles.nonMemberModalContent1}>로그인이 필요합니다</h2>
                 {/* 모달 설명 */}
-                <p>
+                <p className={styles.nonMemberModalContent2}>
                     회원가입 후 이용하시면<br />
                     더 많은 서비스를 이용하실 수 있습니다.
                 </p>

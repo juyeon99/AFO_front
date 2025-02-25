@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PerfumeCard from './PerfumeCard';
+import styles from '../../../css/scentlens/PerfumeCarousel.module.css';
 
 // PerfumeCarousel 컴포넌트: 향수 카드들을 캐러셀 형태로 표시
 // props:
@@ -10,7 +11,7 @@ import PerfumeCard from './PerfumeCard';
 // - title: 캐러셀 섹션의 제목
 const PerfumeCarousel = ({ perfumes, currentIndex, setCurrentIndex, title, currentTheme }) => {
     return (
-        <section className="scentlens-carousel-section">
+        <section className={styles.carousel_section}>
             <h2>{title}</h2>
 
             {/* AnimatePresence : 컴포넌트가 제거될 때도 애니메이션 적용 가능 */}
@@ -18,7 +19,7 @@ const PerfumeCarousel = ({ perfumes, currentIndex, setCurrentIndex, title, curre
                 {/* 메인 카드 영역 */}
                 <motion.div 
                     key={currentIndex}
-                    className="scentlens-carousel-card"
+                    className={styles.carousel_card}
                     // 오른쪽에서 나타나는 시작 애니메이션
                     initial={{ opacity: 0, x: 100 }}
                     // 애니메이션 중 완료 상태
@@ -39,13 +40,13 @@ const PerfumeCarousel = ({ perfumes, currentIndex, setCurrentIndex, title, curre
             </AnimatePresence>
 
             {/* 하단 미니 카드 네비게이션 */}
-            <div className="scentlens-mini-cards">
+            <div className={styles.mini_cards}>
                 {/* 모든 향수에 대한 미니 카드 생성 */}
                 {perfumes.map((perfume, idx) => (
                     <div 
                         key={idx} 
                         // 현재 선택된 카드에 active 클래스 추가
-                        className={`scentlens-mini-card ${idx === currentIndex ? 'active' : ''}`}
+                        className={`${styles.mini_card} ${idx === currentIndex ? styles.active : ''}`}
                         // 클릭 해당 향수로 이동
                         onClick={() => setCurrentIndex(idx)}
                     >

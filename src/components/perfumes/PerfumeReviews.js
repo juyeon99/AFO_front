@@ -31,14 +31,14 @@ const PerfumeReviews = ({ perfumeId }) => {
         setReviewContent,
         setCurrentPage,
         setSliderLeft,
-        setCardOffset
+        setCardOffset,
     } = usePerfumeReviewState(perfumeId);
 
     return (
         <div className={styles.reviewsContainer}>
             {/* 리뷰 요약 섹션 추가 */}
             <ReviewSummary perfumeId={perfumeId} />
-            
+
             {/* 상단 Top 1 리뷰 */}
             <div className={styles.topReviewsSection}>
                 <div className={styles.topReviewCard}>
@@ -103,21 +103,25 @@ const PerfumeReviews = ({ perfumeId }) => {
                 </div>
 
                 {/* 슬라이더 */}
-                {reviews.length > 0 && (
-                    <ReviewSlider
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        isDragging={isDragging}
-                        sliderLeft={sliderLeft}
-                        cardOffset={cardOffset}
-                        allReviews={reviews}
-                        CARDS_PER_PAGE={CARDS_PER_PAGE}
-                        onMouseDown={handleMouseDown}
-                        setCurrentPage={setCurrentPage}
-                        setSliderLeft={setSliderLeft}
-                        setCardOffset={setCardOffset}
-                    />
-                )}
+                <ReviewSlider
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    isDragging={isDragging}
+                    sliderLeft={sliderLeft}
+                    cardOffset={cardOffset}
+                    allReviews={reviews}
+                    CARDS_PER_PAGE={CARDS_PER_PAGE}
+                    onMouseDown={handleMouseDown}
+                    setCurrentPage={(page) => {
+                        setCurrentPage(page);
+                        const percentage = ((page - 1) / (totalPages - 1)) * 100;
+                        const newOffset = (percentage / 100) * ((reviews.length - CARDS_PER_PAGE) * (196 + 37));
+                        setSliderLeft(percentage);
+                        setCardOffset(newOffset);
+                    }}
+                    setSliderLeft={setSliderLeft}
+                    setCardOffset={setCardOffset}
+                />
             </div>
         </div>
     );

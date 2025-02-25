@@ -3,9 +3,9 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #EFEDED;
     padding: 20px;
     border-top: 1px solid #e0e0e0;
+    background-color: #EFEDED;
     position: relative;
 }
 
@@ -18,7 +18,6 @@
     background-color: white;
     border-radius: 10px;
     padding: 10px 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .input {
@@ -27,7 +26,6 @@
     outline: none;
     font-size: 14px;
     padding: 8px;
-    background: transparent;
 }
 
 .fileUpload {
@@ -52,7 +50,7 @@
 .imagePreviewContainer {
     position: absolute;
     bottom: 100%; /* 입력창 바로 위에 위치 */
-    left: 0;
+    left: 90px;
     right: 0;
     padding: 10px;
     display: flex;
@@ -68,7 +66,6 @@
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 10px;
-    background-color: #f9f9f9;
     max-width: 200px;
 }
 
@@ -81,11 +78,9 @@
 
 .removeImageButton {
     position: absolute;
-    top: 5px;
-    right: 5px;
-    background: black;
-    color: white;
-    border: none;
+    top: -10px;
+    left: 90px;
+    color: black;
     border-radius: 50%;
     width: 20px;
     height: 20px;
@@ -94,4 +89,5 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid black;
 }

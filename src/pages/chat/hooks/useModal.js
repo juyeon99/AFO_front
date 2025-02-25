@@ -16,12 +16,12 @@ export const useModal = () => {
     const [modalImage, setModalImage] = useState(null);
 
     /**
-  * 이미지 팝업 열기
-  * - 클릭한 이미지를 크게 보여줌
-  */
-
-    const openImageModal = (image) => {
-        setModalImage(image);   // 보여줄 이미지 설정
+     * 이미지 팝업 열기
+     * - 클릭한 이미지를 크게 보여줌
+     */
+    const openImageModal = (imageUrl) => {
+        if (!imageUrl) return;
+        setModalImage(imageUrl);   // 보여줄 이미지 설정
         setIsImageModalOpen(true); // 팝업창 열기
     };
 
@@ -29,30 +29,41 @@ export const useModal = () => {
      * 이미지 팝업 닫기
      * - 팝업창을 닫고 이미지 정보도 초기화
      */
-
     const closeImageModal = () => {
         setIsImageModalOpen(false); // 팝업창 닫기
         setModalImage(null);       // 이미지 정보 초기화
     };
 
+    /**
+     * 로그인 팝업 열기
+     * - 비회원 사용자에게 로그인 권유
+     */
+    const openLoginModal = () => {
+        setIsLoginModalOpen(true); // 팝업창 열기
+    };
+
+    /**
+     * 로그인 팝업 닫기
+     * - 팝업창을 닫음
+     */
+    const closeLoginModal = () => {
+        setIsLoginModalOpen(false); // 팝업창 닫기
+    };
+
     // 모든 팝업 관련 속성을 하나의 객체로 묶어서 반환
     return {
-        modalProps: {
-            // 팝업창들의 열림/닫힘 상태
+        modalProps: {  // modalProps 중첩 제거
             isImageModalOpen,
             isLoginModalOpen,
-
-            // 이미지 팝업 관련 속성
             imageModal: {
                 image: modalImage,
                 openModal: openImageModal,
                 onClose: closeImageModal
             },
-
-            // 로그인 팝업 관련 속성
             loginModal: {
                 isOpen: isLoginModalOpen,
-                onClose: () => setIsLoginModalOpen(false)
+                onOpen: openLoginModal,
+                onClose: closeLoginModal
             }
         }
     };

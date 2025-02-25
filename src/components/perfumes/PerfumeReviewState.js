@@ -27,12 +27,12 @@ const usePerfumeReviewState = (perfumeId) => {
     const perfumes = useSelector(selectPerfumes);
     const perfume = perfumes?.find(p => p.id === perfumeId);
     const rawReviews = useSelector(selectReviews) ?? [];
-    
+
     // 리뷰를 최신순으로 정렬
     const reviews = [...rawReviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     // 가장 좋아요가 많은 리뷰 찾기
-    const mostLikedReview = reviews.length > 0 
+    const mostLikedReview = reviews.length > 0
         ? [...reviews].sort((a, b) => (b.heartCount || 0) - (a.heartCount || 0))[0]
         : null;
 
@@ -46,7 +46,7 @@ const usePerfumeReviewState = (perfumeId) => {
     // (1) 초기 로딩 (마운트 시 1회) : 리뷰 + 좋아요
     useEffect(() => {
         if (!perfumeId) return;
-        
+
         const initializeData = async () => {
             try {
                 await dispatch(fetchReviews(perfumeId));
@@ -55,7 +55,7 @@ const usePerfumeReviewState = (perfumeId) => {
                     setLikedReviews(likedReviewIds);
                 }
                 setHasInitialized(true);
-                
+
                 // 초기 로딩 시 슬라이더를 맨 앞으로 설정
                 setCurrentPage(1);
                 setSliderLeft(0);
@@ -72,7 +72,7 @@ const usePerfumeReviewState = (perfumeId) => {
     useEffect(() => {
         const handleRealRefresh = async () => {
             if (!perfumeId) return;
-            
+
             if (performance.navigation.type === 1) {
                 try {
                     await dispatch(fetchReviews(perfumeId));
@@ -103,7 +103,18 @@ const usePerfumeReviewState = (perfumeId) => {
             });
             setHeartCounts(counts);
         }
-    }, [reviews.length]);
+
+        // 슬라이더 위치 초기화 (현재 페이지 변경 시)
+        if (currentPage === 1) {
+            setSliderLeft(0);
+            setCardOffset(0);
+        } else {
+            const percentage = ((currentPage - 1) / (totalPages - 1)) * 100;
+            const newOffset = (percentage / 100) * ((reviews.length - CARDS_PER_PAGE) * (196 + 37));
+            setSliderLeft(percentage);
+            setCardOffset(newOffset);
+        }
+    }, [reviews.length, currentPage]);
 
     // (4) 슬라이더 마우스 이벤트 (드래그 & 이동)
     useEffect(() => {
@@ -210,13 +221,13 @@ const usePerfumeReviewState = (perfumeId) => {
             }));
             setReviewContent('');
             setIsModalOpen(false);
-            
+
             // 리뷰 작성 후 최신 데이터를 가져오고 슬라이더를 맨 앞으로 리셋
             await dispatch(fetchReviews(perfumeId));
             setCurrentPage(1);
             setSliderLeft(0);
             setCardOffset(0);
-            
+
         } catch (error) {
             console.error("리뷰 작성 실패:", error);
             alert('리뷰 작성에 실패했습니다.');
@@ -227,7 +238,7 @@ const usePerfumeReviewState = (perfumeId) => {
     const handleModalOpen = () => {
         setIsModalOpen(true);
     };
-    
+
     const handleModalClose = async () => {
         setIsModalOpen(false);
         if (userId) {

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import PerfumeCard from './scentlens/PerfumeCard';
-import PerfumeCarousel from './scentlens/PerfumeCarousel';
-import '../css/ScentLens.css';
-import { useTheme } from './ThemeEffect';
+import PerfumeCard from '../scentlens/perfumeCard/PerfumeCard';
+import PerfumeCarousel from '../scentlens/perfumeCard/PerfumeCarousel';
+import styles from '../../css/scentlens/Scentlens.module.css';
+import { useTheme } from './hooks/ThemeEffect';
 
 function ScentLens() {
     const navigate = useNavigate();
@@ -38,35 +38,37 @@ function ScentLens() {
     };
 
     return (
-        <div className={`lens-scent-lens ${currentTheme}`}>
+        <div className={`${styles.lens_scent_lens} ${styles[currentTheme]}`}>
             {/* 뒤로가기 버튼 추가 */}
             <button
-                className="scentlens-back-button"
+                className={styles.back_button}
                 onClick={() => navigate(-1)}
+                aria-label="뒤로 가기"
             >
-                뒤로가기
+                <img src="/images/back.png" alt="back" className={styles.back_image} />
             </button>
 
             {/* 메인 섹션 */}
-            <div className="scentlens-main-section">
-                <div className="scentlens-title-container">
+            <div className={styles.main_section}>
+                <div className={styles.title_container}>
                     <h2>이미지와 가장 유사한 향수</h2>
                 </div>
 
                 {/* 캐러셀 컴포넌트 */}
-                <div className="scentlens-carousel-container">
+                <div className={styles.carousel_container}>
                     <PerfumeCarousel
                         perfumes={searchedPerfumes}
                         currentIndex={currentIndex}
                         setCurrentIndex={setCurrentIndex}
+                        currentTheme={currentTheme}
                     />
                 </div>
             </div>
 
             {/* 더보기/접기 버튼 */}
-            <div className="scentlens-button-container">
+            <div className={styles.button_container}>
                 <motion.button
-                    className="scentlens-more-button"
+                    className={styles.more_button}
                     onClick={handleMoreClick}
                     whileHover={{ scale: 1.05 }}
                 >
@@ -76,11 +78,11 @@ function ScentLens() {
 
             {/* 추가 향수 섹션 - showMore가 true일 때 표시 */}
             {showMore && (
-                <div className={`scentlens-additional-section ${currentTheme}`}>
+                <div className={`${styles.additional_section} ${styles[currentTheme]}`} ref={additionalSectionRef}>
                     <h2>추가 유사 향수</h2>
-                    <div className="scentlens-additional-perfumes">
+                    <div className={styles.additional_perfumes}>
                         {morePerfumes.map((perfume, index) => (
-                            <PerfumeCard key={index} perfume={perfume} />
+                            <PerfumeCard key={index} perfume={perfume} currentTheme={currentTheme} />
                         ))}
                     </div>
                 </div>
