@@ -231,7 +231,9 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
                             </p>
                             <p className={styles.productBrand}>{product.productBrand}</p>
                             <h3 className={styles.productTitle}>{product.productNameKr}</h3>
-                            <p className={styles.productGrade}>{product.productGrade || ''}</p>
+                            {product.productGrade && product.productGrade.toLowerCase() !== 'none' && (
+                                <p className={styles.productGrade}>{product.productGrade}</p>
+                            )}
                         </div>
                     </div>
                 ))}
