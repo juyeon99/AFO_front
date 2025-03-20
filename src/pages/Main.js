@@ -30,6 +30,18 @@ function Main() {
     const [imageSrc, setImageSrc] = useState(null);
     const navigate = useNavigate();
 
+    const storedLanguage = localStorage.getItem('language') || 'english';
+    const [language, setLanguage] = useState(storedLanguage);
+
+    // Language change handler
+    const handleLanguageChange = (newLanguage) => {
+        if (newLanguage !== localStorage.getItem('language')) {
+            localStorage.setItem('language', newLanguage);
+            console.log("Language changed to:", newLanguage);
+            window.location.reload();
+        }
+    };
+
     const handleImageUpload = (file) => {
         if (file) {
             const reader = new FileReader();
@@ -47,7 +59,6 @@ function Main() {
     const handleCropComplete = async (croppedImage) => {
         if (!croppedImage) return;
         setIsLoading(true);
-
 
         try {
             const blob = await fetch(croppedImage).then((r) => r.blob());
@@ -180,12 +191,37 @@ function Main() {
         transition: 'opacity 0.7s ease, transform 0.7s ease',
     };
 
-
+    const texts = {
+        korean: {
+            mainTitle: '"일상에 자연스럽게 스며드는 향기, 당신의 순간을 향기로 완성하세요."',
+            title: "매 순간을 특별하게 만드는 힘, 센티크에서 당신만의 향을 찾아보세요.",
+            intro: "향은 단순히 맡는 것을 넘어 우리의 감정, 기억, 그리고 하루를 채워주는 강력한 매개체입니다.",
+            additional1: "센티크는 단순한 향 추천이 아닙니다.",
+            additional2: "당신이 입력한 이미지와 텍스트를 통해 맞춤 향을 추천할 뿐만 아니라, 향과 어울리는 색을 통해 향을 시각적으로 느끼는 감각적 경험을 선사합니다.",
+            additional3: "오직 센티크에서만 만날 수 있는 나만의 향기, 지금 바로 찾아보세요.",
+        },
+        english: {
+            mainTitle: '"A scent that blends seamlessly into your daily life\n— complete your moments with fragrance."',
+            title: "The power to make every moment special — find your unique scent with Scentique.",
+            intro: "Fragrance goes beyond mere scent. It evokes emotions, preserves memories, and enriches our everyday experiences.",
+            additional1: "Scentique is more than just a fragrance recommendation service.",
+            additional2: "Beyond personalized scent recommendations based on your images and text, we create a multisensory experience by visually bringing your recommended fragrance to life.",
+            additional3: "Uncover a scent that is uniquely yours — exclusively at Scentique, waiting for you.",
+        },
+    };
 
     return (
         <>
             <div className="main-video-container">
-                <img src="/images/logo-w.png" alt="1번 이미지" className="main-logo-image" />
+                <div className="main-header">
+                    {/* <img src={language === 'english' ? "/images/logo-w-en.png" : "/images/logo-w-kr.png"} alt="logo" className="main-logo-image" /> */}
+                    <img src="/images/logo-w-en.png" alt="main logo" className="main-logo-image" />
+                    <div className="language-buttons">
+                        <p className="language-btn" onClick={() => handleLanguageChange("korean")}>한국어</p>
+                        <p>|</p>
+                        <p className="language-btn" onClick={() => handleLanguageChange("english")}>En</p>
+                    </div>
+                </div>
 
                 {/* 관리자 문구 */}
                 {role === 'ADMIN' && (
@@ -221,7 +257,18 @@ function Main() {
                         backgroundColor: `rgba(239, 237, 237, ${overlayOpacity})`,
                     }}
                 ></div>
-                <h1 className="main-title">"일상에 자연스럽게 스며드는 향기, 당신의 순간을 향기로 완성하세요."</h1>
+                
+                <h1 className="main-title">
+                    {language === 'english' ? (
+                            <>
+                                "A scent that blends seamlessly into your daily life —
+                                <br />
+                                complete your moments with fragrance."
+                            </>
+                        )
+                        : texts.korean.mainTitle}
+                </h1>
+
                 <div className="main-content" style={{ opacity: videoOpacity }}>
                     <div className="main-buttons-container">
                         <NavLink to="/chat">
@@ -275,23 +322,50 @@ function Main() {
                 ref={introSectionRef}
                 style={introSectionStyle}
             >
-                <h2>매 순간을 특별하게 만드는 힘, 방향에서 당신만의 향을 찾아보세요.</h2>
+                <h2>{language === 'english' ? texts.english.title : texts.korean.title}</h2>
                 <div className="intro-content-wrapper">
                     <div className="intro-item1">
-                        <img src="/images/1.png" alt="1번 이미지" className="intro-image" />
-                        <h3>긍정적인 감정과 에너지 상승</h3>
-                        <p>향은 자신감을 채워주고 <br />활기찬 하루로 시작할 수 있도록 <br />나의 삶에 도움을 줍니다.</p>
+                        <img src="/images/1.png" alt="intro 1" className="intro-image" />
+                        <h3>{language === "english" ? "Positive Emotions and Energy Boost" : "긍정적인 감정과 에너지 상승"}</h3>
+                        <p>
+                            {language === 'english' ? (
+                                <>
+                                    Fragrance fills you with confidence<br />and helps you start your day with energy.
+                                </>
+                            ) : (
+                                <>
+                                    향은 자신감을 채워주고 <br />활기찬 하루로 시작할 수 있도록 <br />나의 삶에 도움을 줍니다.
+                                </>
+                            )}
+                        </p>
                     </div>
-                    <div className="intro-item2">
-                        <img src="/images/2.png" alt="2번 이미지" className="intro-image" />
-                        <h3>스트레스 완화와 심신 안정</h3>
-                        <p>스트레스 받은 오늘의 마음을<br />향으로 다스려보세요. 잔잔히 흘러오는 향기는 <br />여러분의 마음을 편안하게 안정시켜줄 것입니다.</p>
-                    </div>
-                    <div className="intro-item3">
-                        <img src="/images/3.png" alt="3번 이미지" className="intro-image" />
-                        <h3>기억력 향상과 집중력 강화</h3>
-                        <p>특정 향기는 기억력을 자극해 <br />중요한 순간을 기억하도록 돕고, 집중력을 높여 <br />일과 학습 효율을 향상시킵니다.</p>
-                    </div>
+                    {language === 'english' ? (
+                        <>
+                            <div className="intro-item2">
+                                <img src="/images/3.png" alt="intro 2" className="intro-image" />
+                                <h3>Memory Enhancement and Focus Improvement</h3>
+                                <p>Certain fragrances stimulate memory,<br />helping you recall important moments, and enhance focus, improving work and study efficiency.</p>
+                            </div>
+                            <div className="intro-item3">
+                                <img src="/images/2.png" alt="intro 3" className="intro-image" />
+                                <h3>Stress Relief and Mental Balance</h3>
+                                <p>Try soothing your stressed mind with fragrance. The gentle flow of fragrance will calm and stabilize your mind.</p>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="intro-item2">
+                                <img src="/images/2.png" alt="intro 2" className="intro-image" />
+                                <h3>스트레스 완화와 심신 안정</h3>
+                                <p>스트레스 받은 오늘의 마음을<br />향으로 다스려보세요. 잔잔히 흘러오는 향기는 <br />여러분의 마음을 편안하게 안정시켜줄 것입니다.</p>
+                            </div>
+                            <div className="intro-item3">
+                                <img src="/images/3.png" alt="intro 3" className="intro-image" />
+                                <h3>기억력 향상과 집중력 강화</h3>
+                                <p>특정 향기는 기억력을 자극해 <br />중요한 순간을 기억하도록 돕고, 집중력을 높여 <br />일과 학습 효율을 향상시킵니다.</p>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -300,7 +374,11 @@ function Main() {
                 ref={additionalSectionRef1}
                 style={additionalSectionStyle1}
             >
-                <h2>향은 단순히 맡는 것을 넘어 우리의 감정, 기억, 그리고 하루를 채워주는 강력한 매개체입니다.</h2>
+                <h2>{language === 'english' ? (
+                    <>
+                        Fragrance goes beyond mere scent.<br/>It evokes emotions, preserves memories, and enriches our everyday experiences.
+                    </>
+                    ) : texts.korean.intro}</h2>
                 <h3>●</h3>
                 <h3>●</h3>
                 <h3>●</h3>
@@ -311,17 +389,40 @@ function Main() {
                 ref={additionalSectionRef2}
                 style={additionalSectionStyle2}
             >
-                <h2 className="additional-h2">방향은 단순한 향 추천이 아닙니다.</h2>
+                <h2 className="additional-h2">{language === 'english' ? texts.english.additional1 : texts.korean.additional1}</h2>
                 <div className="additional-images">
-                    <img src="/images/infoSub1.png" alt="추가 이미지 1" className="additional-image" />
-                    <img src="/images/infoSub2.png" alt="추가 이미지 2" className="additional-image" />
+                    <img src="/images/infoSub1.png" alt="additional image 1" className="additional-image" />
+                    <img src="/images/infoSub2.png" alt="additional image 2" className="additional-image" />
                 </div>
                 <div className="fade-in-section" ref={fadeInSectionRef} style={fadeInSectionStyle}>
-                    <h2 className="additional-h2">당신이 입력한 이미지와 텍스트를 통해 <span className="highlight">맞춤 향을 추천</span>할 뿐만 아니라,<br />
-                        <span className="highlight">향과 어울리는 색</span>을 통해 <span className="highlight">향을 시각적</span>으로 느끼는 감각적 경험을 선사합니다.</h2>
+                    <h2 className="additional-h2">
+                        {language === 'english' ? (
+                            <>
+                                Beyond <span className="highlight">personalized scent recommendations</span> based on your images and text,<br />
+                                we create a <span className="highlight">multisensory experience</span> by <span className="highlight">visually</span> bringing your recommended fragrance to life.
+                            </>
+                        )
+                        : (
+                            <>
+                                당신이 입력한 이미지와 텍스트를 통해 <span className="highlight">맞춤 향을 추천</span>할 뿐만 아니라,<br />
+                                <span className="highlight">향과 어울리는 색</span>을 통해 <span className="highlight">향을 시각적</span>으로 느끼는 감각적 경험을 선사합니다.
+                            </>
+                        )}
+                    </h2>
                     <h1>•</h1>
                     <h1>•</h1>
-                    <h2 className="additional-h2">오직 <span className="highlight">방향에서만 만날 수 있는 나만의 향기</span>, 지금 바로 찾아보세요.</h2>
+                    <h2 className="additional-h2">
+                    {language === 'english' ? (
+                            <>
+                                Uncover a <span className="highlight">scent that is uniquely yours</span> — exclusively at <span className="highlight">Scentique</span>, waiting for you.
+                            </>
+                        )
+                        : (
+                            <>
+                                오직 <span className="highlight">센티크에서만 만날 수 있는 나만의 향기</span>, 지금 바로 찾아보세요.
+                            </>
+                        )}
+                    </h2>
                 </div>
                 <img src="/images/footer.png" alt="footer-image" className="footer-image" />
             </div>

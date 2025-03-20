@@ -73,7 +73,6 @@ function App() {
             <Route path='/reviews/:id' element={<PerfumeReviews />} />
           </Route>
 
-
           <Route index element={<Main />} />
           <Route path="/login" element={<Login />} />
           <Route path="/oauth/redirected/kakao" element={<Login />} />
