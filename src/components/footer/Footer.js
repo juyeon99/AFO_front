@@ -3,65 +3,87 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import '../../css/components/Footer.css';
 import { FaInstagram, FaFacebook, FaTwitter, FaYoutube, FaGithub } from "react-icons/fa";
 
-const Footer = () => {
+const Footer = ({language}) => {
     const location = useLocation();
     const isMainPage = location.pathname === '/';
 
     // 소셜 미디어 링크 데이터
     const socialLinks = [
-        { title: '인스타그램', icon: <FaInstagram />, path: '#' },
-        { title: '페이스북', icon: <FaFacebook />, path: '#' },
-        { title: '트위터', icon: <FaTwitter />, path: '#' },
-        { title: '유튜브', icon: <FaYoutube />, path: 'https://www.youtube.com/@AllForOne-1216' },
-        { title: '깃허브', icon: <FaGithub />, path: 'https://github.com/Project-AllForOne' }
+        { title: 'instagram', icon: <FaInstagram />, path: '#' },
+        { title: 'facebook', icon: <FaFacebook />, path: '#' },
+        { title: 'x', icon: <FaTwitter />, path: 'https://x.com/its_me_jenny__?s=21' },
+        { title: 'youtube', icon: <FaYoutube />, path: 'https://www.youtube.com/@AllForOne-1216' },
+        { title: 'github', icon: <FaGithub />, path: 'https://github.com/juyeon99/AFO_AIserver' }
     ];
 
-    // 클릭 핸들러
-    const handleClick = (path) => {
-        if (path === '#') {
-            alert('링크가 비활성화되어 있습니다.');
+    const handleScrollToIntro = (e) => {
+        e.preventDefault(); // Prevent default link behavior
+
+        if (location.pathname === "/") {
+            // Already on the main page, just scroll
+            scrollToIntro();
+        } else {
+            // Navigate to "/" first, then scroll after page load
+            navigate("/");
+            setTimeout(scrollToIntro, 500); // Delay to ensure page loads
+        }
+    };
+
+    const scrollToIntro = () => {
+        const target = document.getElementById("intro-section");
+        if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
         }
     };
 
     const navigate = useNavigate();
 
+    const texts = {
+        slogan: { en: "The Fragrance That's Truly Yours", ko: "당신만의 특별한 향기" },
+        intro: { en: "Introduction", ko: "소개" },
+        spices: { en: "Explore Notes", ko: "향료 알아가기" },
+        perfumes: { en: "Explore Perfumes", ko: "향수 알아가기" },
+        recommendation: { en: "AI Perfume Recommendation", ko: "AI 향수 추천" },
+        history: { en: "Fragrance History", ko: "향기 히스토리" },
+        therapy: { en: "Aromatherapy", ko: "향 테라피" },
+        faq: { en: "FAQ", ko: "자주 묻는 질문 (FAQ)" },
+        privacyPolicy: { en: "Privacy Policy", ko: "개인정보 처리방침" },
+        termsOfService: { en: "Terms of Service", ko: "이용약관" },
+        cookiePolicy: { en: "Cookie Policy", ko: "쿠키 정책" }
+    };
+
     return (
         <>
             <footer className="footer">
-            <img 
-                src="/images/logo.png" 
-                alt="로고 이미지" 
-                className="footer-main-logo-image"
-                onClick={() => {
-                    navigate('/'); // 경로 변경
-                    window.scrollTo({ top: 0, behavior: 'smooth' }); // 스크롤 맨 위로 이동
-                }}
-                style={{ cursor: 'pointer' }}
-            />
+                <img 
+                    src="/images/logo-en.png" 
+                    alt="logo" 
+                    className="footer-main-logo-image"
+                    onClick={() => {
+                        navigate('/'); // 경로 변경
+                        window.scrollTo({ top: 0, behavior: 'smooth' }); // 스크롤 맨 위로 이동
+                    }}
+                    style={{ cursor: 'pointer' }}
+                />
                 <div className="footer-container">
 
                     <div className="footer-textbox">
-                        <div className="footer-slogan">당신만의 특별한 향기</div>
+                        <div className="footer-slogan">{language === 'english' ? texts.slogan.en : texts.slogan.ko}</div>
                         <nav className="footer-navlinks">
                             <div className="footer-nav">
-                                <a href="#"
-                                onClick={(e) => {
-                                e.preventDefault(); // 기본 링크 동작 방지
-                                const target = document.getElementById('intro-section'); // 해당 섹션의 id를 가져옴
-                                if (target) {
-                                    target.scrollIntoView({ behavior: 'smooth', block: 'start' }); // 부드럽게 스크롤
-                                }
-                                }}>소개</a>
+                                <a href="#" onClick={handleScrollToIntro}>{language === 'english' ? texts.intro.en : texts.intro.ko}</a>
                                 <span className="separator">|</span>
-                                <a href="/spiceslist">향료 알아가기</a>
+                                <a href="/perfumeList">{language === 'english' ? texts.perfumes.en : texts.perfumes.ko}</a>
                                 <span className="separator">|</span>
-                                <a href="/perfumeList">향수 알아가기</a>
+                                <a href="/spiceslist">{language === 'english' ? texts.spices.en : texts.spices.ko}</a>
                                 <span className="separator">|</span>
-                                <a href="/chat">맞춤 향수 추천</a>
+                                <a href="/chat">{language === 'english' ? texts.recommendation.en : texts.recommendation.ko}</a>
                                 <span className="separator">|</span>
-                                <a href="/history">향기 히스토리</a>
+                                <a href="/history">{language === 'english' ? texts.history.en : texts.history.ko}</a>
                                 <span className="separator">|</span>
-                                <a href="/FAQ">자주 묻는 질문 (FAQ)</a>
+                                <a href="/therapy">{language === 'english' ? texts.therapy.en : texts.therapy.ko}</a>
+                                <span className="separator">|</span>
+                                <a href="/FAQ">{language === 'english' ? texts.faq.en : texts.faq.ko}</a>
                             </div>
                         </nav>
 
@@ -85,27 +107,37 @@ const Footer = () => {
                         </div> 
 
                         <div className="footer-company-info">
-                            회사명: 올포원 | 서비스명: 방향(訪香) | 위치: 서울특별시 강남구 테헤란로 123 | 사업자 등록번호: 123-45-67890<br />
-                            통신판매업 신고번호: 제 2024-서울강남-1234호 | 대표자: 홍길동 | 고객센터: 02-1234-5678 | 이메일: support@banghyang.com
+                            {language === 'english' ? (
+                                <>
+                                    Company Name: AFO | Service Name: Sentique | Location: 123 Teheran-ro, Gangnam-gu, Seoul, South Korea | Business Registration Number: 123-45-67890<br />
+                                    E-commerce Registration Number: 제 2024-서울강남-1234호 | Representative: Gil-dong Hong | Customer Service: 02-1234-5678 | Email: support@sentique.com
+                                </>
+                                ) : (
+                                <>
+                                    회사명: AFO | 서비스명: Sentique | 위치: 서울특별시 강남구 테헤란로 123 | 사업자 등록번호: 123-45-67890<br />
+                                    통신판매업 신고번호: 제 2024-서울강남-1234호 | 대표자: 홍길동 | 고객센터: 02-1234-5678 | 이메일: support@sentique.com
+                                </>
+                            )}
+                            
                         </div>
 
                         <div className="footer-bottom-block">
                             <div className="footer-legal">
                                 <a href="/PrivacyPolicy" className="PrivacyPolicy">
-                                    <b>개인정보 처리방침</b>
+                                    <b>{language === 'english' ? texts.privacyPolicy.en : texts.privacyPolicy.ko}</b>
                                 </a>
                                 <span className="separator">|</span>
                                 <a href="/TermsofUse" className="TermsofUse">
-                                    <b>이용약관</b>
+                                    <b>{language === 'english' ? texts.termsOfService.en : texts.termsOfService.ko}</b>
                                 </a>
                                 <span className="separator">|</span>
                                 <a href="/CookiePolicy" className="CookiePolicy">
-                                    <b>쿠키 정책</b>
+                                    <b>{language === 'english' ? texts.cookiePolicy.en : texts.cookiePolicy.ko}</b>
                                 </a>
                             </div>
 
                             <div className="footer-copyright">
-                                © 2024 방향. All rights reserved.
+                                © 2024 Sentique. All rights reserved.
                             </div>
                         </div>
                     </div>

@@ -17,6 +17,8 @@ const Sidebar = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    const language = localStorage.getItem('language') || 'english';
+
     useEffect(() => {
         // 로컬 스토리지에서 사용자 정보 가져오기
         const storedUser = JSON.parse(localStorage.getItem('auth'));
@@ -45,13 +47,13 @@ const Sidebar = () => {
         try {
             const storedUser = localStorage.getItem('auth');
             if (!storedUser) {
-                alert('사용자 정보를 찾을 수 없습니다.');
+                alert(language === "english" ? "User information not found." : "사용자 정보를 찾을 수 없습니다.");
                 return;
             }
 
             const parsedUser = JSON.parse(storedUser);
             if (!parsedUser?.id) {
-                alert('회원 ID가 유효하지 않습니다.');
+                alert(language === "english" ? "The user ID is invalid." : "회원 ID가 유효하지 않습니다.");
                 return;
             }
 
@@ -62,15 +64,13 @@ const Sidebar = () => {
                 dispatch(logout()); // Redux 상태 초기화
                 navigate('/'); // 메인 페이지로 이동
             } else {
-                alert('회원 탈퇴 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+                alert(language === "english" ? "An error occurred while processing your account deletion. Please try again." : "회원 탈퇴 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
             }
         } catch (error) {
             console.error('회원 탈퇴 처리 중 오류:', error);
-            alert('회원 탈퇴 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+            alert(language === "english" ? "An error occurred while processing your account deletion. Please try again." : "회원 탈퇴 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
         }
     };
-
-
 
     const handleScrollToIntro = (e) => {
         e.preventDefault(); // 기본 링크 동작 방지
@@ -96,6 +96,18 @@ const Sidebar = () => {
     const userRole = localUser?.role || 'USER'; // 사용자 역할 가져오기
     const isAdmin = userRole === 'ADMIN';
     const isActive = location.pathname === '/';
+    const sidebarTexts = {
+        intro: { en: "Introduction", ko: "소개" },
+        spices: { en: "Explore Notes", ko: "향료 알아가기" },
+        perfumes: { en: "Explore Perfumes", ko: "향수 알아가기" },
+        recommendation: { en: "AI Perfume Recommendation", ko: "AI 향수 추천" },
+        history: { en: "Fragrance History", ko: "향기 히스토리" },
+        therapy: { en: "Aromatherapy", ko: "향 테라피" },
+        login: { en: "Login / Sign Up", ko: "로그인/회원가입" },
+        myReviews: { en: "My Reviews", ko: "내가 작성한 리뷰" },
+        deleteAccount: { en: "Delete Account", ko: "회원탈퇴" },
+        logout: { en: "Logout", ko: "로그아웃" },
+    };
 
     return (
         <>
@@ -112,13 +124,23 @@ const Sidebar = () => {
                 <nav className="sidebar-nav">
                     <div className="sidebar-links">
                         <a href="#" className="sidebar-link" onClick={handleScrollToIntro}>
-                            소개
+                        {language === 'english' ? sidebarTexts.intro.en : sidebarTexts.intro.ko}
                         </a>
-                        <a href="/spiceslist" className="sidebar-link">향료 알아가기</a>
-                        <a href="/perfumelist" className="sidebar-link">향수 알아가기</a>
-                        <a href="/chat" className="sidebar-link">향수 추천</a>
-                        <a href="/history" className="sidebar-link">향기 히스토리</a>
-                        <a href="/therapy" className="sidebar-link">향 테라피</a>
+                        <a href="/perfumelist" className="sidebar-link">
+                            {language === 'english' ? sidebarTexts.perfumes.en : sidebarTexts.perfumes.ko}
+                        </a>
+                        <a href="/spiceslist" className="sidebar-link">
+                            {language === 'english' ? sidebarTexts.spices.en : sidebarTexts.spices.ko}
+                        </a>
+                        <a href="/chat" className="sidebar-link">
+                            {language === 'english' ? sidebarTexts.recommendation.en : sidebarTexts.recommendation.ko}
+                        </a>
+                        <a href="/history" className="sidebar-link">
+                            {language === 'english' ? sidebarTexts.history.en : sidebarTexts.history.ko}
+                        </a>
+                        <a href="/therapy" className="sidebar-link">
+                            {language === 'english' ? sidebarTexts.therapy.en : sidebarTexts.therapy.ko}
+                        </a>
 
                         {/* 관리자 전용 링크 */}
                         {isAdmin && (
@@ -132,11 +154,13 @@ const Sidebar = () => {
                             <div className="sidebar-profile-section">
                                 <img
                                     src="/images/Main-Propic.png"
-                                    alt="기본 프로필"
+                                    alt="default profile picture"
                                     className="sidebar-profile-img"
                                 />
                                 <NavLink to="/login">
-                                    <button className="sidebar-auth-button login">로그인/회원가입</button>
+                                    <button className="sidebar-auth-button login">
+                                    {language === 'english' ? sidebarTexts.login.en : sidebarTexts.login.ko}
+                                    </button>
                                 </NavLink>
                             </div>
                         ) : (
@@ -145,10 +169,10 @@ const Sidebar = () => {
                                 <div className="sidebar-profile-section">
                                     <img
                                         src="/images/Main-Propic.png"
-                                        alt="프로필"
+                                        alt="profile picture"
                                         className="sidebar-profile-img"
                                     />
-                                    <span className="sidebar-username" onClick={toggleMenu}>{userNickname}님</span>
+                                    <span className="sidebar-username" onClick={toggleMenu}>{userNickname}{language === 'english' ? "" : " 님"}</span>
                                 </div>
 
                                 {/* 회원탈퇴/로그아웃 메뉴 */}
@@ -159,19 +183,19 @@ const Sidebar = () => {
                                             onClick={() => setShowMyReviews(true)}
                                             data-type="my-reviews"
                                         >
-                                            내가 작성한 리뷰
+                                            {language === 'english' ? sidebarTexts.myReviews.en : sidebarTexts.myReviews.ko}
                                         </button>
                                         <button
                                             className="sidebar-auth-button"
                                             onClick={handleMemberLeave}
                                         >
-                                            회원탈퇴
+                                            {language === 'english' ? sidebarTexts.deleteAccount.en : sidebarTexts.deleteAccount.ko}
                                         </button>
                                         <button
                                             className="sidebar-auth-button"
                                             onClick={handleLogout}
                                         >
-                                            로그아웃
+                                            {language === 'english' ? sidebarTexts.logout.en : sidebarTexts.logout.ko}
                                         </button>
                                     </div>
                                 )}
