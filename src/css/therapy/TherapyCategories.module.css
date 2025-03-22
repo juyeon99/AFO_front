@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap');
+@font-face {
+    font-family: 'MaruBuri';
+    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.eot);
+    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.eot?#iefix) format("embedded-opentype"), url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff2) format("woff2"), url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff) format("woff"), url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.ttf) format("truetype");
+}
 
 .categoriesContainer {
     text-align: center;
@@ -26,7 +31,7 @@
 }
 
 .heading {
-    font-family: "Nanum Myeongjo", serif;
+    font-family: "MaruBuri", serif;
     width: 100%;
     text-align: center;
     margin: 20px 0 0 0;
@@ -148,7 +153,7 @@
     cursor: pointer;
     font-size: 18px;
     transition: transform 0.3s ease-in-out;
-    font-family: "Nanum Myeongjo", serif;
+    font-family: "MaruBuri", serif;
 }
 
 .closeButton:hover {

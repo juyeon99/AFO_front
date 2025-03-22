@@ -8,7 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 const TherapyMain = ({ onStart }) => {
     const navigate = useNavigate();
-
+    const language = localStorage.getItem('language') || 'english';
+    
     useEffect(() => {
         // 컴포넌트가 마운트될 때 자동으로 스크롤 맨 위로
         window.scrollTo({
@@ -17,19 +18,28 @@ const TherapyMain = ({ onStart }) => {
         });
     }, []); // 컴포넌트가 마운트될 때만 실행
 
+    const texts = {
+        korean: {
+            title: "향기로 마음을 채우는 작은 여유, 시작해볼까요?",
+        },
+        english: {
+            title: "A little moment to fill your heart with fragrance — shall we begin?",
+        },
+    };
+
     return (
         <div className={styles.therapyWrapper}>
             <div className={styles.contentContainer}>
                 {/* 로고 영역 */}
                 <img
-                    src="/images/logo.png"
-                    alt="로고 이미지"
+                    src="/images/logo-en.png"
+                    alt="logo"
                     className={styles.logo}
                     onClick={() => navigate('/')}
                 />
                 {/* 메인 콘텐츠 영역 */}
                 <div className={styles.therapyMain}>
-                    <h2 className={styles.heading}>향기로 마음을 채우는 작은 여유, 시작해볼까요?</h2>
+                    <h2 className={styles.heading}>{language === 'english' ? texts.english.title : texts.korean.title}</h2>
                     <TherapyButton label="START" onClick={onStart} />
                 </div>
             </div>

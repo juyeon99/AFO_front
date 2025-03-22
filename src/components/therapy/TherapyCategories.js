@@ -5,29 +5,30 @@ import { useDispatch, useSelector } from 'react-redux';
 import ColorLoadingScreen from '../../components/loading/ColorLoadingScreen';
 import { fetchTherapyResponse, selectLoading } from '../../module/TherapyModule';
 
-
 // 향기 테라피의 메인 카테고리 선택 컴포넌트
 // 원형 메뉴 형태로 카테고리를 표시하고 선택할 수 있게 함
+
+const language = localStorage.getItem('language') || 'english';
 
 // 카테고리 데이터 정의
 const categories = [
     // 각 카테고리의 이름과 대표 이미지 정의
-    { name: "수면 & 회복", image: "https://health.chosun.com/site/data/img_dir/2024/07/19/2024071902007_0.jpg" },
-    { name: "집중 & 마인드풀니스", image: "https://www.brainmedia.co.kr/Library/FileDown.aspx?filename=KakaoTalk_20190923_141307132s(4).jpg&filepath=" },
-    { name: "활력 & 에너지", image: "https://i0.wp.com/habitdays.com/wp-content/uploads/2024/03/Healthy-lifestyle_man-woman-practicing-yoga-outdoor_23-2148196903.jpg?fit=728%2C485&ssl=1" },
-    { name: "평온 & 스트레스 해소", image: "https://cdn.news.hidoc.co.kr/news/photo/202107/25263_60448_0811.jpg" },
-    { name: "기쁨 & 긍정", image: "https://img.segye.com/content/image/2016/05/04/20160504514369.jpg" },
-    { name: "리프레시 & 클린 에어", image: "https://model.foto.ne.jp/free/img/images_big/m030034.jpg" }
+    { name: language === 'english' ? "Sleep & Recovery" : "수면 & 회복", image: "https://health.chosun.com/site/data/img_dir/2024/07/19/2024071902007_0.jpg" },
+    { name: language === 'english' ? "Focus & Mindfulness" : "집중 & 마인드풀니스", image: "https://www.brainmedia.co.kr/Library/FileDown.aspx?filename=KakaoTalk_20190923_141307132s(4).jpg&filepath=" },
+    { name: language === 'english' ? "Vitality & Energy" : "활력 & 에너지", image: "https://i0.wp.com/habitdays.com/wp-content/uploads/2024/03/Healthy-lifestyle_man-woman-practicing-yoga-outdoor_23-2148196903.jpg?fit=728%2C485&ssl=1" },
+    { name: language === 'english' ? "Calm & Stress Relief" : "평온 & 스트레스 해소", image: "https://cdn.news.hidoc.co.kr/news/photo/202107/25263_60448_0811.jpg" },
+    { name: language === 'english' ? "Joy & Positivity" : "기쁨 & 긍정", image: "https://img.segye.com/content/image/2016/05/04/20160504514369.jpg" },
+    { name: language === 'english' ? "Refresh & Clean Air" : "리프레시 & 클린 에어", image: "https://model.foto.ne.jp/free/img/images_big/m030034.jpg" }
 ];
 
 // 각 카테고리별 스타일 매핑
 const categoryStyles = {
-    "수면 & 회복": styles.sleep,
-    "집중 & 마인드풀니스": styles.focus,
-    "활력 & 에너지": styles.energy,
-    "평온 & 스트레스 해소": styles.calm,
-    "기쁨 & 긍정": styles.happiness,
-    "리프레시 & 클린 에어": styles.refresh,
+    [language === 'english' ? "Sleep & Recovery" : "수면 & 회복"]: styles.sleep,
+    [language === 'english' ? "Focus & Mindfulness" : "집중 & 마인드풀니스"]: styles.focus,
+    [language === 'english' ? "Vitality & Energy" : "활력 & 에너지"]: styles.energy,
+    [language === 'english' ? "Calm & Stress Relief" : "평온 & 스트레스 해소"]: styles.calm,
+    [language === 'english' ? "Joy & Positivity" : "기쁨 & 긍정"]: styles.happiness,
+    [language === 'english' ? "Refresh & Clean Air" : "리프레시 & 클린 에어"]: styles.refresh,
 };
 
 const TherapyCategories = ({ onClose }) => {
@@ -55,10 +56,10 @@ const TherapyCategories = ({ onClose }) => {
     }, []);
 
     // 카테고리 선택 핸들러 추가
-    const handleCategorySelect = async (categoryName) => {
+    const handleCategorySelect = async (categoryName, categoryIndex) => {
         try {
             // API 요청 (loading 상태는 reducer에서 자동으로 처리됨)
-            await dispatch(fetchTherapyResponse(categoryName));
+            await dispatch(fetchTherapyResponse(language, categoryIndex));
 
             // API 요청이 성공하면 페이지 이동
             navigate('/therapy/recommend', {
@@ -72,22 +73,33 @@ const TherapyCategories = ({ onClose }) => {
         }
     };
 
+    const texts = {
+        korean: {
+            loading: "디퓨저를 찾는 중...",
+            title: "현재 필요한 상태를 골라보세요."
+        },
+        english: {
+            loading: "Searching for diffusers...",
+            title: "Select the state you need."
+        },
+    };
+
     return (
         <div className={styles.container}>
             {loading && (
-                <ColorLoadingScreen loadingText="디퓨저를 찾는 중..." />
+                <ColorLoadingScreen loadingText={language === 'english' ? texts.english.loading : texts.korean.loading} />
             )}
 
             {/* 카테고리 선택 전 초기 화면 */}
             {!selectedCategory && (
                 <>
                     <img
-                        src="/images/logo.png"
-                        alt="로고 이미지"
+                        src="/images/logo-en.png"
+                        alt="logo"
                         className={styles.logo}
                         onClick={() => navigate('/')}
                     />
-                    <h2 className={styles.heading}>현재 필요한 상태를 골라보세요.</h2>
+                    <h2 className={styles.heading}>{language === 'english' ? texts.english.title : texts.korean.title}</h2>
                 </>
             )}
 
@@ -98,7 +110,7 @@ const TherapyCategories = ({ onClose }) => {
                         <div
                             key={category.name}
                             className={`${styles.categoryItem} ${styles[`position${index}`]} ${categoryStyles[category.name]}`}
-                            onClick={() => handleCategorySelect(category.name)}
+                            onClick={() => handleCategorySelect(category.name, index)}
                             data-name={category.name}
                         >
                             <img src={category.image} alt={category.name} className={styles.categoryImage} />

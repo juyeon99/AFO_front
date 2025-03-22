@@ -27,10 +27,10 @@ export const {
 });
 
 // 디퓨저 추천 요청
-export const fetchTherapyResponse = (userInput) => async (dispatch) => {
+export const fetchTherapyResponse = (language, categoryIndex) => async (dispatch) => {
     try {
         dispatch(fetchTherapyStart());
-        const response = await responseTherapy(userInput);
+        const response = await responseTherapy(language, categoryIndex);
         dispatch(fetchTherapySuccess(response));
         return response;
     } catch (error) {

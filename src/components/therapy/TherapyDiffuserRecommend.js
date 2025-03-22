@@ -20,8 +20,21 @@ const TherapyDiffuserRecommend = () => {
     const loading = useSelector(selectLoading);
     const therapyTitle = useSelector(selectTherapyTitle);
 
+    const language = localStorage.getItem('language') || 'english';
+
+    const texts = {
+        korean: {
+            loading: "디퓨저를 찾는 중...",
+            title: "키워드에 적합한 디퓨저를 추천합니다."
+        },
+        english: {
+            loading: "Searching for diffusers...",
+            title: "Recommended diffuser results based on the selected keywords."
+        },
+    };
+
     if (loading) {
-        return <ColorLoadingScreen loadingText="디퓨저를 찾는 중..." />;
+        return <ColorLoadingScreen loadingText={language === 'english' ? texts.english.loading : texts.korean.loading} />;
     }
 
     return (
@@ -29,7 +42,7 @@ const TherapyDiffuserRecommend = () => {
             {/* 헤더 영역: 로고 */}
             <div className={styles.header}>
                 <img
-                    src="/images/logo.png"
+                    src="/images/logo-en.png"
                     alt="로고"
                     className={styles.logo}
                     onClick={() => navigate('/')}
@@ -37,7 +50,7 @@ const TherapyDiffuserRecommend = () => {
             </div>
 
             {/* 메인 컨텐츠 */}
-            <h1 className={styles.mainTitle}>키워드에 적합한 디퓨저를 추천합니다.</h1>
+            <h1 className={styles.mainTitle}>{language === 'english' ? texts.english.title : texts.korean.title}</h1>
             {/* 선택된 카테고리 태그 표시 */}
             <p className={styles.categoryTag}>{therapyTitle}</p>
 

@@ -1,11 +1,12 @@
 import apis from "./Apis";
 
-export const responseTherapy = async (userInput) => {
+export const responseTherapy = async (language, categoryIndex) => {
     try {
         const response = await apis.post("/diffusers", {
-            user_input: userInput
+            language: language,
+            category_index: categoryIndex
         });
-        console.log('API Request:', userInput);  // 요청 데이터 확인
+        console.log('API Request:', categoryIndex);  // 요청 데이터 확인
         console.log('API Response:', response.data);  // 응답 데이터 확인
         return response.data;
     } catch (error) {
