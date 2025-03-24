@@ -133,7 +133,7 @@ const SpicesCard = ({
                     <h3 className={styles.nameEn}>{spice.nameEn}</h3>
                     <h3 className={styles.nameKr}>{spice.nameKr}</h3>
                     <div className={styles.divider}></div>
-                    <p className={styles.category}>{spice.lineName} 계열</p>
+                    <p className={styles.category}>{spice.lineName}</p>
                 </div>
 
                 {/* 카드 뒷면 */}

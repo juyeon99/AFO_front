@@ -10,6 +10,7 @@ const MyReviewsPopover = ({ show, onClose }) => {
     const auth = JSON.parse(localStorage.getItem('auth'));
     const [editingReview, setEditingReview] = useState(null);
     const [editContent, setEditContent] = useState('');
+    const language = localStorage.getItem('language') || 'english';
 
     useEffect(() => {
         const loadReviews = async () => {
@@ -27,7 +28,7 @@ const MyReviewsPopover = ({ show, onClose }) => {
     }, [show, auth?.id, dispatch]);
 
     const handleDelete = async (reviewId, productId) => {
-        if (window.confirm('리뷰를 삭제하시겠습니까?')) {
+        if (window.confirm(language === 'english' ? "Do you want to delete this review?" : "리뷰를 삭제하시겠습니까?")) {
             await dispatch(deleteExistingReview(reviewId, productId));
             dispatch(fetchMemberReviews(auth.id));
         }
@@ -59,7 +60,7 @@ const MyReviewsPopover = ({ show, onClose }) => {
             await dispatch(fetchMemberReviews(auth.id));
         } catch (error) {
             console.error('Failed to update review:', error);
-            alert('리뷰 수정에 실패했습니다.');
+            alert(language === 'english' ? "Failed to edit the review." : '리뷰 수정에 실패했습니다.');
         }
     };
 
@@ -68,7 +69,7 @@ const MyReviewsPopover = ({ show, onClose }) => {
     return (
         <div className={styles.popoverContainer}>
             <div className={styles.header}>
-                <h3>내가 작성한 리뷰</h3>
+                <h3>{language === 'english' ? "My Reviews" : "내가 작성한 리뷰"}</h3>
                 <button onClick={onClose} className={styles.closeButton}>
                     <X size={16} />
                 </button>
@@ -76,7 +77,7 @@ const MyReviewsPopover = ({ show, onClose }) => {
 
             <div className={styles.content}>
                 {loading ? (
-                    <div className={styles.loading}>로딩 중...</div>
+                    <div className={styles.loading}>{language === 'english' ? "Loading..." : "로딩 중..."}</div>
                 ) : reviews?.length > 0 ? (
                     reviews.map(review => (
                         <div key={review.id} className={styles.reviewItem}>
@@ -95,7 +96,7 @@ const MyReviewsPopover = ({ show, onClose }) => {
                                         className={styles.deleteButton}
                                         onClick={() => handleDelete(review.id, review.productId)}
                                     >
-                                        삭제
+                                        {language === 'english' ? "Delete" : "삭제"}
                                     </button>
                                 </div>
                             </div>
@@ -111,13 +112,13 @@ const MyReviewsPopover = ({ show, onClose }) => {
                                             className={styles.saveButton}
                                             onClick={handleUpdate}
                                         >
-                                            저장
+                                            {language === 'english' ? "Save" : "저장"}
                                         </button>
                                         <button
                                             className={styles.cancelButton}
                                             onClick={() => setEditingReview(null)}
                                         >
-                                            취소
+                                            {language === 'english' ? "Cancel" : "취소"}
                                         </button>
                                     </div>
                                 </div>
@@ -130,7 +131,7 @@ const MyReviewsPopover = ({ show, onClose }) => {
                         </div>
                     ))
                 ) : (
-                    <p className={styles.noReviews}>작성한 리뷰가 없습니다.</p>
+                    <p className={styles.noReviews}>{language === 'english' ? "No reviews" : "작성한 리뷰가 없습니다."}</p>
                 )}
             </div>
         </div>

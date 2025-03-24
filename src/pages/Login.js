@@ -9,6 +9,7 @@ function Login() {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
+    const language = localStorage.getItem('language') || 'english';
 
     const { loading, error } = useSelector((state) => state.auth); // Redux 상태 가져오기
 
@@ -17,7 +18,7 @@ function Login() {
         return (
             <div className="login-container-loading">
                 <div className="spinner"></div>
-                <span>로그인 처리 중입니다...</span>
+                <span>{language === 'english' ? "Logging in..." : "로그인 처리 중입니다..."}</span>
             </div>
         );
     }
@@ -56,15 +57,15 @@ function Login() {
 
     return (
         <div className="login-container">
-            <img src="/images/logo.png" className="login-logo" alt="Logo" onClick={() => navigate('/')}/>
-            <p className="login-subtitle">당신의 향기, 당신의 이야기 - 일상의 특별한 향기</p>
+            <img src="/images/logo-en.png" className="login-logo" alt="Logo" onClick={() => navigate('/')}/>
+            <p className="login-subtitle">{language === 'english' ? "Your fragrance, your story — the special scent of everyday life." : "당신의 향기, 당신의 이야기 — 일상의 특별한 향기"}</p>
 
             <div className="login-box">
                 <button className="kakao-login-button" onClick={handleLogin}>
                     Sign in with Kakao
                     <img src="/images/kakao.png" alt="Kakao Icon" className="kakao-icon" />
                 </button>
-                <img src="/images/footer.png" alt="푸터 이미지" className="login_footer" />
+                <img src="/images/footer.png" alt="login footer" className="login_footer" />
             </div>
         </div>
     );

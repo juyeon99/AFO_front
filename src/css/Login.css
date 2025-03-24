@@ -1,4 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Nanum+Gothic+Coding&family=Noto+Serif+KR:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=IBM+Plex+Sans+KR&family=Nanum+Gothic+Coding&family=Noto+Serif+KR:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Noto+Serif+KR:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
 
 /* 전체 컨테이너 스타일 */
@@ -96,7 +101,7 @@
     margin-bottom: 2rem;
     font-weight: 900;
     text-align: center;
-    font-family: 'Nanum Myeongjo';
+    /* font-family: 'Nanum Myeongjo', 'Gowun Batang'; */
 }
 
 /* 로그인 박스 스타일 */
@@ -127,7 +132,7 @@
     transition: background-color 0.3s ease;
     margin-top: 150px;
     margin-bottom: 50px;
-    font-family: 'Nanum Myeongjo', serif;
+    font-family: 'Gowun Batang', 'Noto Serif KR';
 }
 
 .google-login-button:hover {

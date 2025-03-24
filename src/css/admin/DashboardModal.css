@@ -164,7 +164,7 @@
     text-align: center; /* 중앙 정렬 */
     margin-bottom: 15px; /* 제목과 차트 간 간격 */
     font-family: 'Nanum Myeongjo', sans-serif; /* 폰트 설정 */
-    /* 텍스트 방향을 수평으로 고정 */
+    /* 텍스트 Sentique을 수평으로 고정 */
     writing-mode: horizontal-tb; /* 세로로 표시되는 문제 해결 */
     white-space: nowrap; /* 텍스트가 한 줄로 표시되도록 설정 */
     text-overflow: ellipsis; /* 넘치는 텍스트는 '...'으로 표시 */
