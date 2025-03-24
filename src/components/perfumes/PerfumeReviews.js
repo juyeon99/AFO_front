@@ -8,6 +8,8 @@ import usePerfumeReviewState from './PerfumeReviewState';
 import ReviewSummary from './ReviewSummary';
 
 const PerfumeReviews = ({ perfumeId }) => {
+    const language = localStorage.getItem('language') || 'english';
+    
     const {
         isDragging,
         sliderLeft,
@@ -42,9 +44,9 @@ const PerfumeReviews = ({ perfumeId }) => {
             {/* 상단 Top 1 리뷰 */}
             <div className={styles.topReviewsSection}>
                 <div className={styles.topReviewCard}>
-                    <h4>사용자 리뷰 Top 1</h4>
+                    <h4>{language === 'english' ? "Top 1 User Review" : "사용자 리뷰 Top 1"}</h4>
                     <div className={styles.reviewContent}>
-                        <p>{mostLikedReview?.content || "사용자 리뷰가 없습니다."}</p>
+                        <p>{mostLikedReview?.content || (language === 'english' ? "No user reviews." : "사용자 리뷰가 없습니다.")}</p>
                     </div>
                 </div>
             </div>
@@ -53,7 +55,7 @@ const PerfumeReviews = ({ perfumeId }) => {
             <div className={styles.reviewListSection}>
                 {/* 🔹 "리뷰 작성하기" 버튼 → 모달 열기 */}
                 <button className={styles.writeReviewBtn} onClick={handleModalOpen}>
-                    리뷰 작성하기
+                    {language === 'english' ? "Write Review" : "리뷰 작성하기"}
                 </button>
 
                 {/* 리뷰 작성 모달 */}

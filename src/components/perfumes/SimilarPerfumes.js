@@ -8,6 +8,7 @@ const SimilarPerfumes = ({ perfumeId ,initialData = null, onPerfumeChange }) => 
     const [designSimilarPerfumes, setDesignSimilarPerfumes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
+    const language = localStorage.getItem('language') || 'english';
 
     useEffect(() => {
         // 초기 데이터가 이미 있으면 바로 사용
@@ -77,11 +78,11 @@ const SimilarPerfumes = ({ perfumeId ,initialData = null, onPerfumeChange }) => 
     );
 
     if (isLoading) {
-        return <div className={styles.loading}>로딩 중...</div>;
+        return <div className={styles.loading}>{language === 'english' ? "Loading..." : "로딩 중..."}</div>;
     }
 
     if (!noteSimilarPerfumes.length && !designSimilarPerfumes.length) {
-        return <div className={styles.noSimilar}>유사한 향수가 없습니다.</div>;
+        return <div className={styles.noSimilar}>{language === 'english' ? "No similar perfumes available." : "유사한 향수가 없습니다."}</div>;
     }
 
 
@@ -90,13 +91,13 @@ const SimilarPerfumes = ({ perfumeId ,initialData = null, onPerfumeChange }) => 
             {noteSimilarPerfumes.length > 0 && (
                 <PerfumeCardList
                     perfumes={noteSimilarPerfumes}
-                    title="노트 기반 추천"
+                    title={language === 'english' ? "Note-Based Recommendation" : "노트 기반 추천"}
                 />
             )}
             {designSimilarPerfumes.length > 0 && (
                 <PerfumeCardList
                     perfumes={designSimilarPerfumes}
-                    title="디자인 기반 추천"
+                    title={language === 'english' ? "Design-Based Recommendation" : "디자인 기반 추천"}
                 />
             )}
         </div>

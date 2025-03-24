@@ -7,6 +7,7 @@ const ReviewModal = ({ isOpen, onClose, perfume }) => {
     const [reviewContent, setReviewContent] = useState('');
     const dispatch = useDispatch();
     const auth = JSON.parse(localStorage.getItem('auth'));
+    const language = localStorage.getItem('language') || 'english';
 
     if (!isOpen) return null;
 
@@ -29,7 +30,7 @@ const ReviewModal = ({ isOpen, onClose, perfume }) => {
                     productId: perfume?.id,
                     memberId: currentAuth?.id
                 });
-                alert('필요한 정보가 누락되었습니다. 다시 시도해주세요.');
+                alert(language === 'english' ? "Required information is missing. Please try again." : '필요한 정보가 누락되었습니다. 다시 시도해주세요.');
                 return;
             }
 
@@ -50,7 +51,7 @@ const ReviewModal = ({ isOpen, onClose, perfume }) => {
 
         } catch (error) {
             console.error('리뷰 작성 실패:', error);
-            alert('리뷰 작성에 실패했습니다. 다시 시도해주세요.');
+            alert(language === 'english' ? "Failed to write the review." : '리뷰 작성에 실패했습니다. 다시 시도해주세요.');
         }
     };
 
@@ -81,12 +82,12 @@ const ReviewModal = ({ isOpen, onClose, perfume }) => {
                     className={styles.reviewInput}
                     value={reviewContent}
                     onChange={(e) => setReviewContent(e.target.value)}
-                    placeholder="향수의 느낌 등을 살려 향수의 구체적인 리뷰를 작성해주세요."
+                    placeholder={language === 'english' ? "Please write a detailed review of the perfume, capturing its scent and other characteristics." : "향수의 느낌 등을 살려 향수의 구체적인 리뷰를 작성해주세요."}
                 />
 
                 {/* 작성 버튼 */}
                 <button className={styles.submitButton} onClick={handleSubmit}>
-                    작성
+                    {language === 'english' ? "Save" : "작성"}
                 </button>
             </div>
         </div>

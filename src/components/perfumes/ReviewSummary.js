@@ -6,6 +6,7 @@ import styles from '../../css/perfumes/PerfumeReviews.module.css';
 const ReviewSummary = ({ perfumeId }) => {
     const dispatch = useDispatch();
     const summary = useSelector(selectReviewSummary);
+    const language = localStorage.getItem('language') || 'english';
 
     useEffect(() => {
         if (perfumeId) {
@@ -18,9 +19,9 @@ const ReviewSummary = ({ perfumeId }) => {
         return (
             <div className={styles.summarySection}>
                 <div className={styles.summaryCard}>
-                    <h4>리뷰 요약</h4>
+                    <h4>{language === 'english' ? "Review Summary" : "리뷰 요약"}</h4>
                     <div className={styles.summaryContent}>
-                        <p>리뷰 요약을 불러오는 중...</p>
+                        <p>{language === 'english' ? "Loading review summary..." : "리뷰 요약을 불러오는 중..."}</p>
                     </div>
                 </div>
             </div>
@@ -30,7 +31,7 @@ const ReviewSummary = ({ perfumeId }) => {
     return (
         <div className={styles.summarySection}>
             <div className={styles.summaryCard}>
-                <h4>리뷰 요약</h4>
+                <h4>{language === 'english' ? "Review Summary" : "리뷰 요약"}</h4>
                 <div className={styles.summaryContent}>
                     <p>{summary}</p>
                 </div>

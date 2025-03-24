@@ -59,9 +59,9 @@ const FAQ = () => {
                     <br/>
                 
                     <section className="faq-section">
-                        <h2>6. What is the "Scent History" feature?</h2>
+                        <h2>6. What is the "Fragrance History" feature?</h2>
                         <ul>
-                            <li className="faq-li">Scent History allows users to save recommended fragrances as cards, which can be shared on social media or downloaded as images for personal use.</li>
+                            <li className="faq-li">Fragrance History allows users to save recommended fragrances as cards, which can be shared on social media or downloaded as images for personal use.</li>
                         </ul>
                     </section>
                 </div>) : (

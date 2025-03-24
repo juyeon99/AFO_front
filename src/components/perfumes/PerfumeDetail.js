@@ -17,6 +17,7 @@ const PerfumeDetail = () => {
     const perfumes = useSelector(selectPerfumes);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const language = localStorage.getItem('language') || 'english';
 
     // 페이지 로드/새로고침 시 항상 전체 향수 목록과 현재 향수 데이터 불러오기
     useEffect(() => {
@@ -83,8 +84,17 @@ const PerfumeDetail = () => {
                 height: '100vh',
                 fontSize: '1.2rem'
             }}>
-                향수 정보를 불러오는데 실패했습니다. <br />
-                잠시 후 다시 시도해주세요.
+                {language === 'english' ? (
+                    <>
+                        Failed to load perfume information.<br />
+                        Please try again later.
+                    </>
+                ) : (
+                    <>
+                        향수 정보를 불러오는데 실패했습니다.<br />
+                        잠시 후 다시 시도해주세요.
+                    </>
+                )}
             </div>
         );
     }
@@ -93,8 +103,8 @@ const PerfumeDetail = () => {
         <div className={styles.container}>
             {/* 로고 */}
             <img
-                src="/images/logo.png"
-                alt="방향"
+                src="/images/logo-en.png"
+                alt="Sentique"
                 className={styles.logo}
                 onClick={() => navigate('/')}
                 style={{ cursor: 'pointer' }}
