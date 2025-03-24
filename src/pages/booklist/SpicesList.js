@@ -14,6 +14,8 @@ import styles from '../../css/spices/SpicesList.module.css';
 const SpicesList = () => {
     const navigate = useNavigate();
     const spices = useSelector(selectSpices);
+    const language = localStorage.getItem('language') || 'english';
+
     const {
         searchTerm,
         activeFilters,
@@ -50,27 +52,27 @@ const SpicesList = () => {
     } = useSpicesState(spices);
 
     if (isLoading) {
-        return <LoadingScreen message="향료를 불러오는 중..." />;
+        return <LoadingScreen message={language === 'english' ? "Loading fragrance notes..." : "향료를 불러오는 중..."} />;
     }
 
     return (
         <>
             <div className={styles.container}>
                 <img
-                    src="/images/logo.png"
-                    alt="방향"
+                    src="/images/logo-en.png"
+                    alt="logo"
                     className={styles.logo}
                     onClick={() => navigate('/')}
                     style={{ cursor: 'pointer' }}
                 />
 
                 <div className={styles.header}>
-                    <div className={styles.title}>향료</div>
+                    <div className={styles.title}>{language === 'english' ? "Fragrance Notes" : "향료"}</div>
                     <div className={styles.searchArea}>
                         <input
                             type="text"
                             className={styles.searchInput}
-                            placeholder="향료 이름 검색 가능"
+                            placeholder={language === 'english' ? "Search for note names" : "향료 이름 검색 가능"}
                             value={searchTerm}
                             onChange={handleSearch}
                         />

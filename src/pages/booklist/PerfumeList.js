@@ -18,6 +18,7 @@ import BookmarkPopover from '../../components/perfumes/BookmarkPopover';
 const PerfumeList = () => {
     const dispatch = useDispatch();
     const perfumes = useSelector(selectPerfumes);
+    const language = localStorage.getItem('language') || 'english';
 
     useEffect(() => {
         if (!perfumes || perfumes.length === 0) {
@@ -85,7 +86,7 @@ const PerfumeList = () => {
     } = usePerfumeState();
 
     if (isLoading) {
-        return <LoadingScreen message="향수를 불러오는 중..." />;
+        return <LoadingScreen message={language === 'english' ? "Loading perfumes..." : "향수를 불러오는 중..."} />;
     }
 
     return (
@@ -93,20 +94,20 @@ const PerfumeList = () => {
             <div className={styles.container}>
                 {/* 로고 이미지 */}
                 <img
-                    src="/images/logo.png"
-                    alt="방향"
+                    src="/images/logo-en.png"
+                    alt="logo"
                     className={styles.logo}
                     onClick={() => navigate('/')}
                     style={{ cursor: 'pointer' }}
                 />
 
                 <div className={styles.header}>
-                    <div className={styles.title}>향수</div>
+                    <div className={styles.title}>{language === 'english' ? "Perfumes" : "향수"}</div>
                     <form className={styles.searchContainer}>
                         <input
                             type="text"
                             className={styles.searchInput}
-                            placeholder="브랜드명, 향수 이름 검색 가능"
+                            placeholder={language === 'english' ? "Search by brand name or perfume name" : "브랜드명, 향수 이름 검색 가능"}
                             value={searchTerm}
                             onChange={handleSearch}
                         />

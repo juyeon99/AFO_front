@@ -261,8 +261,8 @@ const AdminPerfumeList = () => {
     return (
         <>
             <img
-                src="/images/logo.png"
-                alt="1번 이미지"
+                src="/images/logo-en.png"
+                alt="logo"
                 className="main-logo-image"
                 onClick={() => navigate('/')}
                 style={{ cursor: 'pointer' }}
