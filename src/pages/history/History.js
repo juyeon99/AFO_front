@@ -7,6 +7,7 @@ import html2canvas from "html2canvas";
 import saveAs from "file-saver";
 import { useRef } from "react";
 import '../../css/History.css';
+import brandEnData from "../../data/brands_en.json";
 
 function History() {
     const formatDate = (timestamp) => {
@@ -25,6 +26,8 @@ function History() {
     const divRef = useRef(null);
 
     const { historyData } = useSelector((state) => state.history || {});
+
+    const language = localStorage.getItem('language') || 'english';
 
     const lines = [
         { name: 'Spicy', color: '#FF5757', id: '1' },
@@ -46,11 +49,15 @@ function History() {
 
     const cardsPerPage = 3;
 
+    const brandLookup = Object.fromEntries(
+        brandEnData.map(({ brand_kr, brand_en }) => [brand_kr, brand_en])
+    );
+
     useEffect(() => {
         const localAuth = JSON.parse(localStorage.getItem("auth"));
         const memberId = localAuth?.id;
         const name = localAuth?.name;
-        setUserName(name || "사용자");
+        setUserName(name || "user");
 
         if (memberId) {
             dispatch(fetchHistory(memberId))
@@ -68,7 +75,8 @@ function History() {
                 recommendations: item.recommendations.map((rec) => ({
                     ...rec,
                     perfumeImageUrl: rec.productImageUrls?.[0] || "",
-                    perfumeName: rec.productNameKr || "",
+                    perfumeNameKr: rec.productNameKr || "",
+                    perfumeNameEn: rec.productNameEn || "",
                     perfumeBrand: rec.productBrand || "",
                     reason: rec.reason || "",
                     situation: rec.situation || "",
@@ -129,7 +137,7 @@ function History() {
         try {
             const canvas = await html2canvas(divRef.current, { scale: 2, useCORS: true, allowTaint: false });
             canvas.toBlob((blob) => {
-                if (blob !== null) saveAs(blob, "향수 히스토리 카드.png");
+                if (blob !== null) saveAs(blob, "sentique_history_card.png");
             });
         } catch (error) {
             console.error("Error converting div to image:", error);
@@ -138,7 +146,7 @@ function History() {
 
     return (
         <div className="history-main-container">
-            <img src="/images/logo.png" alt="Logo" className="history-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} />
+            <img src="/images/logo-en.png" alt="Logo" className="history-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }} />
             <div className="history-header">
                 {uniqueDates.map((date, index) => (
                     <button
@@ -153,21 +161,21 @@ function History() {
 
             <div className="history-container" ref={divRef} style={{ borderColor: currentCardLineColor }}>
                 {mappedHistory.length === 0 ? (
-                    <div className="empty-history-message">저장된 향기 히스토리가 없습니다.</div>
+                    <div className="empty-history-message">{language === 'english' ? "No saved fragrance history." : "저장된 향기 히스토리가 없습니다."}</div>
                 ) : (
                     <>
                         <div className="history-title-set">
-                            <h2 className="history-main-title">{`${userName}님의 향수 카드`}</h2>
-                            <h2 className="history-title" style={{ color: currentCardLineColor }}>{currentCardLineName} 계열</h2>
+                            <h2 className="history-main-title">{`${userName}`}{language === 'english' ? "'s fragrance card" : "님의 향수 카드"}</h2>
+                            <h2 className="history-title" style={{ color: currentCardLineColor }}>{currentCardLineName} {language === 'english' ? "line" : "계열"}</h2>
                         </div>
                         {/* 카드 컨테이너 - 이미지와 기본 정보만 표시 */}
                         <div className="card-container">
                             {visibleCards.map((card, index) => (
                                 <div className="history-card" key={index}>
-                                    <img src={card.perfumeImageUrl || "https://via.placeholder.com/150"} alt={card.perfumeName || "Default"} className="card-image" />
+                                    <img src={card.perfumeImageUrl || "https://via.placeholder.com/150"} alt={card.perfumeNameEn || "Default"} className="card-image" />
                                     <div className="card-content">
-                                        <h3 className="card-perfume-name">{card.perfumeName}</h3>
-                                        <h3 className="card-perfume-brand">{card.perfumeBrand}</h3>
+                                        <h3 className="card-perfume-name">{language === 'english' ? card.perfumeNameEn : card.perfumeNameKr}</h3>
+                                        <h3 className="card-perfume-brand">{language === "english" ? brandLookup[card.perfumeBrand] || card.perfumeBrand : card.perfumeBrand}</h3>
                                     </div>
                                 </div>
                             ))}
@@ -177,14 +185,14 @@ function History() {
                         <div className="all-recommendations">
                             {visibleCards.map((card, index) => (
                                 <div className="recommendation-group" key={index}>
-                                    <h4 className="recommendation-perfume-name">{card.perfumeName}</h4>
+                                    <h4 className="recommendation-perfume-name">{language === 'english' ? card.perfumeNameEn : card.perfumeNameKr}</h4>
                                     <div className="recommendation-row">
                                         <div className="recommendation-box">
-                                            <span className="recommendation-label">추천 이유</span>
+                                            <span className="recommendation-label">{language === 'english' ? "Why It's Recommended" : "추천 이유"}</span>
                                             <p className="recommendation-text">{card.reason}</p>
                                         </div>
                                         <div className="recommendation-box">
-                                            <span className="recommendation-label">추천 상황</span>
+                                            <span className="recommendation-label">{language === 'english' ? "When to Use" : "추천 상황"}</span>
                                             <p className="recommendation-text">{card.situation}</p>
                                         </div>
                                     </div>
@@ -207,9 +215,11 @@ function History() {
                     ></span>
                 ))}
             </div>
+            
+            {mappedHistory.length === 0 ? "" : (
             <div className="imageSaveButton">
-                <button className="imageSave" onClick={handleDownload}>이미지 저장 <Download strokeWidth={2} size={20} /></button>
-            </div>
+                <button className="imageSave" onClick={handleDownload}>{language === 'english' ? "Save Image" : "이미지 저장"} <Download strokeWidth={2} size={20} /></button>
+            </div>)}
         </div>
     );
 }
