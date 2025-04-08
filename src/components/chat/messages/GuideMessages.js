@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../../css/chat/GuideMessages.module.css';
 import { useLocation } from 'react-router-dom';
+
+const language = localStorage.getItem('language') || 'english';
+
 const guideMessages = [
-    { id: 1, text: "우디한 향을 추천받고 싶어요.", cleanText: "우디한 향을 추천받고 싶어요." },
-    { id: 2, text: "카페 분위기에 어울리는 향수를 추천해 주세요! (이미지를 추가하면 더 정확한 추천이 가능합니다.)", cleanText: "카페 분위기에 어울리는 향수를 추천해 주세요.", imageRelated: true },
-    { id: 3, text: "스트릿 패션에 어울리는 향수를 알고 싶어요. (패션 사진을 첨부하면 더 정확한 추천을 받을 수 있어요!)", cleanText: "스트릿 패션에 어울리는 향수를 알고 싶어요.", imageRelated: true }
+    { id: 1, text: (language === 'english' ? "I'd like a woody fragrance recommendation." : "우디한 향을 추천받고 싶어요."), cleanText: (language === 'english' ? "I'd like a woody fragrance recommendation." : "우디한 향을 추천받고 싶어요.") },
+    { id: 2, text: (language === 'english' ? "Recommend me a perfume that suits a café atmosphere! (Adding an interior image will help with a more accurate recommendation!)" : "카페 분위기에 어울리는 향수를 추천해 주세요! (이미지를 추가하면 더 정확한 추천이 가능합니다!)"), cleanText: (language === 'english' ? "Recommend me a perfume that suits a café atmosphere!" : "카페 분위기에 어울리는 향수를 추천해 주세요."), imageRelated: true },
+    { id: 3, text: (language === 'english' ? "I want to find a fragrance that matches street fashion. (Attaching a fashion photo will provide a more precise recommendation!)" : "스트릿 패션에 어울리는 향수를 알고 싶어요. (패션 사진을 첨부하면 더 정확한 추천을 받을 수 있어요!)"), cleanText: (language === 'english' ? "I want to find a fragrance that matches street fashion." : "스트릿 패션에 어울리는 향수를 알고 싶어요."), imageRelated: true }
 ];
 
 // 괄호 안의 텍스트 추출 함수
@@ -57,7 +60,7 @@ const GuideMessages = ({ onSend }) => {
                             {message.cleanText}
                         </button>
                         {/* 괄호 안의 텍스트가 존재할 경우만 툴팁 표시 */}
-                        {tooltipText && <span className={styles.tooltip}>{tooltipText}</span>}
+                        {tooltipText && <span className={styles.tooltip} style={{ left: language === 'english' ? '30%' : '49%' }}>{tooltipText}</span>}
                     </div>
                 );
             })}

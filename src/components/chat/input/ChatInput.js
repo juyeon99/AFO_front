@@ -19,6 +19,9 @@ const ChatInput = memo(({
     input,               // 입력값 상태 (외부에서 관리)
     setInput             // 입력값 상태 변경 함수 (외부에서 관리)
 }) => {
+    const language = localStorage.getItem('language') || 'english';
+    const placeholderText = language === 'english' ? "Type a message..." : "메시지를 입력하세요";
+    
     // 메시지 입력시 실행되는 함수
     const handleInputChange = (e) => {
         setInput(e.target.value);
@@ -115,7 +118,7 @@ const ChatInput = memo(({
                     onChange={handleInputChange}
                     onPaste={handlePaste}       // 이미지 붙여넣기 처리
                     onKeyPress={handleKeyPress} // Enter 키로 메시지 전송
-                    placeholder="메시지를 입력하세요"
+                    placeholder={placeholderText}
                     className={styles.input}
                 />
 

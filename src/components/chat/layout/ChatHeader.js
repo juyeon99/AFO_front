@@ -16,25 +16,27 @@ import styles from '../../../css/chat/ChatHeader.module.css';
  */
 
 const ChatHeader = memo(({ onGoBack }) => {
+    const language = localStorage.getItem('language') || 'english';
+
     return (
         <div className={styles.header}>
             {/* 뒤로가기 버튼 */}
             <button
                 className={styles.backButton}
                 onClick={onGoBack}
-                aria-label="뒤로 가기"
+                aria-label="back"
             >
                 <img src="/images/back.png" alt="back" className={styles.backImage} />
             </button>
 
             {/* 홈으로 이동하는 로고 링크 */}
             <NavLink to="/">
-                <img src="/images/logo.png" alt="방향" className={styles.titleImage} />
+                <img src="/images/logo-en.png" alt="Sentique" className={styles.titleImage} />
             </NavLink>
 
             {/* 서비스 설명 문구 */}
             <p className={styles.subtitle}>
-                일상의 순간을 향으로 기록해보세요.
+                {language === 'english' ? "Capture the moments of your day with fragrance." : "일상의 순간을 향으로 기록해보세요."}
             </p>
         </div>
     );

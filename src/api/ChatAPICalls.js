@@ -2,6 +2,8 @@ import apis from "./Apis";
 
 // 채팅 추천 요청
 export const requestRecommendations = async (userInput, imageFile = null, userId = null) => {
+    const language = localStorage.getItem('language') || 'english';
+    
     console.log('ChatAPICalls에서 받은 데이터:', { userInput, imageFile, userId });
 
     try {
@@ -31,6 +33,9 @@ export const requestRecommendations = async (userInput, imageFile = null, userId
             }
         }
 
+        formData.append("language", language);
+        
+        // 사용자 ID가 있는 경우 추가
         if (userId) formData.append("memberId", userId);
 
         // FormData 내용 로깅 (디버깅용)

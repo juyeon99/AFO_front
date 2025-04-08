@@ -21,6 +21,7 @@ const SearchBar = ({
     currentHighlightedIndex,    // 현재 하이라이트된 검색 결과 인덱스
     highlightedMessageIndexes,   // 검색된 메시지 인덱스 배열
 }) => {
+    const language = localStorage.getItem('language') || 'english';
 
     // 검색어 입력 처리
     const handleChange = (e) => {
@@ -72,7 +73,7 @@ const SearchBar = ({
             {/* 검색어 입력 필드 */}
             <input
                 type="text"
-                placeholder="검색할 단어를 입력해주세요"
+                placeholder={language === 'english' ? "Enter the word to search." : "검색할 단어를 입력해주세요"}
                 className={styles.searchInput}
                 value={searchInput}
                 onChange={handleChange}

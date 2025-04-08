@@ -5,6 +5,7 @@ import { useRecommendation } from '../../../pages/chat/hooks/useRecommendation';
 
 const SaveScentButton = ({ chatId }) => {
     const { handleCreateScentCard } = useRecommendation();
+    const language = localStorage.getItem('language') || 'english';
 
     const handleSaveScent = async () => {
         try {
@@ -20,7 +21,7 @@ const SaveScentButton = ({ chatId }) => {
             onClick={handleSaveScent}
         >
             <BookmarkAddIcon sx={{ fontSize: 24 }} />
-            <span>향기 기록하기</span>
+            <span>{language === 'english' ? "Record Scent" : "향기 기록하기"}</span>
             <div className={styles.buttonEffect} />
         </button>
     );

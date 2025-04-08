@@ -66,6 +66,7 @@ function Main() {
 
             const formData = new FormData();
             formData.append("file", file);
+            formData.append("language", language);
 
             const response = await axios.post("http://localhost:8080/scentlens/get_image_search_result", formData, {
                 headers: {

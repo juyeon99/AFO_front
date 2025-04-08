@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from '../../../css/chat/RecommendationItem.module.css';
 import StarIcon from '@mui/icons-material/Star';  // 일반 추천
 import StyleIcon from '@mui/icons-material/Style'; // 패션
@@ -7,6 +7,8 @@ import SpaIcon from '@mui/icons-material/Spa';     // 테라피
 import SaveScentButton from './SaveScentButton';
 import { useSelector } from 'react-redux';
 import { selectChatHistory } from '../../../module/ChatModule';
+import brandEnData from "../../../data/brands_en.json";
+import gradeEnData from "../../../data/grades_en.json";
 
 // 전역 변수로 마지막 lineId 저장
 let globalLastLineId = null;
@@ -14,6 +16,7 @@ let globalLastLineId = null;
 const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId, recommendationType, lineId }) => {
     const [currentLineId, setCurrentLineId] = useState(lineId);
     const chatHistory = useSelector(selectChatHistory);
+    const language = localStorage.getItem('language') || 'english';
 
     // 모든 컴포넌트에서 공유할 수 있도록 로컬 스토리지에 저장
     const saveLastLineIdToStorage = (id) => {
@@ -27,6 +30,14 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
         const storedId = localStorage.getItem('lastLineId');
         return storedId ? parseInt(storedId, 10) : null;
     };
+
+    const brandLookup = Object.fromEntries(
+        brandEnData.map(({ brand_kr, brand_en }) => [brand_kr, brand_en])
+    );
+
+    const gradeLookup = Object.fromEntries(
+        gradeEnData.map(({ grade_kr, grade_en }) => [grade_kr, grade_en])
+    );
 
     // 컴포넌트 마운트 시 전체 채팅 기록에서 가장 최근의 lineId 찾기
     useEffect(() => {
@@ -83,7 +94,7 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
                 return {
                     icon: <StarIcon sx={{ fontSize: 28, color: '#fa9522' }} />,  // 일반 추천 아이콘
                     label: 'Perfume Recommendation',
-                    subLabel: '당신을 위한 맞춤 향수 추천',
+                    subLabel: (language === 'english' ? "Personalized Perfume Recommendations for You" : '당신을 위한 맞춤 향수 추천'),
                     className: styles.generalRecommendation,
                     theme: '#fa9522'
                 };
@@ -91,7 +102,7 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
                 return {
                     icon: <StyleIcon sx={{ fontSize: 28, color: '#ff6bf8' }} />,  // 패션 아이콘
                     label: 'Fashion & Fragrance',
-                    subLabel: '패션과 조화로운 향수 추천',
+                    subLabel: (language === 'english' ? "Perfume Recommendations that Harmonize with Your Fashion" : '패션과 조화로운 향수 추천'),
                     className: styles.fashionRecommendation,
                     theme: '#ff6bf8'
                 };
@@ -99,7 +110,7 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
                 return {
                     icon: <HomeIcon sx={{ fontSize: 28, color: '#51CF66' }} />,  // 인테리어 아이콘
                     label: 'Space & Scent',
-                    subLabel: '공간을 채우는 향기 추천',
+                    subLabel: (language === 'english' ? "Fragrances that Fill Your Space" : '공간을 채우는 향기 추천'),
                     className: styles.interiorRecommendation,
                     theme: '#51CF66'
                 };
@@ -107,7 +118,7 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
                 return {
                     icon: <SpaIcon sx={{ fontSize: 28, color: '#845EF7' }} />,  // 테라피 아이콘
                     label: 'Aroma Therapy',
-                    subLabel: '당신의 삶을 위한 테라피 향수',
+                    subLabel: (language === 'english' ? "Therapeutic Scents for Your Life" : '당신의 삶을 위한 테라피 향 추천'),
                     className: styles.therapyRecommendation,
                     theme: '#845EF7'
                 };
@@ -115,7 +126,7 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
                 return {
                     icon: <StarIcon sx={{ fontSize: 28, color: '#007AFF' }} />,
                     label: 'Perfume Recommendation',
-                    subLabel: '당신을 위한 맞춤 향수 추천',
+                    subLabel: (language === 'english' ? "Personalized Perfume Recommendations for You" : '당신을 위한 맞춤 향수 추천'),
                     className: styles.generalRecommendation,
                     theme: '#007AFF'
                 };
@@ -168,6 +179,9 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
         };
         return lineNames[lineId] || '';
     };
+    
+    // 마지막 lineId를 로컬 스토리지에 저장 (각각의 recommendation에 맞는 lineId X)
+    saveLastLineIdToStorage(lineId)
 
     const currentLineColor = getLineColor(currentLineId);
     console.log('Current line color:', currentLineColor);
@@ -197,14 +211,14 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
                     }}
                     style={{ 
                         cursor: 'pointer',
-                        border: `5px solid ${currentLineColor}`,  // 컨테이너에 테두리 추가
+                        // border: `5px solid ${currentLineColor}`,  // 컨테이너에 테두리 추가
                         borderRadius: '10px',  // 모서리 둥글게
                         overflow: 'hidden'     // 내부 이미지가 테두리를 넘지 않도록
                     }}
                 >
                     <img
                         src={imageUrl}
-                        alt="향 이미지"
+                        alt="fragrance"
                         className={styles.commonImage}
                         style={{ 
                             width: '100%',     // 컨테이너에 맞게 너비 조정
@@ -219,20 +233,24 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
             {/* 제품 카드 그리드 */}
             <div className={styles.cardGrid}>
                 {recommendations.map((product, index) => (
-                    <div key={index} className={styles.recommendationCard} style={{ border: `5px solid ${currentLineColor}` }}>
+                    <div 
+                        key={index} 
+                        className={styles.recommendationCard} 
+                        // style={{ border: `5px solid ${currentLineColor}` }}
+                    >
                         <img
                             src={product.productImageUrls?.[0]}
                             alt={product.productNameKr}
                             className={styles.productImage}
                         />
                         <div className={styles.cardContent}>
-                            <p className={styles.productLine}>
+                            {/* <p className={styles.productLine}>
                                 {getLineName(currentLineId)}
-                            </p>
-                            <p className={styles.productBrand}>{product.productBrand}</p>
-                            <h3 className={styles.productTitle}>{product.productNameKr}</h3>
+                            </p> */}
+                            <p className={styles.productBrand}>{language === "english" ? brandLookup[product.productBrand] || product.productBrand : product.productBrand}</p>
+                            <h3 className={styles.productTitle}>{language === 'english' ? product.productNameEn : product.productNameKr}</h3>
                             {product.productGrade && product.productGrade.toLowerCase() !== 'none' && (
-                                <p className={styles.productGrade}>{product.productGrade}</p>
+                                <p className={styles.productGrade}>{language === "english" ? gradeLookup[product.productGrade] || product.productGrade : product.productGrade}</p>
                             )}
                         </div>
                     </div>
@@ -240,21 +258,24 @@ const RecommendationItem = ({ imageUrl, recommendations, openImageModal, chatId,
             </div>
 
             {/* 통합된 설명 박스 */}
-            <div className={styles.unifiedDescriptionBox} style={{ border: `5px solid ${currentLineColor}` }}>
+            <div 
+                className={styles.unifiedDescriptionBox} 
+                // style={{ border: `5px solid ${currentLineColor}` }}
+            >
                 <div className={styles.reasonSection}>
-                    <h4 className={styles.descriptionTitle}>추천 이유</h4>
+                    <h4 className={styles.descriptionTitle}>{language === 'english' ? "Why It's Recommended" : "추천 이유"}</h4>
                     {recommendations.map((product, index) => (
                         <div key={index} className={styles.descriptionItem}>
-                            <span className={styles.productLabel}>{product.productNameKr}</span>
+                            <span className={styles.productLabel}>{language === 'english' ? product.productNameEn : product.productNameKr}</span>
                             <p className={styles.descriptionText}>{product.reason}</p>
                         </div>
                     ))}
                 </div>
                 <div className={styles.situationSection}>
-                    <h4 className={styles.descriptionTitle}>사용 상황</h4>
+                    <h4 className={styles.descriptionTitle}>{language === 'english' ? "When to Use" : "사용 상황"}</h4>
                     {recommendations.map((product, index) => (
                         <div key={index} className={styles.descriptionItem}>
-                            <span className={styles.productLabel}>{product.productNameKr}</span>
+                            <span className={styles.productLabel}>{language === 'english' ? product.productNameEn : product.productNameKr}</span>
                             <p className={styles.descriptionText}>{product.situation}</p>
                         </div>
                     ))}

@@ -2,7 +2,7 @@
     text-align: center;
     width: 100%;
     position: relative;
-    padding: 20px 0;
+    /* padding: 20px 0; */
 }
 
 .backButton {
@@ -32,7 +32,7 @@
 }
 
 .titleImage {
-    max-width: 120px;
+    max-width: 150px;
     height: auto;
     margin: 0 auto;
     display: block;

@@ -14,13 +14,14 @@ import { useChatHistory } from './useChatHistory';
  */
 export const useMessages = () => {
     const dispatch = useDispatch();
+    const language = localStorage.getItem('language') || 'english';
 
     // 초기 AI 메시지를 위한 고정된 ID와 메시지 설정
     const INITIAL_MESSAGE_ID = '000000000000000000000000';
     const [messages, setMessages] = useState([{
         id: INITIAL_MESSAGE_ID,  // 고정된 ID 사용
         type: 'AI',
-        content: '안녕하세요. 센티크입니다. 당신에게 어울리는 향을 찾아드리겠습니다.',
+        content: language === 'english' ? "Hi there! This is Scentique. I’m here to help you discover a fragrance that feels just right for you." : '안녕하세요. 센티크입니다. 당신에게 어울리는 향을 찾아드리겠습니다.',
         mode: 'chat',
         isInitialMessage: true, // 초기 메시지 여부 플래그
         style: {
