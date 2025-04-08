@@ -19,6 +19,7 @@ const ImageCropper = ({ image, onCropComplete, onCancel }) => {
     });
     const [completedCrop, setCompletedCrop] = useState(null);
     const imgRef = useRef(null);
+    const language = localStorage.getItem('language') || 'english';
 
     // 이미지 로드 완료 시 전체 이미지를 크롭 영역으로 설정
     const onImageLoad = (e) => {
@@ -171,7 +172,7 @@ const ImageCropper = ({ image, onCropComplete, onCancel }) => {
                         e.target.style.transform = 'scale(1)';
                     }}
                 >
-                    확인
+                    {language === 'english' ? "Confirm" : "확인"}
                 </button>
                 <button
                     style={buttonStyle}
@@ -185,7 +186,7 @@ const ImageCropper = ({ image, onCropComplete, onCancel }) => {
                         e.target.style.transform = 'scale(1)';
                     }}
                 >
-                    취소
+                    {language === 'english' ? "Cancel" : "취소"}
                 </button>
             </div>
         </div>

@@ -1,3 +1,9 @@
+@font-face {
+    font-family: 'MaruBuri';
+    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.eot);
+    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.eot?#iefix) format("embedded-opentype"), url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff2) format("woff2"), url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff) format("woff"), url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.ttf) format("truetype");
+}
+
 /* 배경 테마 */
 .lens_scent_lens.default {
     background: linear-gradient(to bottom, rgba(239, 237, 237, 0.7), #ffffff);
@@ -85,7 +91,7 @@
     font-size: 1.8rem;
     color: #333;
     margin-bottom: 2rem;
-    font-family: 'Nanum Myeongjo', serif;
+    font-family: 'MaruBuri', serif;
 }
 
 /* 버튼 컨테이너 */
@@ -136,7 +142,7 @@
     font-size: 1.8rem;
     color: #333;
     width: 100%;
-    font-family: 'Nanum Myeongjo', serif;
+    font-family: 'MaruBuri', serif;
 }
 
 .additional_perfumes {

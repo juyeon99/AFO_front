@@ -16,6 +16,7 @@ function ScentLens() {
     const [showMore, setShowMore] = useState(false);
     const additionalSectionRef = useRef(null);
     const currentTheme = useTheme();
+    const language = localStorage.getItem('language') || 'english';
 
     // 메인 캐러셀 자동 슬라이드 효과
     // 3초마다 다음 향수로 자동 전환
@@ -43,7 +44,7 @@ function ScentLens() {
             <button
                 className={styles.back_button}
                 onClick={() => navigate(-1)}
-                aria-label="뒤로 가기"
+                aria-label="back"
             >
                 <img src="/images/back.png" alt="back" className={styles.back_image} />
             </button>
@@ -51,7 +52,7 @@ function ScentLens() {
             {/* 메인 섹션 */}
             <div className={styles.main_section}>
                 <div className={styles.title_container}>
-                    <h2>이미지와 가장 유사한 향수</h2>
+                    <h2>{language === 'english' ? "The perfumes most similar to the image" : "이미지와 가장 유사한 향수"}</h2>
                 </div>
 
                 {/* 캐러셀 컴포넌트 */}
@@ -72,14 +73,14 @@ function ScentLens() {
                     onClick={handleMoreClick}
                     whileHover={{ scale: 1.05 }}
                 >
-                    {showMore ? '접기' : '더 많은 유사 향수 보기'}
+                    {showMore ? (language === 'english' ? "Close" : "접기") : (language === 'english' ? "View More Similar Perfumes" : "더 많은 유사 향수 보기")}
                 </motion.button>
             </div>
 
             {/* 추가 향수 섹션 - showMore가 true일 때 표시 */}
             {showMore && (
                 <div className={`${styles.additional_section} ${styles[currentTheme]}`} ref={additionalSectionRef}>
-                    <h2>추가 유사 향수</h2>
+                    <h2>{language === 'english' ? "More Similar Perfumes" : "추가 유사 향수"}</h2>
                     <div className={styles.additional_perfumes}>
                         {morePerfumes.map((perfume, index) => (
                             <PerfumeCard key={index} perfume={perfume} currentTheme={currentTheme} />
